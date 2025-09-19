@@ -13,7 +13,7 @@ import moderngl
 import sys
 from array import array
 
-# from scripts.entities.player import Player
+from scripts.entities.player import Player
 
 from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
@@ -33,7 +33,7 @@ class Game:
         self.initialise()
 
         #initalising pygame window
-        flags = pygame.RESIZABLE | pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL
+        flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL
         self.window = pygame.display.set_mode(SIZE, flags, vsync=1)
         self.screen = pygame.Surface(SIZE)
         pygame.display.toggle_fullscreen()
@@ -59,7 +59,7 @@ class Game:
         # self.debugger = Debugger(self)
 
 
-        # self.player = Player(self, [self.all_sprites, self.entities], vec(SIZE) / 2 + vec(TILE_SIZE * 1.5, 0))
+        self.player = Player(self, [self.all_sprites, self.entities])
 
         ####################################################################################
 
@@ -151,6 +151,8 @@ class Game:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
+
+            self.all_sprites.update()
 
             # self.state_loader.update()
 

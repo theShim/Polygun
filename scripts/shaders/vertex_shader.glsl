@@ -5,7 +5,6 @@ in vec2 texcoord;
 out vec2 uvs;
 
 uniform float zoom;
-// uniform vec2 resolution;
 
 void main() {
 
