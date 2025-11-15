@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.acc.y = 1 * self.run_speed
             if self.vel.y < 0: self.vel.y = 0
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
+        if keys[pygame.K_e] or keys[pygame.K_UP]:
             self.acc.y = -1 * self.run_speed
             if self.vel.y > 0: self.vel.y = 0
 
@@ -81,6 +81,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and not self.jumping:
             self.jumping = True
             self.jump_time = 0
+
 
         #the psuedo height stuff, just projectile motion
         if self.jumping:
@@ -159,14 +160,15 @@ class Player(pygame.sprite.Sprite):
         self.move()
         # self.draw()
 
-        if self.pos.x < 0:
-            self.pos.x = 0
-        if self.pos.x > WIDTH:
-            self.pos.x = WIDTH
-        if self.pos.y < 0:
-            self.pos.y = 0
-        if self.pos.y > HEIGHT:
-            self.pos.y = HEIGHT
+        # if self.pos.x < 0:
+        #     self.pos.x = 0
+        # if self.pos.x > WIDTH:
+        #     self.pos.x = WIDTH
+        # if self.pos.y < 0:
+        #     self.pos.y = 0
+        # if self.pos.y > HEIGHT:
+        #     self.pos.y = HEIGHT
+
         self.shader_draw()
 
     def draw(self):
@@ -193,7 +195,7 @@ class Player(pygame.sprite.Sprite):
         points = rot_2d(points, self.angle)
         jump_scale = max(0.25, 1 -(self.jump_height / self.max_jump_height))
         
-        pygame.draw.polygon(self.screen, (0, 0, 0, 0), (points * (jump_scale * 1.25)) + self.pos + vec(0, 4 * jump_scale))
+        pygame.draw.polygon(self.screen, (0, 0, 0, 0), (-self.game.offset + points * (jump_scale * 1.25)) + self.pos + vec(0, 4 * jump_scale))
         pygame.draw.polygon(temp_surf, (0, 114, 110), points * 1.25 + center - vec(0, self.jump_height))
         pygame.draw.polygon(temp_surf, (0, 255, 247), points + center - vec(0, self.jump_height))
 
@@ -201,5 +203,5 @@ class Player(pygame.sprite.Sprite):
         #temp_surf = pygame.transform.flip(self.game.shader_handler.SHADERS["invert"].apply(temp_surf), flip_x=True, flip_y=False)
 
         # Blit result to the main screen
-        rect = temp_surf.get_rect(center=self.pos)
+        rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)

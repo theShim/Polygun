@@ -70,7 +70,7 @@ class Spark(pygame.sprite.Sprite):
             vec(math.cos(self.angle - math.pi), math.sin(self.angle - math.pi)) * 3 * self.scale * self.speed + vec(random.random(), random.random())*self.speed,
             vec(math.cos(self.angle + math.pi/2), math.sin(self.angle + math.pi/2))  * 0.3 * self.scale * self.speed,
         ])
-        points += self.pos + self.game.offset
+        points += self.pos - self.game.offset
 
         if not self.shadow_height:
             pygame.draw.polygon(self.screen, self.shadow_col, points + [0, 2])

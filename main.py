@@ -130,14 +130,14 @@ class Game:
 
     def calculate_offset(self):
         #have the screen offset kinda lerp to the player location
-        self.offset.x += (self.player.rect.centerx - WIDTH/2 - self.offset.x) / CAMERA_FOLLOW_SPEED
-        self.offset.y += (self.player.rect.centery - HEIGHT/2 - self.offset.y) / CAMERA_FOLLOW_SPEED
+        self.offset.x += (self.player.pos.x - WIDTH/2 - self.offset.x) / CAMERA_FOLLOW_SPEED
+        self.offset.y += (self.player.pos.y - HEIGHT/2 - self.offset.y) / CAMERA_FOLLOW_SPEED
 
         #restricting the offsets
         #MAKE THIS DIFFERENT ACCORDING TO CUSTOM STAGE SIZES LATER
         #e.g. if self.offset.x < self.stage.offset.bounds[0]: x = self.stage.offset.bounds[0]
-        if self.offset.x < 0:
-            self.offset.x = 0
+        # if self.offset.x < 0:
+        #     self.offset.x = 0
         # if self.offset.x > math.inf:
         #     self.offset.x = math.inf
 
@@ -167,6 +167,7 @@ class Game:
                         running = False
                     
             self.screen.fill((18, 35, 54))
+            self.calculate_offset()
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
@@ -178,9 +179,9 @@ class Game:
             self.surf.fill((0, 0, 255), [50, 0, 50, 100])
             surf = self.shader_handler.SHADERS["invert"].apply(self.surf)
             # surf.set_colorkey((0, 0, 0, 0))
-            self.screen.blit(surf, (100, 40))
+            self.screen.blit(surf, (100, 40) - self.offset)
 
-            pygame.draw.circle(self.screen, (255, 0, 0, 120), vec(WIDTH * 0.7, HEIGHT/2), 50)
+            pygame.draw.circle(self.screen, (255, 0, 0, 120), vec(WIDTH * 0.7, HEIGHT/2) - self.offset, 50)
             self.all_sprites.update()
 
             # self.state_loader.update()
