@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.acc.y = 1 * self.run_speed
             if self.vel.y < 0: self.vel.y = 0
-        if keys[pygame.K_e] or keys[pygame.K_UP]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             self.acc.y = -1 * self.run_speed
             if self.vel.y > 0: self.vel.y = 0
 

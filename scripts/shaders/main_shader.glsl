@@ -14,6 +14,17 @@ vec2 pixelate(vec2 uv) {
     return vec2(dx * floor(uv.x / dx), dy * floor(uv.y / dy));
 }
 
+vec3 vignette(vec2 uv, vec3 col) {
+    // float offset = floor(time * 0.004) * 0.2;
+    // vec2 noiseSample = texture(noiseTex, uv * 10 - offset).rg - 0.5;
+    // uv += noiseSample * 0.1;
+
+    vec2 circ_center = vec2(0.5, 0.5);
+    float dist = distance(uv, circ_center);
+    float vig = smoothstep(0.58, 0.3, dist); // inner < outer = fade inward
+    return col * mix(0.4, 1.1, vig); // inner = darker edge
+}
+
 void main() {
     time;
     f_color = vec4(texture(tex, uvs).rgb, 1.0);
@@ -36,6 +47,8 @@ void main() {
     // Optional: tiny warm tint (looks like paper reflection)
     pencil *= vec3(1.05, 1.02, 0.97);
 
-    f_color = vec4(pencil, 1.0);
+    vec3 final_colour = vignette(uvs, pencil);
+
+    f_color = vec4(final_colour, 1.0);
 
 }
