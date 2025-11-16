@@ -53,7 +53,7 @@ class Sprite_Shader:
         width, height = surface.get_size()
 
         # Convert the Pygame surface to bytes, flipped vertically to match OpenGL coordinates
-        tex_bytes = pygame.image.tobytes(surface, "RGBA", True)
+        tex_bytes = pygame.image.tobytes(surface, "RGBA", not True)
 
         # Upload texture to GPU
         tex = self.ctx.texture((width, height), 4, tex_bytes)
