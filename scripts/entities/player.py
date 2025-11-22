@@ -200,7 +200,7 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.polygon(temp_surf, (0, 255, 247), points + center - vec(0, self.jump_height))
 
         # Apply shader only to that region
-        temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
+        # temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
 
         # Blit result to the main screen
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)

@@ -16,6 +16,7 @@ import numpy as np
 
 from scripts.entities.player import Player
 from scripts.shaders.shader import Shader_Handler
+from scripts.states.state_loader import State_Loader
 
 from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
@@ -65,9 +66,8 @@ class Game:
         self.entities = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
 
-        #
-        # self.state_loader = State_Loader(self, start="debug")
-        # self.state_loader.populate_states()
+        self.state_loader = State_Loader(self, start="debug")
+        self.state_loader.populate_states()
 
         # self.debugger = Debugger(self)
 
@@ -167,24 +167,25 @@ class Game:
                         running = False
                     
             self.screen.fill((18, 35, 54))
-            self.calculate_offset()
+            # self.calculate_offset()
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
 
-            self.k += math.radians(4)
-            surf = self.surf
-            self.surf.fill((255 * abs(math.sin(self.k)), 0, 0), [0, 0, 100, 100])
-            self.surf.fill((0, 0, 255), [50, 0, 50, 100])
-            surf = self.shader_handler.SHADERS["invert"].apply(self.surf)
+            # self.k += math.radians(4)
+            # surf = self.surf
+            # self.surf.fill((255 * abs(math.sin(self.k)), 0, 0), [0, 0, 100, 100])
+            # self.surf.fill((0, 0, 255), [50, 0, 50, 100])
+            # surf = self.shader_handler.SHADERS["invert"].apply(self.surf)
             # surf.set_colorkey((0, 0, 0, 0))
-            self.screen.blit(surf, (100, 40) - self.offset)
+            # self.screen.blit(surf, (100, 40) - self.offset)
 
-            pygame.draw.circle(self.screen, (255, 0, 0, 120), vec(WIDTH * 0.7, HEIGHT/2) - self.offset, 50)
-            self.all_sprites.update()
 
-            # self.state_loader.update()
+            # for spr in sorted(self.all_sprites, key=lambda spr: spr.pos.y):
+            #     spr.update()
+
+            self.state_loader.update()
 
 
             if DEBUG:
