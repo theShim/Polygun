@@ -49,6 +49,7 @@ def generate_path(min_length=5, max_length=10):
     start = (0, 0)
     cells = [start]
     stack = [start]
+    connections = {}
     target_length = random.randint(min_length, max_length)
 
     #while there are possible cell locations and it hasn't reached the wanted target length,
@@ -68,8 +69,19 @@ def generate_path(min_length=5, max_length=10):
         if next_cell:
             cells.append(next_cell)
             stack.append(next_cell)
+
+            if (x, y) not in connections:
+                connections[(x, y)] = []
+            if (nx, ny) not in connections:
+                connections[(nx, ny)] = []
+            connections[(x, y)].append((nx, ny))
+            connections[(nx, ny)].append((x, y))
         #otherwise just get rid of the cell from the stack entirely
         else:
             stack.pop()
 
-    return cells
+    return cells, connections
+#
+p = generate_path()
+print(p[0])
+print(p[1])
