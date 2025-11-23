@@ -66,7 +66,7 @@ class Game:
         self.entities = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
 
-        self.state_loader = State_Loader(self, start="debug")
+        self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
 
         # self.debugger = Debugger(self)

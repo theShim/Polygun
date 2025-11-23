@@ -4,7 +4,9 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 
 import random
+
 from scripts.states.state_loader import State
+from scripts.world_loading.dungeons import DungeonLevel
 
     ##############################################################################################
 
@@ -16,4 +18,4 @@ class Dungeon(State):
         # self.tilemap.load("tiled/tmx/debug.tmx")
         # # self.game.player.rect.center = [100, -50]
 
-        self.levels = []
+        self.levels = [DungeonLevel(self.game) for _ in range(self.LEVEL_NUM)]
