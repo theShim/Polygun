@@ -17,6 +17,7 @@ import numpy as np
 from scripts.entities.player import Player
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
+from scripts.world_loading.tilemap import Tile
 
 from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
@@ -125,8 +126,8 @@ class Game:
         ####################################################################################
 
     def cache_sprites(self):
-        return
-        Player.cache_sprites()
+        Tile.cache_sprites()
+        # Player.cache_sprites()
 
     def calculate_offset(self):
         #have the screen offset kinda lerp to the player location
@@ -166,7 +167,7 @@ class Game:
                     if event.key == pygame.K_q:
                         running = False
                     
-            self.screen.fill((18, 35, 54))
+            self.screen.fill((35, 34, 43))
             # self.calculate_offset()
 
             keys = pygame.key.get_pressed()
