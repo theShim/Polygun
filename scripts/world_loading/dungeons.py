@@ -8,7 +8,7 @@ import random
 from scripts.world_loading.tilemap import Tilemap
 
 from scripts.utils.CORE_FUNCS import vec
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, Z_LAYERS, TILE_SIZE
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE
 
     ##############################################################################################
 

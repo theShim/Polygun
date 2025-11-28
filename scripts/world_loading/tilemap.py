@@ -7,7 +7,7 @@ with contextlib.redirect_stdout(None):
 # from scripts.world_loading.nature.manager import Nature_Manager
 
 from scripts.utils.CORE_FUNCS import vec
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, Z_LAYERS, TILE_SIZE, LEVEL_SIZE
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
 
     ##############################################################################################
     
@@ -82,7 +82,9 @@ class Tile(pygame.sprite.Sprite):
 
         surf = pygame.Surface((TILE_SIZE, TILE_SIZE * 2)) #wall
         surf.fill((56, 56, 67))
+        pygame.draw.rect(surf, (255, 255, 255), [0, 0, TILE_SIZE, TILE_SIZE], 4)
         surf.fill((20, 20, 24), [0, TILE_SIZE, TILE_SIZE, TILE_SIZE])
+        pygame.draw.rect(surf, (70, 70, 70), [0, TILE_SIZE, TILE_SIZE, TILE_SIZE], 4)
         cls.SPRITES[1] = surf
     
     def __init__(self, game, pos: tuple, index: int):

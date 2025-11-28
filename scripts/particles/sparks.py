@@ -10,7 +10,7 @@ import json
 import numpy as np
 
 
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, Z_LAYERS, GRAV, FRIC, TILE_SIZE
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 
     ##############################################################################################
