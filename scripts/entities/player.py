@@ -203,5 +203,7 @@ class Player(pygame.sprite.Sprite):
         # temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
 
         # Blit result to the main screen
+        # pygame.draw.circle(temp_surf, (11, 164, 29), (self.size / 2, self.size / 2), self.size/2)
+        # pygame.draw.circle(temp_surf, (242, 34, 34), (self.size / 2, self.size / 2), self.size/2 * 0.95)
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)

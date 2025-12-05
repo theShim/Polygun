@@ -47,7 +47,7 @@ void main() {
     // Optional: tiny warm tint (looks like paper reflection)
     pencil *= vec3(1.05, 1.02, 0.97);
 
-    vec3 final_colour = vignette(uvs, pencil);
+    vec3 final_colour = pencil; // vignette(uvs, pencil);
 
     f_color = vec4(final_colour, 1.0);
 

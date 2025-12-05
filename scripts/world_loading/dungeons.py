@@ -25,28 +25,31 @@ def generate_path(min_length=5, max_length=10):
         neighbours = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
         random.shuffle(neighbours) #randomise all the possible neighbours surrounding the current cell
         
-        #pick the next available position out of the random neighbour list
-        next_cell = None
-        for nx, ny in neighbours:
-            if (nx, ny) not in cells:
-                next_cell = (nx, ny)
-                break
+        for i in range(2):
+            #pick the next available position out of the random neighbour list
+            next_cell = None
+            for nx, ny in neighbours:
+                if (nx, ny) not in cells:
+                    next_cell = (nx, ny)
+                    break
 
-        #if one of the positions is available, add it to stack and the cell list and repeat the process
-        if next_cell:
-            cells.append(next_cell)
-            stack.append(next_cell)
+            #if one of the positions is available, add it to stack and the cell list and repeat the process
+            if next_cell:
+                neighbours.remove((nx, ny))
+                
+                cells.append(next_cell)
+                stack.append(next_cell)
 
-            if (x, y) not in connections:
-                connections[(x, y)] = []
-            if (nx, ny) not in connections:
-                connections[(nx, ny)] = []
-            connections[(x, y)].append((nx, ny))
-            connections[(nx, ny)].append((x, y))
+                if (x, y) not in connections:
+                    connections[(x, y)] = []
+                if (nx, ny) not in connections:
+                    connections[(nx, ny)] = []
+                connections[(x, y)].append((nx, ny))
+                connections[(nx, ny)].append((x, y))
 
-        #otherwise just get rid of the cell from the stack entirely
-        else:
-            stack.pop()
+            #otherwise just get rid of the cell from the stack entirely
+            else:
+                stack.pop()
 
     return cells, connections
 
@@ -69,6 +72,9 @@ class DungeonLevel:
 
         for node in nodes:
             self.rooms[node] = Room(self.game, node, conns[node])
+            print(node)
+            print(conns[node])
+        print(conns)
 
     def generate_boss_room(self):
         leaves = [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]

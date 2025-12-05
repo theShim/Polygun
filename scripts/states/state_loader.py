@@ -27,10 +27,12 @@ class State_Loader:
     #is created
     def populate_states(self):
         from scripts.states.states.debug_stage import Debug_Stage
+        from scripts.states.states.title_screen import Title_Screen
         from scripts.states.states.dungeon import Dungeon
 
         self.states = {
             "debug" : Debug_Stage(self.game),
+            "title_screen" : Title_Screen(self.game),
             "dungeon" : Dungeon(self.game)
         }
 
