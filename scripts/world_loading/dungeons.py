@@ -72,9 +72,9 @@ class DungeonLevel:
 
         for node in nodes:
             self.rooms[node] = Room(self.game, node, conns[node])
-            print(node)
-            print(conns[node])
-        print(conns)
+        #     print(node)
+        #     print(conns[node])
+        # print(conns)
 
     def generate_boss_room(self):
         leaves = [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]

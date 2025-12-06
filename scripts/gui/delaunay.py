@@ -1,0 +1,96 @@
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
+    from pygame.locals import *
+    
+import random
+import sys
+import math
+import time
+import numpy as np
+
+from scipy.spatial import Delaunay
+
+from scripts.config.SETTINGS import WIDTH, HEIGHT
+from scripts.utils.CORE_FUNCS import vec
+
+    ##############################################################################################
+
+class Del:
+    def __init__(self, game, point_num=100):
+        self.game = game
+        self.screen = self.game.screen
+
+        self.points = np.array([
+            vec(random.uniform(-50, WIDTH+50), random.uniform(-50, HEIGHT+50)) for i in range(point_num)
+        ] + [
+            vec(-50, -50),
+            vec(-50, HEIGHT+50),
+            vec(WIDTH+50, -50),
+            vec(WIDTH+50, HEIGHT+50)
+        ])
+        #movement of each point in a random direction
+        self.vectors = np.array([
+            vec([random.uniform(-1, 1), random.uniform(-1, 1)]) * 0.9 for i in range(point_num)
+        ] + [
+            vec(0, 0),
+            vec(0, 0),
+            vec(0, 0),
+            vec(0, 0),
+        ])
+
+        self.weight = 0
+        self.R = 255
+        self.G = 0
+        self.B = 0
+
+    def update(self):
+        self.points += self.vectors
+
+        #border collisions
+        condition1 = self.points[:, 0] < -50
+        condition2 = self.points[:, 1] < -50
+        condition3 = self.points[:, 0] > WIDTH + 50
+        condition4 = self.points[:, 1] > HEIGHT + 50
+
+        self.vectors[condition1, 0] *= -1
+        self.vectors[condition2, 1] *= -1
+        self.vectors[condition3, 0] *= -1
+        self.vectors[condition4, 1] *= -1
+
+        mousePos = pygame.mouse.get_pos()
+        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
+        scale_x = WIDTH / window_size[0]
+        scale_y = HEIGHT / window_size[1]
+        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+
+        #recalculate the new triangles and render them
+        self.triangles = Delaunay(np.vstack([self.points, mousePos]))
+        self.draw()
+
+    def draw(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            self.weight += 20
+        elif keys[pygame.K_DOWN]:
+            self.weight -= 20
+
+        mousePos = pygame.mouse.get_pos()
+        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
+        scale_x = WIDTH / window_size[0]
+        scale_y = HEIGHT / window_size[1]
+        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+
+        points = np.vstack([self.points, mousePos])
+        for polygon in self.triangles.simplices:
+            polygon = points[polygon]
+
+            height = polygon[polygon[:, 1].argsort()][-1][1]
+            ratio = ((height + self.weight) / HEIGHT)
+            t = min(1, max(0, ratio))
+
+            c = pygame.Color(0, 242, 255).lerp(pygame.Color(91, 44, 131), t)
+            pygame.draw.polygon(self.screen, c, polygon, 0)
+            
+        # for p in self.points:
+        #     pygame.draw.circle(screen, (255 - 255, 255 - 255, 255 - 255), p, 3)
