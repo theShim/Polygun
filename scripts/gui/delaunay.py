@@ -40,12 +40,24 @@ class Del:
         ])
 
         self.weight = 0
-        self.R = 255
-        self.G = 0
-        self.B = 0
+        self.p1 = vec(random.random() * WIDTH, random.random() * HEIGHT)
+        self.v1 = vec([random.uniform(-1, 1), random.uniform(-1, 1)]) * 2
+        self.p2 = vec(random.random() * WIDTH, random.random() * HEIGHT)
+        self.v2 = vec([random.uniform(-1, 1), random.uniform(-1, 1)]) * 2
 
     def update(self):
         self.points += self.vectors
+        self.p1 += self.v1
+        self.p2 += self.v2
+
+        if self.p1.x < -50 or self.p1.x > WIDTH + 50:
+            self.v1.x *= -1
+        if self.p2.x < -50 or self.p2.x > WIDTH + 50:
+            self.v2.x *= -1
+        if self.p1.y < -50 or self.p1.y > HEIGHT + 50:
+            self.v1.y *= -1
+        if self.p2.y < -50 or self.p2.y > HEIGHT + 50:
+            self.v2.y *= -1
 
         #border collisions
         condition1 = self.points[:, 0] < -50
@@ -85,9 +97,14 @@ class Del:
         for polygon in self.triangles.simplices:
             polygon = points[polygon]
 
-            height = polygon[polygon[:, 1].argsort()][-1][1]
-            ratio = ((height + self.weight) / HEIGHT)
-            t = min(1, max(0, ratio))
+            # height = polygon[polygon[:, 1].argsort()][-1][1]
+            # ratio = ((height + self.weight) / HEIGHT)
+            # t = min(1, max(0, ratio))
+
+            centroid = polygon.mean(axis=0)
+            d1 = self.p1.distance_squared_to(centroid)#np.linalg.norm(centroid - self.p1)
+            d2 = self.p2.distance_squared_to(centroid)#np.linalg.norm(centroid - self.p2)
+            t = d1 / (d1 + d2)
 
             c = pygame.Color(0, 242, 255).lerp(pygame.Color(91, 44, 131), t)
             pygame.draw.polygon(self.screen, c, polygon, 0)

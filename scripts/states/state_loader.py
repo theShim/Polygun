@@ -45,6 +45,10 @@ class State_Loader:
     @property
     def current_state(self):
         return self.stack[-1]
+    
+    @property
+    def prev_state(self):
+        return self.stack[-2]
 
     #the current state's tilemap, or the last state that has a tilemap
     # @property

@@ -22,7 +22,7 @@ from scripts.world_loading.tilemap import Tile
 
 from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
-# from scripts.utils.debugger import Debugger
+from scripts.utils.debugger import Debugger
 
 if DEBUG:
     #code profiling for performance optimisations
@@ -71,7 +71,7 @@ class Game:
         self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
 
-        # self.debugger = Debugger(self)
+        self.debugger = Debugger(self)
 
         self.surf = pygame.Surface((100, 100))
         self.k = 0

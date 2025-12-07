@@ -17,7 +17,7 @@ class Title_Screen(State):
     def __init__(self, game):
         super().__init__(game, "title_screen")
 
-        self.d = Del(self, 200)
+        self.d = Del(self, 100)
         self.logo = pygame.image.load("assets/gui/logo.png").convert_alpha()
         self.t = 0
 

@@ -1,6 +1,6 @@
 import pygame
 
-DEBUG = False
+DEBUG = not False
 
 SIZE = WIDTH, HEIGHT = (960, 540) #window size
 WINDOW_TITLE = "WINDOW TITLE"
