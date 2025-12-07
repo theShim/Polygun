@@ -15,6 +15,7 @@ from array import array
 import numpy as np
 
 from scripts.entities.player import Player
+from scripts.gui.custom_fonts import Custom_Font
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.world_loading.tilemap import Tile
@@ -127,6 +128,7 @@ class Game:
 
     def cache_sprites(self):
         Tile.cache_sprites()
+        Custom_Font.init()
         # Player.cache_sprites()
 
     def calculate_offset(self):
