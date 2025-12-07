@@ -29,11 +29,13 @@ class State_Loader:
         from scripts.states.states.debug_stage import Debug_Stage
         from scripts.states.states.title_screen import Title_Screen
         from scripts.states.states.dungeon import Dungeon
+        from scripts.states.states.settings import Settings
 
         self.states = {
             "debug" : Debug_Stage(self.game),
             "title_screen" : Title_Screen(self.game),
-            "dungeon" : Dungeon(self.game)
+            "dungeon" : Dungeon(self.game),
+            "settings" : Settings(self.game),
         }
 
         #adding the first state
@@ -73,7 +75,7 @@ class State_Loader:
         self.last_state = self.stack.pop(-1)
 
     def get_state(self, name):
-        return self.states.get(name, default=None)
+        return self.states[name]
 
         #############################################################################
 

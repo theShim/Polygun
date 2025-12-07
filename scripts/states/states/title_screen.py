@@ -22,11 +22,14 @@ class Title_Screen(State):
         self.t = 0
 
         self.buttons = pygame.sprite.Group()
-        Button(self.game, [self.buttons], "Start", (30, HEIGHT * 0.65))
-        Button(self.game, [self.buttons], "Options", (30, HEIGHT * 0.65 + 60))
-        Button(self.game, [self.buttons], "Quit", (30, HEIGHT * 0.65 + 120))
+        self.start_button = Button(self.game, [self.buttons], "Start", (30, HEIGHT * 0.65))
+        self.options_button = Button(self.game, [self.buttons], "Options", (30, HEIGHT * 0.65 + 60))
+        self.quit_button = Button(self.game, [self.buttons], "Quit", (30, HEIGHT * 0.65 + 120))
 
     def update(self):
+        self.start_button.out_of_frame = False
+        self.options_button.out_of_frame = False
+        self.quit_button.out_of_frame = False
         # self.screen.fill((255, 0, 0))
 
         self.d.update()
@@ -35,3 +38,14 @@ class Title_Screen(State):
         self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2, self.logo.height / 2 + 30 + math.sin(self.t) * 8)))
 
         self.buttons.update()
+
+        if self.options_button.clicked:
+            self.game.state_loader.add_state(self.game.state_loader.get_state("settings"))
+            self.game.state_loader.current_state.prev = self
+            self.start_button.out_of_frame = True
+            self.options_button.out_of_frame = True
+            self.quit_button.out_of_frame = True
+            self.options_button.clicked = False
+        
+        elif self.quit_button.clicked:
+            self.game.running = False

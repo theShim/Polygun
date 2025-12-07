@@ -15,13 +15,20 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT
 rot_2d = lambda points, a: points @ np.array([[math.cos(-a), -math.sin(-a)], [math.sin(-a), math.cos(-a)]])
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, game, groups, text: str, pos: vec):
+    def __init__(self, game, groups, text: str, pos: vec, font = Custom_Font.font2_5):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
-        self.font: Font = Custom_Font.font1
+        self.font: Font = font
         
         self.text = text
+        self.surf = pygame.Surface((self.font.calc_surf_width(self.text) + 6, self.font.space_height + 6), pygame.SRCALPHA)
+        self.font.render(self.surf, self.text, (0, 0, 1), (6, 3))
+        self.font.render(self.surf, self.text, (0, 0, 1), (0, 3))
+        self.font.render(self.surf, self.text, (0, 0, 1), (3, 6))
+        self.font.render(self.surf, self.text, (0, 0, 1), (3, 0))
+        self.font.render(self.surf, self.text, (255, 255, 255), (3, 3))
+
 
         self.pos = vec(pos)
         self.oPos = vec(pos)
@@ -45,6 +52,8 @@ class Button(pygame.sprite.Sprite):
         self.pointer_offset_timer = 0
 
         self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 300, self.font.space_height)
+        self.clicked = False
+        self.out_of_frame = False
 
 
     def update(self):
@@ -54,24 +63,35 @@ class Button(pygame.sprite.Sprite):
         scale_y = HEIGHT / window_size[1]
         mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
 
-        if self.hitbox.collidepoint(mousePos):
-            self.pos = self.pos.lerp(self.target_pos, 0.5)
-            self.line_end = self.line_end.lerp(self.line_target_pos, 0.5)
-            self.pointer_pos = self.pointer_pos.lerp(self.pointer_target_pos, 0.5)
-            self.pointer_angle = lerp(self.pointer_angle, self.pointer_target_angle, 0.5)
-            self.pointer_offset_timer += math.radians(7)
+        if not self.out_of_frame:
+            self.clicked = False
+            if self.hitbox.collidepoint(mousePos):
+                self.pos = self.pos.lerp(self.target_pos, 0.5)
+                self.line_end = self.line_end.lerp(self.line_target_pos, 0.5)
+                self.pointer_pos = self.pointer_pos.lerp(self.pointer_target_pos, 0.5)
+                self.pointer_angle = lerp(self.pointer_angle, self.pointer_target_angle, 0.5)
+                self.pointer_offset_timer += math.radians(7)
+                
+                if pygame.mouse.get_just_pressed()[0]:
+                    self.clicked = True
+            else:
+                self.pos = self.pos.lerp(self.oPos, 0.5)
+                self.line_end = self.line_end.lerp(self.line_oPos, 0.5)
+                self.pointer_pos = self.pointer_pos.lerp(self.pointer_oPos, 0.5)
+                self.pointer_angle = lerp(self.pointer_angle, self.pointer_oAngle, 0.5)
+                self.pointer_offset_timer = 0
         else:
-            self.pos = self.pos.lerp(self.oPos, 0.5)
-            self.line_end = self.line_end.lerp(self.line_oPos, 0.5)
-            self.pointer_pos = self.pointer_pos.lerp(self.pointer_oPos, 0.5)
-            self.pointer_angle = lerp(self.pointer_angle, self.pointer_oAngle, 0.5)
-            self.pointer_offset_timer = 0
+            self.pos = self.pos.lerp(vec(-300, self.pos.y), 0.2)
+            self.line_end = self.line_end.lerp(vec(-200, self.line_oPos.y), 0.1)
+            self.pointer_pos = self.pointer_pos.lerp(vec(-200, self.pointer_oPos.y), 0.1)
 
-        self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x + 3, self.pos.y))
-        self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x - 3, self.pos.y))
-        self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x, self.pos.y + 3))
-        self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x, self.pos.y - 3))
-        self.font.render(self.screen, self.text, (255, 255, 255), (self.pos.x, self.pos.y))
+
+        # self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x + 3, self.pos.y))
+        # self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x - 3, self.pos.y))
+        # self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x, self.pos.y + 3))
+        # self.font.render(self.screen, self.text, (0, 0, 1), (self.pos.x, self.pos.y - 3))
+        # self.font.render(self.screen, self.text, (255, 255, 255), (self.pos.x, self.pos.y))
+        self.screen.blit(self.surf, (self.pos.x - 3, self.pos.y - 3))
 
         pygame.draw.line(self.screen, (0, 0, 0), self.line_oPos, self.line_end + vec(1, 0), 7)
         pygame.draw.line(self.screen, (255, 255, 255), self.line_oPos, self.line_end, 3)

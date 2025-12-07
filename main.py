@@ -155,8 +155,8 @@ class Game:
             PROFILER.enable()
 
         last_time = pygame.time.get_ticks()
-        running = True
-        while running:
+        self.running = True
+        while self.running:
             #deltatime
             self.dt = (current_time := pygame.time.get_ticks()) - last_time
             self.dt /= 1000
@@ -164,10 +164,10 @@ class Game:
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        running = False
+                        self.running = False
                     
             self.screen.fill((35, 34, 43))
             # self.calculate_offset()
