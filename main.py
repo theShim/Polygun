@@ -8,8 +8,6 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 import moderngl
 
-# from scripts.states.state_machine import State_Loader
-
 import sys
 from array import array
 import numpy as np
@@ -18,6 +16,7 @@ from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
+from scripts.utils.controller_handler import ControlsHandler
 from scripts.world_loading.tilemap import Tile
 
 from scripts.config.SETTINGS import *
@@ -72,6 +71,7 @@ class Game:
 
         self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
+        self.controls_handler = ControlsHandler(self)
 
         self.debugger = Debugger(self)
 

@@ -30,12 +30,11 @@ class Title_Screen(State):
         self.start_button.out_of_frame = False
         self.options_button.out_of_frame = False
         self.quit_button.out_of_frame = False
-        # self.screen.fill((255, 0, 0))
 
         self.d.update()
-        self.t += math.radians(200)
+        self.t += math.radians(2)
 
-        self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2, self.logo.height / 2 + 30 + math.sin(self.t) * 80)))
+        self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2, self.logo.height / 2 + 30 + math.sin(self.t) * 8)))
 
         self.buttons.update()
 
