@@ -49,6 +49,33 @@ class Settings(State):
             if self.shadow_pos.x < -WIDTH / 2:
                 self.back_button.clicked = False
                 self.game.state_loader.pop_state()
+                self.back_button.clicked = False
+
+
+        elif self.controller_button.clicked:
+            for button in self.buttons:
+                button.out_of_frame = True
+            
+            self.shadow_pos = self.shadow_pos.lerp(vec(-WIDTH, 0), 0.3)
+            if self.shadow_pos.x < -WIDTH / 2:
+                self.back_button.clicked = False
+                self.game.state_loader.add_state(self.game.state_loader.get_state("controllers_gui"))
+                self.game.state_loader.current_state.prev = self
+                self.controller_button.clicked = False
+
+
+        elif self.keyboard_button.clicked:
+            for button in self.buttons:
+                button.out_of_frame = True
+            
+            self.shadow_pos = self.shadow_pos.lerp(vec(-WIDTH, 0), 0.3)
+            if self.shadow_pos.x < -WIDTH / 2:
+                self.back_button.clicked = False
+                self.game.state_loader.add_state(self.game.state_loader.get_state("keyboard_gui"))
+                self.game.state_loader.current_state.prev = self
+                self.keyboard_button.clicked = False
+                
+
         else:
             for button in self.buttons:
                 button.out_of_frame = False

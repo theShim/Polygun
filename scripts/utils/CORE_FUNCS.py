@@ -125,7 +125,11 @@ def countLinesIn(directory):
             if file.endswith('.py'):
                 file_path = os.path.join(root, file)
                 with open(file_path, 'r') as f:
-                    lines = f.readlines()
+                    if ".venv" in file_path: continue
+                    try:
+                        lines = f.readlines()
+                    except UnicodeDecodeError:
+                        continue
                     total_lines += len(lines)
                     uncommented_total += len(list(filter(lambda l:l[0] != "#", filter(lambda l: len(l), map(lambda l: l.strip(), lines)))))
     print(f"Total Lines: {total_lines} | Uncommented: {uncommented_total}")

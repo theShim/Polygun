@@ -30,6 +30,8 @@ if DEBUG:
     import cProfile
     import io
 
+# print(countLinesIn(os.path.dirname(os.path.abspath(__file__))))
+
     ##############################################################################################
 
 def create_noise_texture(ctx: moderngl.Context, size=256):

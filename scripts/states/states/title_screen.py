@@ -33,9 +33,9 @@ class Title_Screen(State):
         # self.screen.fill((255, 0, 0))
 
         self.d.update()
-        self.t += math.radians(2)
+        self.t += math.radians(200)
 
-        self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2, self.logo.height / 2 + 30 + math.sin(self.t) * 8)))
+        self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2, self.logo.height / 2 + 30 + math.sin(self.t) * 80)))
 
         self.buttons.update()
 

@@ -30,12 +30,16 @@ class State_Loader:
         from scripts.states.states.title_screen import Title_Screen
         from scripts.states.states.dungeon import Dungeon
         from scripts.states.states.settings import Settings
+        from scripts.states.states.controllers import Controllers_GUI
+        from scripts.states.states.keyboard import Keyboard_GUI
 
         self.states = {
             "debug" : Debug_Stage(self.game),
             "title_screen" : Title_Screen(self.game),
             "dungeon" : Dungeon(self.game),
             "settings" : Settings(self.game),
+            "controllers_gui" : Controllers_GUI(self.game),
+            "keyboard_gui" : Keyboard_GUI(self.game),
         }
 
         #adding the first state
