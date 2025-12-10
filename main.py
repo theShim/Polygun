@@ -63,6 +63,8 @@ class Game:
 
         #caching
         self.cache_sprites()
+        
+        self.controls_handler = ControlsHandler(self)
 
         #groups
         self.all_sprites = pygame.sprite.Group()
@@ -71,7 +73,6 @@ class Game:
 
         self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
-        self.controls_handler = ControlsHandler(self)
 
         self.debugger = Debugger(self)
 

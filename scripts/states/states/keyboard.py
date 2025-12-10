@@ -5,7 +5,7 @@ with contextlib.redirect_stdout(None):
 
 import math
 
-from scripts.gui.menu_buttons import Button, Label
+from scripts.gui.menu_buttons import Button, Label, KeyboardInputButton
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.states.state_loader import State
 
@@ -28,6 +28,11 @@ class Keyboard_GUI(State):
         self.buttons = pygame.sprite.Group()
         Label(self.game, [self.buttons], "Keyboard", (30, 60))
         self.back_button = Button(self.game, [self.buttons], "Back", (30, 480), font=Custom_Font.font2)
+
+        self.up = KeyboardInputButton(self.game, [self.buttons], "Move UP: ", (60, 140), self.game.controls_handler.controls["move_up"], font=Custom_Font.font2)
+        self.down = KeyboardInputButton(self.game, [self.buttons], "Move DOWN:", (60, 180), self.game.controls_handler.controls["move_down"], font=Custom_Font.font2)
+        self.left = KeyboardInputButton(self.game, [self.buttons], "Move LEFT: ", (60, 220), self.game.controls_handler.controls["move_left"], font=Custom_Font.font2)
+        self.right = KeyboardInputButton(self.game, [self.buttons], "Move RIGHT: ", (60, 260), self.game.controls_handler.controls["move_right"], font=Custom_Font.font2)
         
     def update(self):
         self.prev.prev.d.update() #delaunay

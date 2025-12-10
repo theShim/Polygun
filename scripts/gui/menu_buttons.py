@@ -123,12 +123,6 @@ class Label(pygame.sprite.Sprite):
 
 
     def update(self):
-        mousePos = pygame.mouse.get_pos()
-        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-        scale_x = WIDTH / window_size[0]
-        scale_y = HEIGHT / window_size[1]
-        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
-
         if not self.out_of_frame:
             self.pos = self.pos.lerp(self.oPos, 0.5)
             self.line_end = self.line_end.lerp(self.line_oPos, 0.5)
@@ -231,6 +225,78 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         pygame.K_F12 : "F12",
     }
 
-    def __init__(self, game, groups, text, pos, key):
+    def __init__(self, game, groups, text, pos, key, font=Custom_Font.font2_5):
         super().__init__(groups)
         self.game = game
+        self.screen = self.game.screen
+        self.font: Font = font
+        
+        self.text = text # f"{text:<13}{self.CONTROLS_TO_TEXT[key]:<10}"
+        self.key = key
+        self.surf = None
+        self.update_surf()
+
+        self.pos = vec(pos)
+        self.oPos = vec(pos)
+        self.target_pos = self.pos + vec(20, -5)
+
+        self.line_end = vec(0, self.pos.y + self.font.space_height - 3)
+        self.line_oPos = vec(-5, self.pos.y + self.font.space_height - 3)
+        self.line_target_pos = vec(self.pos.x + self.font.calc_surf_width(self.text) + 24, self.pos.y + self.font.space_height - 3)
+
+        self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 300, self.font.space_height)
+        self.clicked = False
+        self.out_of_frame = False
+
+    def update_surf(self):
+        total_string = f"{self.text:<14}{self.CONTROLS_TO_TEXT[self.key]:<10}"
+        text_string = f"{self.text:<14}"
+        text_width = self.font.calc_surf_width(text_string)
+        text_width = text_width if text_width == 208 else 208
+        if text_width == 208:
+            text_width = text_width
+        else:
+            text_width = 208
+        key_string = self.CONTROLS_TO_TEXT[self.key]
+
+        self.surf = pygame.Surface((self.font.calc_surf_width(total_string) + 6, self.font.space_height + 6), pygame.SRCALPHA)
+
+        self.font.render(self.surf, text_string, (0, 0, 1), (6, 3))
+        self.font.render(self.surf, text_string, (0, 0, 1), (0, 3))
+        self.font.render(self.surf, text_string, (0, 0, 1), (3, 6))
+        self.font.render(self.surf, text_string, (0, 0, 1), (3, 0))
+
+        self.font.render(self.surf, key_string, (0, 0, 1), (6 + text_width, 3))
+        self.font.render(self.surf, key_string, (0, 0, 1), (0 + text_width, 3))
+        self.font.render(self.surf, key_string, (0, 0, 1), (3 + text_width, 6))
+        self.font.render(self.surf, key_string, (0, 0, 1), (3 + text_width, 0))
+
+        self.font.render(self.surf, text_string, (255, 255, 255), (3, 3))
+        self.font.render(self.surf, key_string, (255, 255, 255), (3 + text_width, 3))
+
+    def update(self):
+        mousePos = pygame.mouse.get_pos()
+        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
+        scale_x = WIDTH / window_size[0]
+        scale_y = HEIGHT / window_size[1]
+        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+
+        if not self.out_of_frame:
+            self.clicked = False
+            if self.hitbox.collidepoint(mousePos):
+                self.pos = self.pos.lerp(self.target_pos, 0.5)
+                self.line_end = self.line_end.lerp(self.line_target_pos, 0.5)
+                
+                if pygame.mouse.get_just_pressed()[0]:
+                    self.clicked = True
+            else:
+                self.pos = self.pos.lerp(self.oPos, 0.5)
+                self.line_end = self.line_end.lerp(self.line_oPos, 0.5)
+        else:
+            self.pos = self.pos.lerp(vec(-300, self.pos.y), 0.2)
+            self.line_end = self.line_end.lerp(vec(-200, self.line_oPos.y), 0.1)
+
+        self.screen.blit(self.surf, (self.pos.x - 3, self.pos.y - 3))
+
+        pygame.draw.line(self.screen, (0, 0, 0), self.line_oPos, self.line_end + vec(1, 0), 7)
+        pygame.draw.line(self.screen, (255, 255, 255), self.line_oPos, self.line_end, 3)

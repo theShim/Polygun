@@ -82,6 +82,4 @@ class Custom_Font:
     def init(cls):
         cls.font2_5 = Font("assets/fonts/nea_font.png", scale=2.5)
         cls.font2 = Font("assets/fonts/nea_font.png", scale=2)
-        # cls.FluffyBig = Font('assets/fonts/fluffy.png', scale=1.5)
-        # cls.Fluffy = Font('assets/fonts/fluffy.png')
-        # cls.FluffySmall = Font('assets/fonts/fluffy.png', scale=0.75)
+        cls.font1_5 = Font("assets/fonts/nea_font.png", scale=1.5)
