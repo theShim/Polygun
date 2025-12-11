@@ -290,7 +290,6 @@ class KeyboardInputButton(pygame.sprite.Sprite):
             else:
                 self.line_displacement = self.line_displacement.lerp(vec(0, 0), 0.5)
         else:
-            self.pos = self.pos.lerp(vec(-300, self.pos.y), 0.2)
             self.line_displacement = self.line_displacement.lerp(vec(0, 0), 0.5)
 
         self.screen.blit(self.surf, (self.pos.x - 3, self.pos.y - 3))

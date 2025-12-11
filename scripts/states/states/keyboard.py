@@ -9,8 +9,8 @@ from scripts.gui.menu_buttons import Button, Label, KeyboardInputButton
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.states.state_loader import State
 
-from scripts.config.SETTINGS import WIDTH, HEIGHT
-from scripts.utils.CORE_FUNCS import vec
+from scripts.config.SETTINGS import WIDTH, HEIGHT, SIZE
+from scripts.utils.CORE_FUNCS import vec, Timer
 
     ##############################################################################################
 
@@ -29,10 +29,17 @@ class Keyboard_GUI(State):
         Label(self.game, [self.buttons], "Keyboard", (30, 60))
         self.back_button = Button(self.game, [self.buttons], "Back", (30, 480), font=Custom_Font.font2)
 
-        self.up = KeyboardInputButton(self.game, [self.buttons], "Move UP: ", (60, 140), self.game.controls_handler.controls["move_up"], font=Custom_Font.font2)
-        self.down = KeyboardInputButton(self.game, [self.buttons], "Move DOWN:", (60, 180), self.game.controls_handler.controls["move_down"], font=Custom_Font.font2)
-        self.left = KeyboardInputButton(self.game, [self.buttons], "Move LEFT: ", (60, 220), self.game.controls_handler.controls["move_left"], font=Custom_Font.font2)
-        self.right = KeyboardInputButton(self.game, [self.buttons], "Move RIGHT: ", (60, 260), self.game.controls_handler.controls["move_right"], font=Custom_Font.font2)
+        self.keys = pygame.sprite.Group()
+        self.up = KeyboardInputButton(self.game, [self.buttons, self.keys], "Move UP: ", (60, 140), self.game.controls_handler.controls["move_up"], font=Custom_Font.font2)
+        self.down = KeyboardInputButton(self.game, [self.buttons, self.keys], "Move DOWN:", (60, 180), self.game.controls_handler.controls["move_down"], font=Custom_Font.font2)
+        self.left = KeyboardInputButton(self.game, [self.buttons, self.keys], "Move LEFT: ", (60, 220), self.game.controls_handler.controls["move_left"], font=Custom_Font.font2)
+        self.right = KeyboardInputButton(self.game, [self.buttons, self.keys], "Move RIGHT: ", (60, 260), self.game.controls_handler.controls["move_right"], font=Custom_Font.font2)
+        
+        self.to_change_button = None
+        self.throbber_timer = Timer(30, 1)
+        self.ellipsis = 0
+        self.dark_overlay = pygame.Surface(SIZE, pygame.SRCALPHA)
+        self.dark_overlay.fill((0, 0, 0, 220))
         
     def update(self):
         self.prev.prev.d.update() #delaunay
@@ -47,6 +54,36 @@ class Keyboard_GUI(State):
         self.screen.blit(self.shadow2, self.shadow2_pos)
 
         self.buttons.update()
+
+        if self.to_change_button:
+            self.screen.blit(self.dark_overlay)
+
+            self.throbber_timer.update()
+            if self.throbber_timer.finished:
+                self.throbber_timer.reset()
+                self.ellipsis = (self.ellipsis + 1) % 4
+            Custom_Font.font2.render(self.screen, f"Enter a Key to Rebind{'.' * self.ellipsis}", (255, 255, 255), vec(SIZE) / 2 + vec(-Custom_Font.font2.calc_surf_width("Enter a Key to Rebind...") / 2, -Custom_Font.font2.space_height * 1.5))
+
+            for event in self.game.events:
+                if event.type == pygame.KEYDOWN:
+                    self.to_change_button.clicked = False
+                    if event.key == pygame.K_ESCAPE:
+                        self.to_change_button = None
+                    else:
+                        for key, value in self.game.controls_handler.controls.items():
+                            if value == self.to_change_button.key:
+                                self.game.controls_handler.controls[key] = event.key
+                                break
+
+                        self.to_change_button.key = event.key
+                        self.to_change_button.update_surf()
+                        self.to_change_button = None
+            return
+
+        for button in self.keys:
+            if button.clicked:
+                self.to_change_button = button
+                break
 
         if self.back_button.clicked:
             for button in self.buttons:

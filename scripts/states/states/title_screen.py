@@ -47,4 +47,4 @@ class Title_Screen(State):
             self.options_button.clicked = False
         
         elif self.quit_button.clicked:
-            self.game.running = False
+            self.game.quit()

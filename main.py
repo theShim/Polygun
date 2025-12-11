@@ -56,6 +56,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.offset = vec()
         self.zoom = 1.0
+        self.events = None
 
         #opengl stuff
         self.initialise_opengl()
@@ -126,6 +127,10 @@ class Game:
         tex.repeat_x = tex.repeat_y = not False
         tex.write(surf.get_view("1"))
         return tex
+    
+    def quit(self):
+        self.running = False
+        self.controls_handler.save_json()
 
         ####################################################################################
 
@@ -165,12 +170,13 @@ class Game:
             self.dt /= 1000
             last_time = current_time
             
-            for event in pygame.event.get():
+            self.events = pygame.event.get()
+            for event in self.events:
                 if event.type == pygame.QUIT:
-                    self.running = False
+                    self.quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        self.running = False
+                        self.quit()
                     
             self.screen.fill((35, 34, 43))
             # self.calculate_offset()
