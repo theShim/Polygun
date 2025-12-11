@@ -27,7 +27,7 @@ class Tilemap:
     def load(self):
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):
-                pos = (int(x + self.room_pos.x * LEVEL_SIZE) * TILE_SIZE, int(y + self.room_pos.y * LEVEL_SIZE) * TILE_SIZE)
+                pos = (int(x + self.room_pos.x * LEVEL_SIZE), int(y + self.room_pos.y * LEVEL_SIZE))
                 self.tilemap[pos] = Tile(self.game, pos, 0)
 
         for x in range(LEVEL_SIZE):
@@ -71,13 +71,32 @@ class Tilemap:
 
 
 class Tile(pygame.sprite.Sprite):
+
+    AUTO_TILE_MAP = {
+        tuple(sorted([]))                                 : 1,
+        tuple(sorted([(1, 0),]))                          : 2,
+        tuple(sorted([(-1, 0), (1, 0)]))                  : 3,
+        tuple(sorted([(-1, 0),]))                         : 4,
+        tuple(sorted([(0, 1),]))                          : 5,
+        tuple(sorted([(0, -1), (0, 1)]))                  : 6,
+        tuple(sorted([(0, -1),]))                         : 7,
+        tuple(sorted([(1, 0), (0, 1)]))                   : 8,
+        tuple(sorted([(-1, 0), (0, 1), (1, 0)]))          : 9,
+        tuple(sorted([(-1, 0), (0, 1)]))                  : 10,
+        tuple(sorted([(0, -1), (1, 0)]))                  : 11,
+        tuple(sorted([(-1, 0), (0, -1), (1, 0)]))         : 12,
+        tuple(sorted([(-1, 0), (0, -1)]))                 : 13,
+        tuple(sorted([(0, -1), (1, 0), (0, 1)]))          : 14,
+        tuple(sorted([(-1, 0), (0, -1), (1, 0), (0, 1)])) : 15,
+        tuple(sorted([(0, -1), (-1, 0), (0, 1)]))         : 16,
+    }
     
     @classmethod
     def cache_sprites(cls):
         cls.SPRITES = {}
 
         surf = pygame.Surface((TILE_SIZE, TILE_SIZE)) #floor
-        surf.fill((34, 34, 34))
+        surf.fill((255, 34, 34))
         cls.SPRITES[0] = surf
 
         surf = pygame.Surface((TILE_SIZE, TILE_SIZE * 2)) #wall
@@ -97,6 +116,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE)
 
     def update(self):
-        image = self.SPRITES[self.index]
-        self.game.screen.blit(image, self.rect.topleft - self.game.offset)
+        if self.index:
+            image = self.SPRITES[self.index]
+            self.game.screen.blit(image, self.rect.topleft - self.game.offset)
     
