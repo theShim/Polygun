@@ -240,16 +240,15 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         self.oPos = vec(pos)
         self.target_pos = self.pos + vec(20, -5)
 
-        self.line_end = vec(0, self.pos.y + self.font.space_height - 3)
-        self.line_oPos = vec(-5, self.pos.y + self.font.space_height - 3)
-        self.line_target_pos = vec(self.pos.x + self.font.calc_surf_width(self.text) + 24, self.pos.y + self.font.space_height - 3)
+        self.line_origin = self.pos + vec(self.font.calc_surf_width(f"{self.text:<14}") + self.font.calc_surf_width(f"{self.CONTROLS_TO_TEXT[self.key]:<12}") / 2, self.font.space_height - 3)
+        self.line_displacement = vec()
 
-        self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 300, self.font.space_height)
+        self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 400, self.font.space_height)
         self.clicked = False
         self.out_of_frame = False
 
     def update_surf(self):
-        total_string = f"{self.text:<14}{self.CONTROLS_TO_TEXT[self.key]:<10}"
+        total_string = f"{self.text:<14}{self.CONTROLS_TO_TEXT[self.key]:<12}"
         text_string = f"{self.text:<14}"
         text_width = self.font.calc_surf_width(text_string)
         text_width = text_width if text_width == 208 else 208
@@ -284,19 +283,18 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         if not self.out_of_frame:
             self.clicked = False
             if self.hitbox.collidepoint(mousePos):
-                self.pos = self.pos.lerp(self.target_pos, 0.5)
-                self.line_end = self.line_end.lerp(self.line_target_pos, 0.5)
+                self.line_displacement = self.line_displacement.lerp(vec(self.font.calc_surf_width(self.CONTROLS_TO_TEXT[self.key]) / 2, 0), 0.5)
                 
                 if pygame.mouse.get_just_pressed()[0]:
                     self.clicked = True
             else:
-                self.pos = self.pos.lerp(self.oPos, 0.5)
-                self.line_end = self.line_end.lerp(self.line_oPos, 0.5)
+                self.line_displacement = self.line_displacement.lerp(vec(0, 0), 0.5)
         else:
             self.pos = self.pos.lerp(vec(-300, self.pos.y), 0.2)
-            self.line_end = self.line_end.lerp(vec(-200, self.line_oPos.y), 0.1)
+            self.line_displacement = self.line_displacement.lerp(vec(0, 0), 0.5)
 
         self.screen.blit(self.surf, (self.pos.x - 3, self.pos.y - 3))
 
-        pygame.draw.line(self.screen, (0, 0, 0), self.line_oPos, self.line_end + vec(1, 0), 7)
-        pygame.draw.line(self.screen, (255, 255, 255), self.line_oPos, self.line_end, 3)
+        if self.line_displacement.magnitude() > 0.5:
+            pygame.draw.line(self.screen, (0, 0, 0), self.line_origin + self.line_displacement, self.line_origin - self.line_displacement, 7)
+            pygame.draw.line(self.screen, (255, 255, 255), self.line_origin + self.line_displacement, self.line_origin - self.line_displacement, 3)
