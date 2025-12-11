@@ -35,6 +35,12 @@ class Keyboard_GUI(State):
         self.left = KeyboardInputButton(self.game, [self.buttons, self.keys], "Move LEFT: ", (60, 220), self.game.controls_handler.controls["move_left"], font=Custom_Font.font2)
         self.right = KeyboardInputButton(self.game, [self.buttons, self.keys], "Move RIGHT: ", (60, 260), self.game.controls_handler.controls["move_right"], font=Custom_Font.font2)
         
+        self.jump = KeyboardInputButton(self.game, [self.buttons, self.keys], "Jump: ", (60, 300), self.game.controls_handler.controls["jump"], font=Custom_Font.font2)
+        self.dash = KeyboardInputButton(self.game, [self.buttons, self.keys], "Dash: ", (60, 340), self.game.controls_handler.controls["dash"], font=Custom_Font.font2)
+        self.swap_weapon = KeyboardInputButton(self.game, [self.buttons, self.keys], "Swap Weapon: ", (60, 380), self.game.controls_handler.controls["swap_weapon"], font=Custom_Font.font2)
+
+        self.pause = KeyboardInputButton(self.game, [self.buttons, self.keys], "Pause: ", (60, 420), self.game.controls_handler.controls["pause"], font=Custom_Font.font2)
+        
         self.to_change_button = None
         self.throbber_timer = Timer(30, 1)
         self.ellipsis = 0

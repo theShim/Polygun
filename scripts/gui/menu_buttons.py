@@ -234,13 +234,14 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         self.text = text # f"{text:<13}{self.CONTROLS_TO_TEXT[key]:<10}"
         self.key = key
         self.surf = None
-        self.update_surf()
 
         self.pos = vec(pos)
         self.oPos = vec(pos)
         self.target_pos = self.pos + vec(20, -5)
+        
+        self.update_surf()
 
-        self.line_origin = self.pos + vec(self.font.calc_surf_width(f"{self.text:<14}") + self.font.calc_surf_width(f"{self.CONTROLS_TO_TEXT[self.key]:<12}") / 2, self.font.space_height - 3)
+        self.line_origin = self.pos + vec(self.font.calc_surf_width(f"{self.text:<14}") + self.font.calc_surf_width(f"{self.CONTROLS_TO_TEXT[self.key]:<14}") / 2, self.font.space_height - 3)
         self.line_displacement = vec()
 
         self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 400, self.font.space_height)
@@ -248,7 +249,7 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         self.out_of_frame = False
 
     def update_surf(self):
-        total_string = f"{self.text:<14}{self.CONTROLS_TO_TEXT[self.key]:<12}"
+        total_string = f"{self.text:<14}{self.CONTROLS_TO_TEXT[self.key]:<14}"
         text_string = f"{self.text:<14}"
         text_width = self.font.calc_surf_width(text_string)
         text_width = text_width if text_width == 208 else 208
@@ -272,6 +273,8 @@ class KeyboardInputButton(pygame.sprite.Sprite):
 
         self.font.render(self.surf, text_string, (255, 255, 255), (3, 3))
         self.font.render(self.surf, key_string, (255, 255, 255), (3 + text_width, 3))
+        
+        self.line_origin = self.pos + vec(self.font.calc_surf_width(f"{self.text:<14}") + self.font.calc_surf_width(self.CONTROLS_TO_TEXT[self.key]) / 2, self.font.space_height - 3)
 
     def update(self):
         mousePos = pygame.mouse.get_pos()
