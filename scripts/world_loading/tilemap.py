@@ -31,11 +31,16 @@ class Tilemap:
                 self.tilemap[pos] = Tile(self.game, pos, 0)
 
         for x in range(LEVEL_SIZE):
-            self.tilemap[(x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)] = Tile(self.game, (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE), 1)
-            self.tilemap[(x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE + LEVEL_SIZE - 1)] = Tile(self.game, (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE + LEVEL_SIZE - 1), 1)
+            pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)
+            self.tilemap[pos] = Tile(self.game, pos, 1)
+            pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE + LEVEL_SIZE - 1)
+            self.tilemap[pos] = Tile(self.game, pos, 1)
+
         for y in range(LEVEL_SIZE):
-            self.tilemap[(self.room_pos.x * LEVEL_SIZE, y + self.room_pos.y * LEVEL_SIZE)] = Tile(self.game, (self.room_pos.x * LEVEL_SIZE, y + self.room_pos.y * LEVEL_SIZE), 1)
-            self.tilemap[(self.room_pos.x * LEVEL_SIZE + LEVEL_SIZE - 1, y + self.room_pos.y * LEVEL_SIZE)] = Tile(self.game, (self.room_pos.x * LEVEL_SIZE + LEVEL_SIZE - 1, y + self.room_pos.y * LEVEL_SIZE), 1)
+            pos = (self.room_pos.x * LEVEL_SIZE, y + self.room_pos.y * LEVEL_SIZE)
+            self.tilemap[pos] = Tile(self.game, pos, 1)
+            pos = (self.room_pos.x * LEVEL_SIZE + LEVEL_SIZE - 1, y + self.room_pos.y * LEVEL_SIZE)
+            self.tilemap[pos] = Tile(self.game, pos, 1)
 
         if (self.room_pos.x + 1, self.room_pos.y) in self.room.conns:
             del self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)]
@@ -49,6 +54,26 @@ class Tilemap:
         if (self.room_pos.x, self.room_pos.y - 1) in self.room.conns:
             del self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)]
             del self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)]
+
+        self.auto_tile()
+
+    def auto_tile(self):
+        for pos in self.tilemap:
+            tile = self.tilemap[pos]
+            if not tile.index: continue
+
+            neighbours = []
+            for dx in range(-1, 2):
+                for dy in range(-1, 2):
+                    if abs(dx) == abs(dy): continue
+
+                    to_check = (pos[0] + dx, pos[1] + dy)
+                    if to_check in self.tilemap:
+                        if self.tilemap[to_check].index:
+                            neighbours.append((dx, dy))
+
+            room_type = Tile.AUTO_TILE_MAP[tuple(sorted(neighbours))]
+            tile.index = room_type
 
     def on_screen_tiles(self, offset, buffer=[0, 0]):
         start_x = int(offset[0] // (self.tile_size) - buffer[0])
@@ -73,6 +98,7 @@ class Tilemap:
 class Tile(pygame.sprite.Sprite):
 
     AUTO_TILE_MAP = {
+        #neighbours : room_type
         tuple(sorted([]))                                 : 1,
         tuple(sorted([(1, 0),]))                          : 2,
         tuple(sorted([(-1, 0), (1, 0)]))                  : 3,
@@ -94,10 +120,20 @@ class Tile(pygame.sprite.Sprite):
     @classmethod
     def cache_sprites(cls):
         cls.SPRITES = {}
+        tilemap = pygame.transform.scale_by(pygame.image.load("assets/tiles/tilemap.png"), 4).convert_alpha()
+        tilemap.set_colorkey((0, 0, 0))
 
         surf = pygame.Surface((TILE_SIZE, TILE_SIZE)) #floor
         surf.fill((255, 34, 34))
         cls.SPRITES[0] = surf
+
+        for y in range(3): #walls
+            for x in range(10):
+                id_ = y * 10 + x + 1
+                if id_ == 30: break
+
+                surf = tilemap.subsurface([x * TILE_SIZE, y * (2 * TILE_SIZE), TILE_SIZE, 2 * TILE_SIZE])
+                cls.SPRITES[id_] = surf
 
         surf = pygame.Surface((TILE_SIZE, TILE_SIZE * 2)) #wall
         surf.fill((56, 56, 67))
