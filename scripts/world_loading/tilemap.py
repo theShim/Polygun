@@ -220,6 +220,7 @@ class Tile(pygame.sprite.Sprite):
         self.index = index
         self.pos = vec(pos) * TILE_SIZE
         self.rect = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE)
+        self.hitbox = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE * 2)
 
     def update(self):
         if self.index:

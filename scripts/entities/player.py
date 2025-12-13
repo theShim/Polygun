@@ -162,33 +162,27 @@ class Player(pygame.sprite.Sprite):
         for room in self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].rooms.values():
             flag = False
             for tile in room.tilemap.collideables(self.game.offset):
-                pygame.draw.line(self.screen, (255, 255, 0), self.pos - self.game.offset, tile.rect.center - self.game.offset, 2)
-                pygame.draw.rect(self.screen, (255, 0, 0), [tile.rect.x - self.game.offset.x, tile.rect.y - self.game.offset.y, *tile.rect.size], 2)
-                # if self.pos.distance_to(tile.rect.center) < self.size * 3:
-                    # pygame.draw.line(self.screen, (0, 255, 0), self.pos - self.game.offset, tile.rect.center - self.game.offset, 2)
-                if direction == "vertical":
-                    if self.pos.y - self.size / 2 < tile.rect.bottom and self.vel.y < 0:
-                        self.pos.y = tile.rect.bottom + self.size / 2
-                        # flag = True
-                    elif self.pos.y + self.size / 2 > tile.rect.top and self.vel.y > 0:
-                        self.pos.y = tile.rect.top - self.size / 2
-                        # flag = True
+                if tile.hitbox.collidepoint(self.pos):
+                    if direction == "vertical":
+                        if self.pos.y - self.size / 2 < tile.hitbox.bottom and self.vel.y < 0:
+                            self.pos.y = tile.hitbox.bottom + self.size / 2
+                            flag = True
+                        elif self.pos.y + self.size / 2 > tile.hitbox.top and self.vel.y > 0:
+                            self.pos.y = tile.hitbox.top - self.size / 2
+                            flag = True
 
-                elif direction == "horizontal":
-                    if self.pos.x - self.size / 2 < tile.rect.right and self.vel.x < 0:
-                        self.pos.x = tile.rect.right + self.size / 2
-                        # flag = True
-                    elif self.pos.x + self.size / 2 > tile.rect.left and self.vel.x > 0:
-                        self.pos.x = tile.rect.left - self.size / 2
-                        # flag = True
+                    elif direction == "horizontal":
+                        if self.pos.x - self.size / 2 < tile.hitbox.right and self.vel.x < 0:
+                            self.pos.x = tile.hitbox.right + self.size / 2
+                            flag = True
+                        elif self.pos.x + self.size / 2 > tile.hitbox.left and self.vel.x > 0:
+                            self.pos.x = tile.hitbox.left - self.size / 2
+                            flag = True
             if flag:
                 break
 
     def update(self):
         self.move()
-        # self.draw()
-
-        self.collisions("")
 
         self.shader_draw()
 
