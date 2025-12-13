@@ -71,10 +71,9 @@ class DungeonLevel:
         self.conns = conns
 
         for node in nodes:
-            self.rooms[node] = Room(self.game, node, conns[node])
-        #     print(node)
-        #     print(conns[node])
-        # print(conns)
+            self.rooms[node] = Room(self.game, node, conns[node], self)
+        for node in nodes:
+            self.rooms[node].tilemap.auto_tile()
 
     def generate_boss_room(self):
         leaves = [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]
@@ -82,9 +81,10 @@ class DungeonLevel:
 
 
 class Room:
-    def __init__(self, game, pos, conns):
+    def __init__(self, game, pos, conns, parent_level):
         self.game = game
 
         self.pos = pos
         self.conns = conns
+        self.parent_level = parent_level
         self.tilemap = Tilemap(self.game, self)

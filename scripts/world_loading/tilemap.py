@@ -55,8 +55,6 @@ class Tilemap:
             del self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)]
             del self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)]
 
-        self.auto_tile()
-
     def auto_tile(self):
         for pos in self.tilemap:
             tile = self.tilemap[pos]
@@ -72,7 +70,34 @@ class Tilemap:
                         if self.tilemap[to_check].index:
                             neighbours.append((dx, dy))
 
+                    else:
+                        for room_x, room_y in self.room.conns:
+                            to_check_room = (int(room_x), int(room_y))
+                            to_check_tilemap = self.room.parent_level.rooms[to_check_room].tilemap.tilemap
+                            if to_check in to_check_tilemap:
+                                if to_check_tilemap[to_check].index:
+                                    neighbours.append((dx, dy))
+                                    break
+
             room_type = Tile.AUTO_TILE_MAP[tuple(sorted(neighbours))]
+            tile.index = room_type
+
+        #corners
+        for pos in self.tilemap:
+            tile = self.tilemap[pos]
+            if tile.index: continue
+
+            neighbours = []
+            for dx in range(-1, 2):
+                for dy in range(-1, 2):
+                    if abs(dx) == abs(dy): continue
+
+                    to_check = (pos[0] + dx, pos[1] + dy)
+                    if to_check in self.tilemap:
+                        if (id_ := self.tilemap[to_check].index):
+                            neighbours.append(id_)
+            
+            room_type = Tile.CORNER_PIXEL_MAP.get(tuple(sorted(filter(lambda x: x != 15 and not (17 <= x <= 29), neighbours))), tile.index)
             tile.index = room_type
 
     def on_screen_tiles(self, offset, buffer=[0, 0]):
@@ -93,6 +118,8 @@ class Tilemap:
                 if loc in self.tilemap:
                     tile: Tile = self.tilemap[loc]
                     yield tile
+                # else:
+                #     print(self.room.conns)
 
 
 class Tile(pygame.sprite.Sprite):
@@ -116,6 +143,53 @@ class Tile(pygame.sprite.Sprite):
         tuple(sorted([(-1, 0), (0, -1), (1, 0), (0, 1)])) : 15,
         tuple(sorted([(0, -1), (-1, 0), (0, 1)]))         : 16,
     }
+
+    CORNER_PIXEL_MAP = {
+        tuple(sorted([9, 14])) : 17,
+        tuple(sorted([9, 16])) : 18,
+        tuple(sorted([12, 16])) : 18,
+        tuple(sorted([12, 14])) : 20,
+        tuple(sorted([9, 9, 6])) : 21,
+        tuple(sorted([9, 9, 5])) : 21,
+        tuple(sorted([16, 16, 3])) : 22,
+        tuple(sorted([16, 16, 4])) : 22,
+        tuple(sorted([12, 12, 6])) : 23,
+        tuple(sorted([12, 12, 7])) : 23,
+        tuple(sorted([14, 14, 3])) : 24,
+        tuple(sorted([14, 14, 2])) : 24,
+        tuple(sorted([9, 16, 6, 3])) : 25,
+        tuple(sorted([9, 16, 6, 4])) : 25,
+        tuple(sorted([9, 16, 5, 3])) : 25,
+        tuple(sorted([9, 16, 5, 4])) : 25,
+        tuple(sorted([16, 12, 6, 3])) : 26,
+        tuple(sorted([16, 12, 6, 4])) : 26,
+        tuple(sorted([16, 12, 7, 3])) : 26,
+        tuple(sorted([16, 12, 7, 4])) : 26,
+        tuple(sorted([12, 14, 6, 3])) : 27,
+        tuple(sorted([12, 14, 6, 2])) : 27,
+        tuple(sorted([12, 14, 7, 3])) : 27,
+        tuple(sorted([12, 14, 7, 2])) : 27,
+        tuple(sorted([14, 9, 6, 3])) : 28,
+        tuple(sorted([14, 9, 6, 2])) : 28,
+        tuple(sorted([14, 9, 5, 3])) : 28,
+        tuple(sorted([14, 9, 5, 2])) : 28,
+        tuple(sorted([3, 3, 6, 6])) : 29,
+        tuple(sorted([3, 3, 6, 5])) : 29,
+        tuple(sorted([3, 3, 6, 7])) : 29,
+        tuple(sorted([3, 3, 5, 7])) : 29,
+        tuple(sorted([3, 2, 6, 6])) : 29,
+        tuple(sorted([3, 2, 6, 5])) : 29,
+        tuple(sorted([3, 2, 6, 7])) : 29,
+        tuple(sorted([3, 2, 5, 7])) : 29,
+        tuple(sorted([3, 4, 6, 6])) : 29,
+        tuple(sorted([3, 4, 6, 5])) : 29,
+        tuple(sorted([3, 4, 6, 7])) : 29,
+        tuple(sorted([3, 4, 5, 7])) : 29,
+        tuple(sorted([2, 4, 6, 6])) : 29,
+        tuple(sorted([2, 4, 6, 5])) : 29,
+        tuple(sorted([2, 4, 6, 7])) : 29,
+        tuple(sorted([2, 4, 5, 7])) : 29,
+    }
     
     @classmethod
     def cache_sprites(cls):
@@ -134,13 +208,6 @@ class Tile(pygame.sprite.Sprite):
 
                 surf = tilemap.subsurface([x * TILE_SIZE, y * (2 * TILE_SIZE), TILE_SIZE, 2 * TILE_SIZE])
                 cls.SPRITES[id_] = surf
-
-        surf = pygame.Surface((TILE_SIZE, TILE_SIZE * 2)) #wall
-        surf.fill((56, 56, 67))
-        pygame.draw.rect(surf, (255, 255, 255), [0, 0, TILE_SIZE, TILE_SIZE], 4)
-        surf.fill((20, 20, 24), [0, TILE_SIZE, TILE_SIZE, TILE_SIZE])
-        pygame.draw.rect(surf, (70, 70, 70), [0, TILE_SIZE, TILE_SIZE, TILE_SIZE], 4)
-        cls.SPRITES[1] = surf
     
     def __init__(self, game, pos: tuple, index: int):
         super().__init__()
