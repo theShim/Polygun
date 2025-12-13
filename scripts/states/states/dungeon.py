@@ -7,6 +7,7 @@ import random
 
 from scripts.states.state_loader import State
 from scripts.world_loading.dungeons import DungeonLevel
+from scripts.world_loading.tilemap import Tile
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS
 
@@ -34,5 +35,5 @@ class Dungeon(State):
         tiles = []
         for room in self.levels[self.current_level_index].rooms.values():
             tiles += list(room.tilemap.on_screen_tiles(self.game.offset, buffer=[1, 1]))
-        for spr in sorted(self.game.all_sprites.sprites() + tiles, key=lambda s: s.pos.y):
+        for spr in sorted(self.game.all_sprites.sprites() + tiles, key=lambda s: s.rect.bottom if isinstance(s, Tile) else s.pos.y):
             spr.update()

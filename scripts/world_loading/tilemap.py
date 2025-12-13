@@ -83,22 +83,22 @@ class Tilemap:
             tile.index = room_type
 
         #corners
-        for pos in self.tilemap:
-            tile = self.tilemap[pos]
-            if tile.index: continue
+        # for pos in self.tilemap:
+        #     tile = self.tilemap[pos]
+        #     if tile.index: continue
 
-            neighbours = []
-            for dx in range(-1, 2):
-                for dy in range(-1, 2):
-                    if abs(dx) == abs(dy): continue
+        #     neighbours = []
+        #     for dx in range(-1, 2):
+        #         for dy in range(-1, 2):
+        #             if abs(dx) == abs(dy): continue
 
-                    to_check = (pos[0] + dx, pos[1] + dy)
-                    if to_check in self.tilemap:
-                        if (id_ := self.tilemap[to_check].index):
-                            neighbours.append(id_)
+        #             to_check = (pos[0] + dx, pos[1] + dy)
+        #             if to_check in self.tilemap:
+        #                 if (id_ := self.tilemap[to_check].index):
+        #                     neighbours.append(id_)
             
-            room_type = Tile.CORNER_PIXEL_MAP.get(tuple(sorted(filter(lambda x: x != 15 and not (17 <= x <= 29), neighbours))), tile.index)
-            tile.index = room_type
+        #     room_type = Tile.CORNER_PIXEL_MAP.get(tuple(sorted(filter(lambda x: x != 15 and not (17 <= x <= 29), neighbours))), tile.index)
+        #     tile.index = room_type
 
     def on_screen_tiles(self, offset, buffer=[0, 0]):
         start_x = int(offset[0] // (self.tile_size) - buffer[0])
@@ -118,8 +118,11 @@ class Tilemap:
                 if loc in self.tilemap:
                     tile: Tile = self.tilemap[loc]
                     yield tile
-                # else:
-                #     print(self.room.conns)
+
+    def collideables(self, offset, buffer=[0, 0]):
+        for tile in self.on_screen_tiles(offset, buffer):
+            if tile.index:
+                yield tile
 
 
 class Tile(pygame.sprite.Sprite):

@@ -114,7 +114,7 @@ class State:
         # self.tilemap.render()
         # pygame.draw.circle(self.screen, (255, 0, 0, 120), (WIDTH * 0.7, HEIGHT/2) - self.game.offset, 50)
 
-        for spr in sorted(self.game.all_sprites.sprites(), key=lambda s: s.pos.y):
+        for spr in sorted(self.game.all_sprites.sprites(), key=lambda s: s.rect.bottom):
             spr.update()
 
 class Cutscene(State):
