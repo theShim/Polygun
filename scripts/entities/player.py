@@ -10,6 +10,7 @@ import json
 import numpy as np
 
 from scripts.particles.sparks import Spark
+from scripts.projectiles.bullet import Bullet
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
@@ -33,12 +34,17 @@ class Player(pygame.sprite.Sprite):
         ])
         self.pos = vec(WIDTH/2 - size/2, HEIGHT/2 - size/2)
 
+        #movement
         self.vel = vec()
         self.old_vel = vec()
         self.acc = vec()
         self.run_speed = 50
         self.dash_speed = 30
         self.angle = 0
+        
+        #shooting
+        self.bullet_spread = math.pi/40 #+- spread angle in radians
+        self.shoot_timer = Timer(0, 1)
         
         #jumping
         self.jump_vel = 50 #the velocity applied upwards
@@ -76,6 +82,23 @@ class Player(pygame.sprite.Sprite):
 
         self.acc.clamp_magnitude_ip(self.run_speed)
         self.change_direction()
+
+    def mouse_inputs(self):
+        mouse = pygame.mouse.get_pressed()
+
+        self.shoot_timer.update()
+        if mouse[0] and self.shoot_timer.finished:
+            self.shoot_timer.reset()
+            
+            mousePos = pygame.mouse.get_pos()
+            window_size = pygame.display.get_window_size()  # actual window size (after scaling)
+            scale_x = WIDTH / window_size[0]
+            scale_y = HEIGHT / window_size[1]
+            mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+            mouseAngle = math.atan2(mousePos.y - self.pos.y + self.game.offset.y, mousePos.x - self.pos.x + self.game.offset.x)
+
+            Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (58, 24, 206))
+
 
     def jump(self, keys):
         if keys[pygame.K_SPACE] and not self.jumping:
@@ -183,6 +206,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.move()
+        self.mouse_inputs()
 
         self.shader_draw()
 
