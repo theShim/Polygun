@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         
         #shooting
         self.bullet_spread = math.pi/40 #+- spread angle in radians
-        self.shoot_timer = Timer(4, 1)
+        self.shoot_timer = Timer(0, 1)
         
         #jumping
         self.jump_vel = 50 #the velocity applied upwards
@@ -97,13 +97,13 @@ class Player(pygame.sprite.Sprite):
             mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
             mouseAngle = math.atan2(mousePos.y - self.pos.y + self.game.offset.y, mousePos.x - self.pos.x + self.game.offset.x)
 
-            Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (58, 24, 206))
+            Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height))
 
             for i in range(random.randint(1, 4)):
                 Spark(
                     self.game, 
                     [self.game.all_sprites, self.game.particles], 
-                    np.mean([self.points[0], self.points[1]], axis=1) + self.pos + vec(math.cos(mouseAngle), math.sin(mouseAngle)) * 8, 
+                    np.mean([self.points[0], self.points[1]], axis=1) + self.pos + vec(math.cos(mouseAngle), math.sin(mouseAngle)) * 16, 
                     (self.size + random.uniform(-4, 8)) / 6, 
                     mouseAngle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1),
                     speed=random.uniform(2, 4),
