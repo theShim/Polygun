@@ -13,7 +13,7 @@ from scripts.utils.CORE_FUNCS import vec, lerp
     ##############################################################################################
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, angle, col):
+    def __init__(self, game, groups, pos, angle, col, shadow_height = None):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
@@ -24,6 +24,7 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 10
         self.col = col
         self.scale = 4
+        self.shadow_height = shadow_height
 
         self.w = vec(math.cos(self.angle - math.pi / 2), math.sin(self.angle - math.pi / 2)) * self.scale
         
@@ -34,9 +35,10 @@ class Bullet(pygame.sprite.Sprite):
         self.pos += self.vel * self.speed
 
     def collisions(self):
-        # for tile in self.game.state_loader.current_state.tilemap.collideables(self.game.offset):
-        #     if tile.rect.collidepoint(self.pos):
-        #         return self.kill()
+        for room in self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].rooms.values():
+            for tile in room.tilemap.collideables(self.game.offset):
+                if tile.hitbox.collidepoint(self.pos):
+                    return self.kill()
             
         if not pygame.Rect(0, 0, *SIZE).collidepoint(self.pos - self.game.offset):
             return self.kill()
@@ -74,14 +76,7 @@ class Bullet(pygame.sprite.Sprite):
         pygame.draw.polygon(bullet_surface, self.col, [(c := vec(shadow_surface.get_rect().center)) + 1.1 * (p - c) for p in  adjusted_points], 2)
         
         self.screen.blit(shadow_surface, (min_x, min_y))
-        self.screen.blit(bullet_surface, (min_x, min_y))
-
-        # points = [
-        #     self.pos + self.w + 2 * self.vel * self.scale - self.game.offset,
-        #     self.pos + self.w - 2 * self.vel * self.scale - self.game.offset,
-        #     self.pos - self.w - 2 * self.vel * self.scale - self.game.offset,
-        #     self.pos - self.w + 2 * self.vel * self.scale - self.game.offset,
-        # ]
-        # pygame.draw.polygon(self.screen, (0, 0, 0, 50), [p + vec(0, 5) for p in points])
-        # pygame.draw.polygon(self.screen, (243, 255, 185), points)
-        # pygame.draw.polygon(self.screen, self.col, points, 1)
+        if self.shadow_height:
+            self.screen.blit(bullet_surface, (min_x, min_y) + self.shadow_height)
+        else:
+            self.screen.blit(bullet_surface, (min_x, min_y))
