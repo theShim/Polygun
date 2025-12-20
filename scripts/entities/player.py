@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         
         #shooting
         self.bullet_spread = math.pi/40 #+- spread angle in radians
-        self.shoot_timer = Timer(0, 1)
+        self.shoot_timer = Timer(10, 1)
         
         #jumping
         self.jump_vel = 50 #the velocity applied upwards
@@ -87,22 +87,22 @@ class Player(pygame.sprite.Sprite):
         mouse = pygame.mouse.get_pressed()
 
         self.shoot_timer.update()
-        if mouse[0] and self.shoot_timer.finished:
+        if mouse[0] and (pygame.key.get_pressed()[pygame.K_LSHIFT] or self.shoot_timer.finished):
             self.shoot_timer.reset()
             
             mousePos = self.game.mousePos
             mouseAngle = math.atan2(mousePos.y - self.pos.y + self.game.offset.y, mousePos.x - self.pos.x + self.game.offset.x)
 
-            Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height))
+            b = Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height))
 
-            for i in range(random.randint(1, 4)):
+            for i in range(random.randint(3, 3)):
                 Spark(
                     self.game, 
                     [self.game.all_sprites, self.game.particles], 
-                    np.mean([self.points[0], self.points[1]], axis=1) + self.pos + vec(math.cos(mouseAngle), math.sin(mouseAngle)) * 16, 
-                    (self.size + random.uniform(-4, 8)) / 6, 
+                    b.pos, 
+                    (self.size + random.uniform(-4, 12)) / 3, 
                     mouseAngle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1),
-                    speed=random.uniform(2, 4),
+                    speed=random.uniform(2, 2),
                     shadow_height=-vec(0, self.jump_height),
                     shadow_col=(0, 0, 0, 0)
                 )

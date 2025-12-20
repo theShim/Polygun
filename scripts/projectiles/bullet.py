@@ -7,6 +7,8 @@ import os
 import math
 import random
 
+from scripts.particles.sparks import Spark
+
 from scripts.config.SETTINGS import WIDTH, HEIGHT, SIZE, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp
 
@@ -21,14 +23,14 @@ class Bullet(pygame.sprite.Sprite):
         self.pos = vec(pos)
         self.angle = angle
         self.vel = vec(math.cos(self.angle), math.sin(self.angle))
-        self.speed = 10
+        self.speed = 14
         self.col = col
         self.scale = 4
         self.shadow_height = shadow_height
 
         self.w = vec(math.cos(self.angle - math.pi / 2), math.sin(self.angle - math.pi / 2)) * self.scale
         
-        for i in range(2):
+        for i in range(1):
             self.move()
 
     def move(self):
@@ -38,6 +40,17 @@ class Bullet(pygame.sprite.Sprite):
         for room in self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].rooms.values():
             for tile in room.tilemap.collideables(self.game.offset):
                 if tile.hitbox.collidepoint(self.pos):
+                    for i in range(random.randint(3, 3)):
+                        Spark(
+                            self.game, 
+                            [self.game.all_sprites, self.game.particles], 
+                            self.pos, 
+                            (self.scale + random.uniform(-4, 12)) / 3, 
+                            self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
+                            speed=random.uniform(2, 2),
+                            shadow_height=self.shadow_height,
+                            shadow_col=(0, 0, 0, 0)
+                        )
                     return self.kill()
         # for tile in self.game.state_loader.current_state.tilemap.collideables(self.game.offset):
         #     if tile.rect.collidepoint(self.pos):

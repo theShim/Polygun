@@ -34,7 +34,7 @@ class Spark(pygame.sprite.Sprite):
         self.grav = grav
         self.outline = outline
 
-        for i in range(int(self.scale*2)+1):
+        for i in range(int(self.scale)+1):
             self.move()
 
 
