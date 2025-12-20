@@ -51,7 +51,7 @@ class Game:
         #initalising pygame window
         flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL
         self.window = pygame.display.set_mode(SIZE, flags, vsync=1)
-        self.screen = pygame.Surface(SIZE)
+        self.screen = pygame.Surface(SIZE, pygame.SRCALPHA)
         pygame.display.toggle_fullscreen()
         self.clock = pygame.time.Clock()
         self.offset = vec()

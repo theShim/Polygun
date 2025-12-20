@@ -5,10 +5,11 @@ with contextlib.redirect_stdout(None):
 
 import random
 
+from scripts.entities.enemy import Enemy
 from scripts.world_loading.tilemap import Tilemap
 
 from scripts.utils.CORE_FUNCS import vec
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
 
     ##############################################################################################
 
@@ -75,6 +76,8 @@ class DungeonLevel:
         for node in nodes:
            self.rooms[node].tilemap.auto_tile()
 
+        self.rooms[(0, 0)].start_room = True
+
     def generate_boss_room(self):
         leaves = [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]
         self.boss_room = random.choice(leaves)
@@ -88,3 +91,7 @@ class Room:
         self.conns = conns
         self.parent_level = parent_level
         self.tilemap = Tilemap(self.game, self)
+
+        self.start_room = False
+
+        Enemy(self.game, [self.game.all_sprites], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])

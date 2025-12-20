@@ -19,6 +19,8 @@ from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 
 rot_2d = lambda points, a: points @ np.array([[math.cos(-a), -math.sin(-a)], [math.sin(-a), math.cos(-a)]])
 
+    ##############################################################################################
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, groups):
         super().__init__(groups)
@@ -232,7 +234,7 @@ class Player(pygame.sprite.Sprite):
         points = rot_2d(points, self.angle)
         jump_scale = max(0.25, 1 -(self.jump_height / self.max_jump_height))
         
-        pygame.draw.polygon(self.screen, (0, 0, 0, 0), (-self.game.offset + points * (jump_scale * 1.25)) + self.pos + vec(0, 4 * jump_scale))
+        pygame.draw.polygon(self.screen, (0, 0, 0), (-self.game.offset + points * (jump_scale * 1.25)) + self.pos + vec(0, 4 * jump_scale))
         pygame.draw.polygon(temp_surf, (0, 114, 110), points * 1.25 + center - vec(0, self.jump_height))
         pygame.draw.polygon(temp_surf, (0, 255, 247), points + center - vec(0, self.jump_height))
 
