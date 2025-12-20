@@ -44,20 +44,31 @@ class Enemy(pygame.sprite.Sprite):
         self.bullet_spread = math.pi/20 #+- spread angle in radians
         self.shoot_timer = Timer(10, 1)
 
+        #damage indicator stuff
+        self.knockback_vel = vec()
+        self.hurt = False
+        self.damage_timer = Timer(4, 1)
+
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
+
 
         #############################################################################
 
     def knockback(self, vel):
-        self.vel += vel * 10
+        self.knockback_vel = vel
 
+    def take_hit(self, damage=0):
+        self.hurt = True
+        self.damage_timer.reset()
 
     def move(self):
         self.acc = vec()
         
-        self.acc = (self.game.player.pos - self.pos).normalize() * self.run_speed
-        self.vel += self.acc * self.game.dt
+        self.vel = (self.game.player.pos - self.pos).normalize() * self.run_speed
         self.pos += self.vel * self.game.dt
+
+        self.pos += self.knockback_vel * self.game.dt
+        self.knockback_vel = self.knockback_vel.lerp(vec(), 0.3)
 
         self.change_direction()
         # self.apply_forces()
@@ -73,6 +84,11 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.move()
 
+        if self.hurt:
+            self.damage_timer.update()
+            if self.damage_timer.finished:
+                self.hurt = False
+
         self.draw()
 
     def draw(self):
@@ -86,8 +102,8 @@ class Enemy(pygame.sprite.Sprite):
         points = rot_2d(points, self.angle)
         
         pygame.draw.polygon(self.screen, (0, 0, 0, 0), (-self.game.offset + points * 1.25) + self.pos + vec(0, 4))
-        pygame.draw.polygon(temp_surf, (114, 0, 2), points * 1.3 + center)
-        pygame.draw.polygon(temp_surf, (255, 0, 55), points + center)
+        pygame.draw.polygon(temp_surf, (114, 0, 2) if not self.hurt else (255, 255, 255), points * 1.3 + center)
+        pygame.draw.polygon(temp_surf, (255, 0, 55) if not self.hurt else (255, 255, 255), points + center)
 
         # Apply shader only to that region
         # temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
