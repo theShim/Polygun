@@ -83,7 +83,7 @@ class Game:
         self.player = Player(self, [self.all_sprites, self.entities])
 
     @property
-    def mousePos(self):
+    def mousePos(self) -> vec:
         mousePos = pygame.mouse.get_pos()
         window_size = pygame.display.get_window_size()  # actual window size (after scaling)
         scale_x = WIDTH / window_size[0]
@@ -152,16 +152,17 @@ class Game:
 
     def calculate_offset(self):
         #have the screen offset kinda lerp to the player location
-        self.offset.x += (self.player.pos.x - WIDTH/2 - self.offset.x) / CAMERA_FOLLOW_SPEED
-        self.offset.y += (self.player.pos.y - HEIGHT/2 - self.offset.y) / CAMERA_FOLLOW_SPEED
+        target_x = self.player.pos.x - WIDTH/2
+        target_y = self.player.pos.y - HEIGHT/2
 
-        #restricting the offsets
-        #MAKE THIS DIFFERENT ACCORDING TO CUSTOM STAGE SIZES LATER
-        #e.g. if self.offset.x < self.stage.offset.bounds[0]: x = self.stage.offset.bounds[0]
-        # if self.offset.x < 0:
-        #     self.offset.x = 0
-        # if self.offset.x > math.inf:
-        #     self.offset.x = math.inf
+        mouse_dx = max(-WIDTH/2, min(WIDTH/2, self.mousePos.x - WIDTH / 2)) / 3.5
+        mouse_dy = max(-HEIGHT/2, min(HEIGHT/2, self.mousePos.y - HEIGHT / 2)) / 3.5
+
+        target_x += mouse_dx
+        target_y += mouse_dy
+        
+        self.offset.x += (target_x - self.offset.x) / CAMERA_FOLLOW_SPEED
+        self.offset.y += (target_y - self.offset.y) / CAMERA_FOLLOW_SPEED
 
     def calculate_zoom(self):
         pass
