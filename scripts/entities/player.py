@@ -90,11 +90,7 @@ class Player(pygame.sprite.Sprite):
         if mouse[0] and self.shoot_timer.finished:
             self.shoot_timer.reset()
             
-            mousePos = pygame.mouse.get_pos()
-            window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-            scale_x = WIDTH / window_size[0]
-            scale_y = HEIGHT / window_size[1]
-            mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+            mousePos = self.game.mousePos
             mouseAngle = math.atan2(mousePos.y - self.pos.y + self.game.offset.y, mousePos.x - self.pos.x + self.game.offset.x)
 
             Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height))
@@ -175,16 +171,6 @@ class Player(pygame.sprite.Sprite):
             )
 
     def change_direction(self):
-        # get raw mouse pos (window coords, affected by scaling)
-        # mousePos = pygame.mouse.get_pos()
-
-        # # scale back into internal surface resolution
-        # window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-        # scale_x = WIDTH / window_size[0]
-        # scale_y = HEIGHT / window_size[1]
-        # mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
-
-        # targetPos = (mousePos) + self.game.offset
         if not self.acc.magnitude():
             return
         

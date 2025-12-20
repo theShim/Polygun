@@ -6,6 +6,7 @@ with contextlib.redirect_stdout(None):
 import math
 
 from scripts.gui.menu_buttons import Button, Label
+from scripts.gui.controllers_gui import DeviceConnection
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.states.state_loader import State
 
@@ -28,6 +29,7 @@ class Controllers_GUI(State):
         self.buttons = pygame.sprite.Group()
         Label(self.game, [self.buttons], "Controllers", (30, 60))
         self.back_button = Button(self.game, [self.buttons], "Back", (30, 480), font=Custom_Font.font2)
+        DeviceConnection(self.game, [self.buttons], 0)
         
     def update(self):
         self.prev.prev.d.update() #delaunay

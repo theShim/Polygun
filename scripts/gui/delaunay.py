@@ -70,11 +70,7 @@ class Del:
         self.vectors[condition3, 0] *= -1
         self.vectors[condition4, 1] *= -1
 
-        mousePos = pygame.mouse.get_pos()
-        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-        scale_x = WIDTH / window_size[0]
-        scale_y = HEIGHT / window_size[1]
-        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+        mousePos = self.game.mousePos
 
         #recalculate the new triangles and render them
         self.triangles = Delaunay(np.vstack([self.points, mousePos]))
@@ -87,11 +83,7 @@ class Del:
         elif keys[pygame.K_DOWN]:
             self.weight -= 20
 
-        mousePos = pygame.mouse.get_pos()
-        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-        scale_x = WIDTH / window_size[0]
-        scale_y = HEIGHT / window_size[1]
-        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+        mousePos = self.game.mousePos
 
         points = np.vstack([self.points, mousePos])
         for polygon in self.triangles.simplices:

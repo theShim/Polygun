@@ -19,6 +19,19 @@ class ControlsHandler(pygame.sprite.Sprite):
         self.controls = {}
         self.load_json()
 
+        self.controller = None
+
+    def add_controller(self, device_index):
+        joystick = pygame.joystick.Joystick(device_index)
+
+        name = joystick.get_name()
+        if "switch" in name.lower(): #nintendo switch
+            self.controller = SwitchController(joystick)
+
+    def remove_controller(self, instance_id):
+        if self.controller and self.controller.joystick.get_instance_id() == instance_id:
+            self.controller = None
+
     def load_json(self):
         try:
             with open("data/player_controls.json", "r") as file:

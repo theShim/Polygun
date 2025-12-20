@@ -31,25 +31,25 @@ void main() {
     f_color = vec4(texture(tex, pixelate(uvs)).rgb, 1.0);
 
     
-    vec2 uv = uvs;
+    // vec2 uv = uvs;
 
-    float pencilOffset = floor(time * 0.004) * 0.2;
-    vec2 noiseSample = texture(noiseTex, uv / 6.0 + pencilOffset).rg - 0.5;
-    uv += noiseSample * 0.0025;
+    // float pencilOffset = floor(time * 0.004) * 0.2;
+    // vec2 noiseSample = texture(noiseTex, uv / 6.0 + pencilOffset).rg - 0.5;
+    // uv += noiseSample * 0.0025;
 
-    vec3 color = texture(tex, uv).rgb;
-    // float detail = (texture(noiseTex, uv + pencilOffset).b - 0.5) * 0.03;
-    // detail += (texture(noiseTex, uv * 4.0 - pencilOffset / 3.0).b - 0.5) * 0.015;
+    // vec3 color = texture(tex, uv).rgb;
+    // // float detail = (texture(noiseTex, uv + pencilOffset).b - 0.5) * 0.03;
+    // // detail += (texture(noiseTex, uv * 4.0 - pencilOffset / 3.0).b - 0.5) * 0.015;
 
-    vec3 pencil = color;// + detail * 1.2;
-    pencil = mix(color, pencil, 0.9); // blend strength
-    pencil = clamp(pencil, 0.0, 1.0);
+    // vec3 pencil = color;// + detail * 1.2;
+    // pencil = mix(color, pencil, 0.9); // blend strength
+    // pencil = clamp(pencil, 0.0, 1.0);
 
-    // Optional: tiny warm tint (looks like paper reflection)
-    pencil *= vec3(1.05, 1.02, 0.97);
+    // // Optional: tiny warm tint (looks like paper reflection)
+    // pencil *= vec3(1.05, 1.02, 0.97);
 
-    vec3 final_colour = vignette(uvs, pencil);
+    // vec3 final_colour = vignette(uvs, pencil);
 
-    f_color = vec4(final_colour, 1.0);
+    // f_color = vec4(final_colour, 1.0);
 
 }

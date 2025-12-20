@@ -16,7 +16,7 @@ from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
-from scripts.utils.controller_handler import ControlsHandler
+from scripts.controls.controller_handler import ControlsHandler
 from scripts.world_loading.tilemap import Tile
 
 from scripts.config.SETTINGS import *
@@ -82,12 +82,23 @@ class Game:
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
+    @property
+    def mousePos(self):
+        mousePos = pygame.mouse.get_pos()
+        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
+        scale_x = WIDTH / window_size[0]
+        scale_y = HEIGHT / window_size[1]
+        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+        return mousePos
+
         ####################################################################################
 
     def initialise(self):
         pygame.init()  #general pygame
         pygame.font.init() #font stuff
         pygame.display.set_caption(WINDOW_TITLE) #Window Title 
+
+        pygame.joystick.init()
 
         pygame.mixer.pre_init(44100, 16, 2, 4096) #music stuff
         pygame.mixer.init()
@@ -177,6 +188,11 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         self.quit()
+
+                elif event.type == pygame.JOYDEVICEADDED:
+                    self.controls_handler.add_controller(event.device_index)
+                elif event.type == pygame.JOYDEVICEREMOVED:
+                    self.controls_handler.remove_controller(event.instance_id)
                     
             self.screen.fill((35, 34, 43))
             # self.calculate_offset()

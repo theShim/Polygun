@@ -57,11 +57,7 @@ class Button(pygame.sprite.Sprite):
 
 
     def update(self):
-        mousePos = pygame.mouse.get_pos()
-        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-        scale_x = WIDTH / window_size[0]
-        scale_y = HEIGHT / window_size[1]
-        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+        mousePos = self.game.mousePos
 
         if not self.out_of_frame:
             self.clicked = False
@@ -277,11 +273,7 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         self.line_origin = self.pos + vec(self.font.calc_surf_width(f"{self.text:<14}") + self.font.calc_surf_width(self.CONTROLS_TO_TEXT[self.key]) / 2, self.font.space_height - 3)
 
     def update(self):
-        mousePos = pygame.mouse.get_pos()
-        window_size = pygame.display.get_window_size()  # actual window size (after scaling)
-        scale_x = WIDTH / window_size[0]
-        scale_y = HEIGHT / window_size[1]
-        mousePos = vec(mousePos[0] * scale_x, mousePos[1] * scale_y)
+        mousePos = self.game.mousePos
 
         if not self.out_of_frame:
             self.clicked = False
