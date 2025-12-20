@@ -70,6 +70,7 @@ class Game:
         #groups
         self.all_sprites = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
 
         self.state_loader = State_Loader(self, start="dungeon")

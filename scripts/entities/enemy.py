@@ -45,23 +45,30 @@ class Enemy(pygame.sprite.Sprite):
         self.shoot_timer = Timer(10, 1)
 
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
-        
+
+        #############################################################################
+
+    def knockback(self, vel):
+        self.vel += vel * 10
+
 
     def move(self):
         self.acc = vec()
         
-        self.vel = (self.game.player.pos - self.pos).normalize() * self.run_speed
+        self.acc = (self.game.player.pos - self.pos).normalize() * self.run_speed
+        self.vel += self.acc * self.game.dt
         self.pos += self.vel * self.game.dt
 
         self.change_direction()
         # self.apply_forces()
 
     def change_direction(self):
-        
         targetPos = self.pos + self.vel
 
         delta = targetPos - self.pos
         self.angle = math.atan2(delta.y, delta.x)
+
+        #############################################################################
 
     def update(self):
         self.move()

@@ -94,4 +94,4 @@ class Room:
 
         self.start_room = False
 
-        Enemy(self.game, [self.game.all_sprites], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])
+        Enemy(self.game, [self.game.all_sprites, self.game.entities, self.game.enemies], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])

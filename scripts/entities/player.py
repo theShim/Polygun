@@ -45,7 +45,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.bullet_spread = math.pi/40 #+- spread angle in radians
+        self.bullet_spread = math.pi/80 #+- spread angle in radians
         self.shoot_timer = Timer(10, 1)
         
         #jumping
@@ -102,7 +102,7 @@ class Player(pygame.sprite.Sprite):
                     self.game, 
                     [self.game.all_sprites, self.game.particles], 
                     b.pos, 
-                    (self.size + random.uniform(-4, 12)) / 3, 
+                    (self.size + random.uniform(-4, 12)) / 6, 
                     mouseAngle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1),
                     speed=random.uniform(2, 2),
                     shadow_height=-vec(0, self.jump_height),

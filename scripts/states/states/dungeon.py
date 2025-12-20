@@ -18,7 +18,6 @@ class Dungeon(State):
 
     def __init__(self, game, prev=None):
         super().__init__(game, "dungeon", prev)
-        # self.tilemap.load("tiled/tmx/debug.tmx")
         # # self.game.player.rect.center = [100, -50]
 
         self.levels: list[DungeonLevel] = [DungeonLevel(self.game) for _ in range(self.LEVEL_NUM)]
@@ -29,7 +28,6 @@ class Dungeon(State):
         self.render()
 
     def render(self):
-        # self.tilemap.render()
         pygame.draw.circle(self.screen, (255, 0, 0, 120), (WIDTH * 0.7, HEIGHT/2) - self.game.offset, 50)
 
         tiles = []

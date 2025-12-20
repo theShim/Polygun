@@ -52,9 +52,22 @@ class Bullet(pygame.sprite.Sprite):
                             shadow_col=(0, 0, 0, 0)
                         )
                     return self.kill()
-        # for tile in self.game.state_loader.current_state.tilemap.collideables(self.game.offset):
-        #     if tile.rect.collidepoint(self.pos):
-        #         return self.kill()
+                
+        for enemy in self.game.enemies:
+            if enemy.pos.distance_to(self.pos) < enemy.size:
+                enemy.knockback(self.vel * self.speed)
+                for i in range(random.randint(3, 3)):
+                    Spark(
+                        self.game, 
+                        [self.game.all_sprites, self.game.particles], 
+                        self.pos, 
+                        (self.scale + random.uniform(-4, 12)) / 3, 
+                        self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
+                        speed=random.uniform(2, 2),
+                        shadow_height=self.shadow_height,
+                        shadow_col=(0, 0, 0, 0)
+                    )
+                return self.kill()
             
         if not pygame.Rect(0, 0, *SIZE).collidepoint(self.pos - self.game.offset):
             return self.kill()
