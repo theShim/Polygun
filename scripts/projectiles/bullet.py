@@ -54,7 +54,7 @@ class Bullet(pygame.sprite.Sprite):
                     return self.kill()
                 
         for enemy in self.game.enemies:
-            if enemy.pos.distance_to(self.pos) < enemy.size:
+            if enemy.pos.distance_to(self.pos) < enemy.size and abs(enemy.height - self.shadow_height.y) < 2:
                 enemy.knockback(self.vel * self.speed * 40)
                 enemy.take_hit()
                 for i in range(random.randint(3, 3)):
@@ -101,7 +101,7 @@ class Bullet(pygame.sprite.Sprite):
         adjusted_points = [(p.x - min_x, p.y - min_y) for p in points]
         shadow_points = [(p[0], p[1] + 10) for p in adjusted_points]
         
-        pygame.draw.polygon(shadow_surface, (0, 0, 0, 50), shadow_points)
+        pygame.draw.polygon(shadow_surface, (0, 0, 0, 100), shadow_points)
         pygame.draw.polygon(bullet_surface, (243, 255, 185), adjusted_points)
         pygame.draw.polygon(bullet_surface, self.col, [(c := vec(shadow_surface.get_rect().center)) + 1.1 * (p - c) for p in  adjusted_points], 2)
         

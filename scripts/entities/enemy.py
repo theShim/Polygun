@@ -39,6 +39,7 @@ class Enemy(pygame.sprite.Sprite):
         self.run_speed = 100
         self.dash_speed = 30
         self.angle = 0
+        self.height = 0
 
         #shooting
         self.bullet_spread = math.pi/20 #+- spread angle in radians

@@ -245,4 +245,5 @@ class Player(pygame.sprite.Sprite):
         # pygame.draw.circle(temp_surf, (11, 164, 29), (self.size / 2, self.size / 2), self.size/2)
         # pygame.draw.circle(temp_surf, (242, 34, 34), (self.size / 2, self.size / 2), self.size/2 * 0.95)
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
+        # temp_surf.set_alpha(30)
         self.screen.blit(temp_surf, rect)
