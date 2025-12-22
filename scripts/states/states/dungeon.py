@@ -5,8 +5,9 @@ with contextlib.redirect_stdout(None):
 
 import random
 
+from scripts.entities.enemy import Enemy
 from scripts.states.state_loader import State
-from scripts.world_loading.dungeons import DungeonLevel
+from scripts.world_loading.dungeons import DungeonLevel, Room
 from scripts.world_loading.tilemap import Tile
 
 from scripts.utils.CORE_FUNCS import vec
@@ -26,7 +27,7 @@ class Dungeon(State):
 
         self.last_available_room = None
 
-    def get_current_room(self, pos = None, offset: vec = vec()):
+    def get_current_room(self, pos = None, offset: vec = vec()) -> Room:
         level: DungeonLevel = self.levels[self.current_level_index]
         
         if pos == None:
@@ -55,5 +56,14 @@ class Dungeon(State):
         tiles = []
         for room in self.levels[self.current_level_index].rooms.values():
             tiles += list(room.tilemap.on_screen_tiles(self.game.offset, buffer=[1, 1]))
-        for spr in sorted(self.game.all_sprites.sprites() + tiles, key=lambda s: s.rect.bottom if isinstance(s, Tile) else s.pos.y):
+
+        sprites = []
+        for spr in self.game.all_sprites:
+            if isinstance(spr, Enemy):
+                if spr in self.get_current_room().enemies_to_kill:
+                    sprites += [spr]
+            else:
+                sprites += [spr]
+
+        for spr in sorted(sprites + tiles, key=lambda s: s.rect.bottom if isinstance(s, Tile) else s.pos.y):
             spr.update()
