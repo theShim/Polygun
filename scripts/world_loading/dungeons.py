@@ -101,17 +101,41 @@ class Room:
         self.state = Room.UNENTERED
         self.start_room = False
 
-        Enemy(self.game, [self.game.all_sprites, self.game.entities, self.game.enemies], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])
+        self.enemies_to_kill = pygame.sprite.Group()
+
+        Enemy(self.game, [self.game.all_sprites, self.game.entities, self.game.enemies, self.enemies_to_kill], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])
 
     def update(self):
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
         #i.e. it's been entered by the player
         if self.state == Room.UNENTERED:
-            self.state = Room.PLAYER_FIGHTING
+            
+            room_x = (self.game.player.pos.x % (TILE_SIZE * LEVEL_SIZE)) // TILE_SIZE
+            room_y = (self.game.player.pos.y % (TILE_SIZE * LEVEL_SIZE)) // TILE_SIZE
+            delta_x = room_x - (LEVEL_SIZE // 2)
+            delta_y = room_y - (LEVEL_SIZE // 2)
+            mag = delta_x * delta_x + delta_y * delta_y
+            
+            if mag < (LEVEL_SIZE * 0.5 * 0.75) ** 2:
+                self.state = Room.PLAYER_FIGHTING
 
-            self.tilemap.fill_corridoors()
+                self.tilemap.fill_corridoors()
+                for conn in self.conns:
+                    self.parent_level.rooms[conn].tilemap.fill_corridoors()
+
+                self.tilemap.auto_tile()
+                for conn in self.conns:
+                    self.parent_level.rooms[conn].tilemap.auto_tile()
+
+        elif self.state == Room.PLAYER_FIGHTING:
+            if len(self.enemies_to_kill):
+                return
+            
+            self.state = Room.CLEARED
+
+            self.tilemap.remove_corridoors()
             for conn in self.conns:
-                self.parent_level.rooms[conn].tilemap.fill_corridoors()
+                self.parent_level.rooms[conn].tilemap.remove_corridoors()
 
             self.tilemap.auto_tile()
             for conn in self.conns:
