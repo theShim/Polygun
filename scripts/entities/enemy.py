@@ -62,13 +62,39 @@ class Enemy(pygame.sprite.Sprite):
         self.hurt = True
         self.damage_timer.reset()
 
+    def collisions(self, direction):
+        room = self.game.state_loader.current_state.get_current_room(self.pos)
+
+        for tile in room.tilemap.collideables(self.game.offset):
+            if tile.hitbox.collidepoint(self.pos):
+                if direction == "vertical":
+                    if self.pos.y - self.size / 2 < tile.hitbox.bottom and self.vel.y < 0:
+                        self.pos.y = tile.hitbox.bottom + self.size / 2
+                        self.vel.y = 0
+                    elif self.pos.y + self.size / 2 > tile.hitbox.top and self.vel.y > 0:
+                        self.pos.y = tile.hitbox.top - self.size / 2
+                        self.vel.y = 0
+
+                elif direction == "horizontal":
+                    if self.pos.x - self.size / 2 < tile.hitbox.right and self.vel.x < 0:
+                        self.pos.x = tile.hitbox.right + self.size / 2
+                        self.vel.x = 0
+                    elif self.pos.x + self.size / 2 > tile.hitbox.left and self.vel.x > 0:
+                        self.pos.x = tile.hitbox.left - self.size / 2
+                        self.vel.x = 0
+
     def move(self):
         self.acc = vec()
-        
         self.vel = (self.game.player.pos - self.pos).normalize() * self.run_speed
-        self.pos += self.vel * self.game.dt
 
-        self.pos += self.knockback_vel * self.game.dt
+        self.pos.x += self.vel.x * self.game.dt
+        self.pos.x += self.knockback_vel.x * self.game.dt
+        self.collisions("horizontal")
+
+        self.pos.y += self.vel.y * self.game.dt
+        self.pos.y += self.knockback_vel.y * self.game.dt
+        self.collisions("vertical")
+
         self.knockback_vel = self.knockback_vel.lerp(vec(), 0.3)
 
         self.change_direction()

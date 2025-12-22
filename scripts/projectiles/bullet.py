@@ -37,21 +37,21 @@ class Bullet(pygame.sprite.Sprite):
         self.pos += self.vel * self.speed
 
     def collisions(self):
-        for room in self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].rooms.values():
-            for tile in room.tilemap.collideables(self.game.offset):
-                if tile.hitbox.collidepoint(self.pos):
-                    for i in range(random.randint(3, 3)):
-                        Spark(
-                            self.game, 
-                            [self.game.all_sprites, self.game.particles], 
-                            self.pos, 
-                            (self.scale + random.uniform(-4, 12)) / 3, 
-                            self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
-                            speed=random.uniform(2, 2),
-                            shadow_height=self.shadow_height,
-                            shadow_col=(0, 0, 0, 0)
-                        )
-                    return self.kill()
+        room = self.game.state_loader.current_state.get_current_room(pos=self.pos)
+        for tile in room.tilemap.collideables(self.game.offset):
+            if tile.hitbox.collidepoint(self.pos):
+                for i in range(random.randint(3, 3)):
+                    Spark(
+                        self.game, 
+                        [self.game.all_sprites, self.game.particles], 
+                        self.pos, 
+                        (self.scale + random.uniform(-4, 12)) / 3, 
+                        self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
+                        speed=random.uniform(2, 2),
+                        shadow_height=self.shadow_height,
+                        shadow_col=(0, 0, 0, 0)
+                    )
+                return self.kill()
                 
         for enemy in self.game.enemies:
             if enemy.pos.distance_to(self.pos) < enemy.size and abs(enemy.height - self.shadow_height.y) < 2:

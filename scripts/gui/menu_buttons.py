@@ -14,6 +14,8 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT
 
 rot_2d = lambda points, a: points @ np.array([[math.cos(-a), -math.sin(-a)], [math.sin(-a), math.cos(-a)]])
 
+    ##############################################################################################
+
 class Button(pygame.sprite.Sprite):
     def __init__(self, game, groups, text: str, pos: vec, font = Custom_Font.font2_5):
         super().__init__(groups)

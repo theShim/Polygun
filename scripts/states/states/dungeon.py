@@ -9,7 +9,8 @@ from scripts.states.state_loader import State
 from scripts.world_loading.dungeons import DungeonLevel
 from scripts.world_loading.tilemap import Tile
 
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS
+from scripts.utils.CORE_FUNCS import vec
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
 
     ##############################################################################################
 
@@ -22,6 +23,19 @@ class Dungeon(State):
 
         self.levels: list[DungeonLevel] = [DungeonLevel(self.game) for _ in range(self.LEVEL_NUM)]
         self.current_level_index = 0
+
+    def get_current_room(self, pos = None, offset: vec = vec()):
+        level: DungeonLevel = self.levels[self.current_level_index]
+        
+        if pos == None:
+            pos = self.game.player.pos
+        else:
+            pos = vec(pos)
+
+        room_x = pos.x // (TILE_SIZE * LEVEL_SIZE) + offset[0]
+        room_y = pos.y // (TILE_SIZE * LEVEL_SIZE) + offset[1]
+        
+        return level.rooms[(int(room_x), int(room_y))]
 
     def update(self):
         self.game.calculate_offset() #camera

@@ -14,6 +14,7 @@ import numpy as np
 
 from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
+from scripts.gui.health_bar import HealthBar
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
@@ -72,6 +73,7 @@ class Game:
         self.entities = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
+        self.gui_elements = pygame.sprite.Group()
 
         self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
@@ -82,6 +84,8 @@ class Game:
         self.k = 0
 
         self.player = Player(self, [self.all_sprites, self.entities])
+
+        HealthBar(self, [self.gui_elements])
 
     @property
     def mousePos(self) -> vec:
@@ -216,6 +220,8 @@ class Game:
             #     spr.update()
 
             self.state_loader.update()
+            self.gui_elements.update()
+            # pygame.draw.rect(sscreen, [255, 0, 0], [3, 3, 40, 40])
 
 
             if DEBUG:

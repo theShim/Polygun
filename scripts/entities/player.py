@@ -177,32 +177,29 @@ class Player(pygame.sprite.Sprite):
             return
         
         targetPos = self.pos + self.vel
-
         delta = targetPos - self.pos
         self.angle = math.atan2(delta.y, delta.x)
 
     def collisions(self, direction):
-        for room in self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].rooms.values():
-            flag = False
-            for tile in room.tilemap.collideables(self.game.offset):
-                if tile.hitbox.collidepoint(self.pos):
-                    if direction == "vertical":
-                        if self.pos.y - self.size / 2 < tile.hitbox.bottom and self.vel.y < 0:
-                            self.pos.y = tile.hitbox.bottom + self.size / 2
-                            flag = True
-                        elif self.pos.y + self.size / 2 > tile.hitbox.top and self.vel.y > 0:
-                            self.pos.y = tile.hitbox.top - self.size / 2
-                            flag = True
+        room = self.game.state_loader.current_state.get_current_room()
 
-                    elif direction == "horizontal":
-                        if self.pos.x - self.size / 2 < tile.hitbox.right and self.vel.x < 0:
-                            self.pos.x = tile.hitbox.right + self.size / 2
-                            flag = True
-                        elif self.pos.x + self.size / 2 > tile.hitbox.left and self.vel.x > 0:
-                            self.pos.x = tile.hitbox.left - self.size / 2
-                            flag = True
-            if flag:
-                break
+        for tile in room.tilemap.collideables(self.game.offset):
+            if tile.hitbox.collidepoint(self.pos):
+                if direction == "vertical":
+                    if self.pos.y - self.size / 2 < tile.hitbox.bottom and self.vel.y < 0:
+                        self.pos.y = tile.hitbox.bottom + self.size / 2
+                        self.vel.y = 0
+                    elif self.pos.y + self.size / 2 > tile.hitbox.top and self.vel.y > 0:
+                        self.pos.y = tile.hitbox.top - self.size / 2
+                        self.vel.y = 0
+
+                elif direction == "horizontal":
+                    if self.pos.x - self.size / 2 < tile.hitbox.right and self.vel.x < 0:
+                        self.pos.x = tile.hitbox.right + self.size / 2
+                        self.vel.x = 0
+                    elif self.pos.x + self.size / 2 > tile.hitbox.left and self.vel.x > 0:
+                        self.pos.x = tile.hitbox.left - self.size / 2
+                        self.vel.x = 0
 
     def update(self):
         self.move()
