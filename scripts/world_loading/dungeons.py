@@ -5,7 +5,7 @@ with contextlib.redirect_stdout(None):
 
 import random
 
-from scripts.entities.enemy import Enemy
+from scripts.entities.enemy import Enemy, EnemySpawnData
 from scripts.world_loading.tilemap import Tilemap
 
 from scripts.utils.CORE_FUNCS import vec
@@ -101,9 +101,33 @@ class Room:
         self.state = Room.UNENTERED
         self.start_room = False
 
+        self.wave_stack: list[list[EnemySpawnData]] = [
+            [EnemySpawnData(Enemy, 3)],
+            [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 2)],
+            [EnemySpawnData(Enemy, 2)],
+        ]
+        self.max_waves = len(self.wave_stack)
+
         self.enemies_to_kill = pygame.sprite.Group()
 
         Enemy(self.game, [self.game.all_sprites, self.game.entities, self.game.enemies, self.enemies_to_kill], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])
+
+    def spawn_wave(self):
+        if not self.wave_stack:
+            return
+        
+        wave = self.wave_stack.pop(0)
+
+        for data in wave:
+            pos = [self.pos[0] * TILE_SIZE * LEVEL_SIZE + random.uniform(TILE_SIZE * 2, LEVEL_SIZE * TILE_SIZE - TILE_SIZE * 2),
+                    self.pos[1] * TILE_SIZE * LEVEL_SIZE + random.uniform(TILE_SIZE * 2, LEVEL_SIZE * TILE_SIZE - TILE_SIZE * 2)]
+            for _ in range(data.count):
+                offset = vec(random.uniform(-TILE_SIZE, TILE_SIZE), random.uniform(-TILE_SIZE, TILE_SIZE))
+                enemy = data.enemy_class(
+                    self.game,
+                    [self.game.all_sprites, self.game.entities, self.game.enemies, self.enemies_to_kill],
+                    pos + offset
+                )
 
     def update(self):
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
@@ -127,7 +151,13 @@ class Room:
                 for conn in self.conns:
                     self.parent_level.rooms[conn].tilemap.auto_tile()
 
+                self.spawn_wave()
+
         elif self.state == Room.PLAYER_FIGHTING:
+            if len(self.enemies_to_kill):
+                return
+            
+            self.spawn_wave()
             if len(self.enemies_to_kill):
                 return
             

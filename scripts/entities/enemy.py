@@ -173,3 +173,13 @@ class Enemy(pygame.sprite.Sprite):
         # Blit result to the main screen
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)
+
+    ##############################################################################################
+
+
+    ##############################################################################################
+
+class EnemySpawnData:
+    def __init__(self, enemy_class, count):
+        self.enemy_class = enemy_class
+        self.count = count
