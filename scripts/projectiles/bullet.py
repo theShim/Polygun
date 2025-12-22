@@ -55,7 +55,6 @@ class Bullet(pygame.sprite.Sprite):
                 return self.kill()
                 
         for enemy in self.game.enemies:
-            print(enemy.height, self.shadow_height.y, abs(enemy.height) - abs(self.shadow_height.y), (abs(enemy.height) - abs(self.shadow_height.y)) < 4)
             if enemy.pos.distance_to(self.pos) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
                 enemy.knockback(self.vel * self.speed * 40)
                 enemy.take_hit(3)
