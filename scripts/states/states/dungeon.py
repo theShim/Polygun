@@ -21,8 +21,10 @@ class Dungeon(State):
         super().__init__(game, "dungeon", prev)
         # # self.game.player.rect.center = [100, -50]
 
-        self.levels: list[DungeonLevel] = [DungeonLevel(self.game) for _ in range(self.LEVEL_NUM)]
+        self.levels: list[DungeonLevel] = [DungeonLevel(self.game, self) for _ in range(self.LEVEL_NUM)]
         self.current_level_index = 0
+
+        self.last_available_room = None
 
     def get_current_room(self, pos = None, offset: vec = vec()):
         level: DungeonLevel = self.levels[self.current_level_index]
@@ -35,10 +37,16 @@ class Dungeon(State):
         room_x = pos.x // (TILE_SIZE * LEVEL_SIZE) + offset[0]
         room_y = pos.y // (TILE_SIZE * LEVEL_SIZE) + offset[1]
         
-        return level.rooms[(int(room_x), int(room_y))]
+        to_check = (int(room_x), int(room_y))
+        if to_check in level.rooms:
+            self.last_available_room = level.rooms[to_check]
+        room = self.last_available_room
+        
+        return room
 
     def update(self):
         self.game.calculate_offset() #camera
+        self.get_current_room().update()
         self.render()
 
     def render(self):

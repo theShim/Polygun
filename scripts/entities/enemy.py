@@ -46,9 +46,13 @@ class Enemy(pygame.sprite.Sprite):
         self.shoot_timer = Timer(10, 1)
 
         #damage indicator stuff
+        self.health = 20
         self.knockback_vel = vec()
         self.hurt = False
         self.damage_timer = Timer(4, 1)
+
+        #death
+        self.dying = False
 
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
@@ -61,6 +65,13 @@ class Enemy(pygame.sprite.Sprite):
     def take_hit(self, damage=0):
         self.hurt = True
         self.damage_timer.reset()
+
+        self.health -= damage
+        if self.health <= 0:
+            self.trigger_death()
+
+    def trigger_death(self):
+        self.dying = True
 
     def collisions(self, direction):
         room = self.game.state_loader.current_state.get_current_room(self.pos)
@@ -85,7 +96,11 @@ class Enemy(pygame.sprite.Sprite):
 
     def move(self):
         self.acc = vec()
-        self.vel = (self.game.player.pos - self.pos).normalize() * self.run_speed
+
+        if not self.dying:
+            self.vel = (self.game.player.pos - self.pos).normalize() * self.run_speed
+        else:
+            self.vel = vec()
 
         self.pos.x += self.vel.x * self.game.dt
         self.pos.x += self.knockback_vel.x * self.game.dt
@@ -97,7 +112,8 @@ class Enemy(pygame.sprite.Sprite):
 
         self.knockback_vel = self.knockback_vel.lerp(vec(), 0.3)
 
-        self.change_direction()
+        if not self.dying:
+            self.change_direction()
         # self.apply_forces()
 
     def change_direction(self):
@@ -115,6 +131,25 @@ class Enemy(pygame.sprite.Sprite):
             self.damage_timer.update()
             if self.damage_timer.finished:
                 self.hurt = False
+
+        if self.dying:
+            self.points *= 0.9
+            self.angle += math.radians(20)
+            
+            if self.points[0, 0] < 0.25:
+                for i in range(random.randint(3, 5)):
+                    Spark(
+                        self.game, 
+                        [self.game.all_sprites, self.game.particles], 
+                        self.pos, 
+                        (12 + random.uniform(-4, 12)) / 6, 
+                        random.uniform(0, 2 * math.pi),
+                        speed=random.uniform(2, 3),
+                        colour=(255, 0, 55),
+                        shadow_col=(0, 0, 0, 0),
+                        grav=True,
+                    )
+                return self.kill()
 
         self.draw()
 

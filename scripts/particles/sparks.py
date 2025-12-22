@@ -26,7 +26,7 @@ class Spark(pygame.sprite.Sprite):
         self.angle = angle
         self.speed = random.uniform(3, 6) if speed == None else speed
         self.colour = colour
-        self.shadow_height = shadow_height
+        self.shadow_height = shadow_height or vec()
         self.shadow_mod = random.random() if random.randint(0, 5) == 0 else 0
         self.shadow_col = shadow_col
 

@@ -56,8 +56,9 @@ def generate_path(min_length=5, max_length=10):
 
 
 class DungeonLevel:
-    def __init__(self, game):
+    def __init__(self, game, parent):
         self.game = game
+        self.parent_dungeon = parent
 
         self.rooms: dict[tuple, Room] = {}
         self.conns: dict[tuple, list[tuple]] = {}
@@ -84,6 +85,11 @@ class DungeonLevel:
 
 
 class Room:
+
+    UNENTERED = 0
+    PLAYER_FIGHTING = 1
+    CLEARED = 2
+
     def __init__(self, game, pos, conns, parent_level):
         self.game = game
 
@@ -92,6 +98,21 @@ class Room:
         self.parent_level = parent_level
         self.tilemap = Tilemap(self.game, self)
 
+        self.state = Room.UNENTERED
         self.start_room = False
 
         Enemy(self.game, [self.game.all_sprites, self.game.entities, self.game.enemies], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])
+
+    def update(self):
+        #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
+        #i.e. it's been entered by the player
+        if self.state == Room.UNENTERED:
+            self.state = Room.PLAYER_FIGHTING
+
+            self.tilemap.fill_corridoors()
+            for conn in self.conns:
+                self.parent_level.rooms[conn].tilemap.fill_corridoors()
+
+            self.tilemap.auto_tile()
+            for conn in self.conns:
+                self.parent_level.rooms[conn].tilemap.auto_tile()

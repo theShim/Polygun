@@ -56,7 +56,7 @@ class Bullet(pygame.sprite.Sprite):
         for enemy in self.game.enemies:
             if enemy.pos.distance_to(self.pos) < enemy.size and abs(enemy.height - self.shadow_height.y) < 2:
                 enemy.knockback(self.vel * self.speed * 40)
-                enemy.take_hit()
+                enemy.take_hit(3)
                 for i in range(random.randint(3, 3)):
                     Spark(
                         self.game, 
