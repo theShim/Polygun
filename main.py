@@ -221,7 +221,6 @@ class Game:
 
             self.state_loader.update()
             self.gui_elements.update()
-            # pygame.draw.rect(sscreen, [255, 0, 0], [3, 3, 40, 40])
 
 
             if DEBUG:

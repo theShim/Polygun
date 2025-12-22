@@ -102,7 +102,7 @@ class Room:
         self.start_room = False
 
         self.wave_stack: list[list[EnemySpawnData]] = [
-            [EnemySpawnData(Enemy, 3)],
+            [EnemySpawnData(Enemy.Hexagon, 3)],
             [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 2)],
             [EnemySpawnData(Enemy, 2)],
         ]
@@ -110,8 +110,7 @@ class Room:
 
         self.enemies_to_kill = pygame.sprite.Group()
 
-        Enemy(self.game, [self.game.all_sprites, self.game.entities, self.game.enemies, self.enemies_to_kill], [self.pos[0] * TILE_SIZE * LEVEL_SIZE + 300, self.pos[1] * TILE_SIZE * LEVEL_SIZE + 300])
-
+        
     def spawn_wave(self):
         if not self.wave_stack:
             return

@@ -15,7 +15,7 @@ from scripts.utils.CORE_FUNCS import vec, lerp
     ##############################################################################################
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, angle, col, shadow_height = None):
+    def __init__(self, game, groups, pos, angle, col, shadow_height = None, scale_mod=1):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
@@ -25,7 +25,8 @@ class Bullet(pygame.sprite.Sprite):
         self.vel = vec(math.cos(self.angle), math.sin(self.angle))
         self.speed = 14
         self.col = col
-        self.scale = 4
+        self.scale_mod = scale_mod
+        self.scale = 4 * scale_mod
         self.shadow_height = shadow_height
 
         self.w = vec(math.cos(self.angle - math.pi / 2), math.sin(self.angle - math.pi / 2)) * self.scale
@@ -45,7 +46,7 @@ class Bullet(pygame.sprite.Sprite):
                         self.game, 
                         [self.game.all_sprites, self.game.particles], 
                         self.pos, 
-                        (self.scale + random.uniform(-4, 12)) / 3, 
+                        ((self.scale + random.uniform(-4, 12)) / 3) * self.scale_mod, 
                         self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
                         speed=random.uniform(2, 2),
                         shadow_height=self.shadow_height,
@@ -54,7 +55,8 @@ class Bullet(pygame.sprite.Sprite):
                 return self.kill()
                 
         for enemy in self.game.enemies:
-            if enemy.pos.distance_to(self.pos) < enemy.size and abs(enemy.height - self.shadow_height.y) < 2:
+            print(enemy.height, self.shadow_height.y, abs(enemy.height) - abs(self.shadow_height.y), (abs(enemy.height) - abs(self.shadow_height.y)) < 4)
+            if enemy.pos.distance_to(self.pos) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
                 enemy.knockback(self.vel * self.speed * 40)
                 enemy.take_hit(3)
                 for i in range(random.randint(3, 3)):
@@ -62,7 +64,7 @@ class Bullet(pygame.sprite.Sprite):
                         self.game, 
                         [self.game.all_sprites, self.game.particles], 
                         self.pos, 
-                        (self.scale + random.uniform(-4, 12)) / 3, 
+                        ((self.scale + random.uniform(-4, 12)) / 3) * self.scale_mod, 
                         self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
                         speed=random.uniform(2, 2),
                         shadow_height=self.shadow_height,
