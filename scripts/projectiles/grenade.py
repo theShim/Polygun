@@ -24,19 +24,16 @@ class Grenade(pygame.sprite.Sprite):
         self.target_pos = vec(target_pos)
         self.pos = self.start_pos.copy()
 
-        displacement = (self.target_pos - self.start_pos).magnitude()
-        self.speed = 300
-        self.total_time = displacement / self.speed # s = ut => t = s/u
-        self.time = 0
+        self.max_height = 70
+        self.vel = math.sqrt(self.max_height * 2 * GRAV)
+        self.total_time = (2 * self.vel) / GRAV
+        self.time = 0.1
         self.dh = 0
         self.landed = False
 
-        self.max_height = 50
-        self.u = math.sqrt(2 * GRAV * self.max_height) #v^2 = u^2 - 2as, v = 0 at max height
-
     def move(self):
-        self.time += self.game.dt
-        self.dh = (self.u * self.time) - (0.5 * GRAV * self.time ** 2) #s = ut + 1/2 at^2
+        self.time += self.game.dt * 5
+        self.dh = (self.vel * self.time) - (0.5 * GRAV * (self.time ** 2))
         
         if self.dh <= 0:
             self.dh = 0
@@ -51,8 +48,7 @@ class Grenade(pygame.sprite.Sprite):
         self.draw()
 
     def draw(self):
-        screen_y = self.pos.y - self.game.offset.y
-        radius = (((5 * screen_y) / HEIGHT) + 4)
+        radius = (((5 * self.dh) / self.max_height) + 4)
 
         y = radius / 2
         shadow = pygame.Surface((y*4, y), pygame.SRCALPHA)
