@@ -44,7 +44,7 @@ class Enemy(pygame.sprite.Sprite):
 
         #shooting
         self.bullet_spread = math.pi/20 #+- spread angle in radians
-        self.shoot_timer = Timer(10, 1)
+        self.shoot_timer = Timer(20, 1)
         for i in range(random.randint(0, 10)):
             self.shoot_timer.update()
 
@@ -157,7 +157,7 @@ class Enemy(pygame.sprite.Sprite):
                     Spark(
                         self.game, 
                         [self.game.all_sprites, self.game.particles], 
-                        self.pos, 
+                        self.pos - vec(0, self.height), 
                         (12 + random.uniform(-4, 12)) / 6, 
                         random.uniform(0, 2 * math.pi),
                         speed=random.uniform(2, 3),
@@ -275,7 +275,7 @@ class Hexagon(Enemy):                               #plants bombs on the floor
                     Spark(
                         self.game, 
                         [self.game.all_sprites, self.game.particles], 
-                        self.pos, 
+                        self.pos - vec(0, self.height), 
                         (12 + random.uniform(-4, 12)) / 6, 
                         random.uniform(0, 2 * math.pi),
                         speed=random.uniform(2, 3),
@@ -384,11 +384,11 @@ class Pentagon(Enemy):                              #throws grenades
                     Spark(
                         self.game, 
                         [self.game.all_sprites, self.game.particles], 
-                        self.pos, 
+                        self.pos - vec(0, self.height), 
                         (12 + random.uniform(-4, 12)) / 6, 
                         random.uniform(0, 2 * math.pi),
                         speed=random.uniform(2, 3),
-                        colour=(28, 179, 73),
+                        colour=(235, 101, 70),
                         shadow_col=(0, 0, 0, 0),
                         grav=True,
                     )
@@ -408,8 +408,8 @@ class Pentagon(Enemy):                              #throws grenades
         jump_scale = max(0.25, (self.height / 50))
         
         pygame.draw.polygon(self.screen, (0, 0, 0, 0), (-self.game.offset + points * 1.25) + self.pos + vec(0, 4))
-        pygame.draw.polygon(temp_surf, (0, 83, 33) if not self.hurt else (255, 255, 255), points * 1.4 + center - vec(0, self.height))
-        pygame.draw.polygon(temp_surf, (28, 179, 73) if not self.hurt else (255, 255, 255), points + center - vec(0, self.height))
+        pygame.draw.polygon(temp_surf, (198, 70, 42) if not self.hurt else (255, 255, 255), points * 1.4 + center - vec(0, self.height))
+        pygame.draw.polygon(temp_surf, (235, 101, 70) if not self.hurt else (255, 255, 255), points + center - vec(0, self.height))
 
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)

@@ -8,6 +8,7 @@ import math
 import random
 
 from scripts.particles.sparks import Grenade_Spark
+from scripts.particles.grenade_explosion import Grenade_Explosion
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, SIZE, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
@@ -61,6 +62,7 @@ class Grenade(pygame.sprite.Sprite):
         self.move()
 
         if self.landed:
+            Grenade_Explosion(self.game, [self.game.all_sprites, self.game.particles], self.pos)
             return self.kill()
 
         self.spark.update()
@@ -74,6 +76,11 @@ class Grenade(pygame.sprite.Sprite):
             vel = -(self.target_pos - self.start_pos) / self.total_time + vec(0, self.v * math.sin(self.theta) - GRAV * self.time) * self.height_mult
             angle = math.atan2(vel.y, vel.x)# + math.pi
 
+            colours = [
+                (25, 12, 36),
+                (235, 101, 70),
+                (191, 60, 97)
+            ]
             Grenade_Spark(
                 self.game, 
                 [self.game.all_sprites, self.game.particles], 
@@ -81,11 +88,15 @@ class Grenade(pygame.sprite.Sprite):
                 random.uniform(3, 5), 
                 angle + (math.pi/32) * (-1 if self.spark_flag else 1),
                 speed=random.uniform(5, 5),
-                colour=(255, 0, 0),
+                colour=random.choice(colours),
                 shadow_height=-vec(0, self.dh),
                 shadow_col=(0, 0, 0, 0),
                 shadow_angle = self.angle + (math.pi/32) * (-1 if self.spark_flag else 1)
             )
+            colours = [
+                (253, 252, 211),
+                (239, 209, 113),
+            ]
             Grenade_Spark(
                 self.game, 
                 [self.game.all_sprites, self.game.particles], 
@@ -93,7 +104,7 @@ class Grenade(pygame.sprite.Sprite):
                 random.uniform(3, 5), 
                 angle - (math.pi/32) * (-1 if self.spark_flag else 1),
                 speed=random.uniform(5, 5),
-                colour=(255, 255, 255),
+                colour=random.choice(colours),
                 shadow_height=-vec(0, self.dh),
                 shadow_col=(0, 0, 0, 0),
                 shadow_angle = self.angle + (math.pi/32) * (-1 if self.spark_flag else 1)
@@ -102,7 +113,7 @@ class Grenade(pygame.sprite.Sprite):
         self.draw()
 
     def draw(self):
-        radius = 6 # (((5 * self.dh) / self.max_height) + 4)
+        radius = 8 # (((5 * self.dh) / self.max_height) + 4)
 
         y = radius / 2
         shadow = pygame.Surface((y*4, y), pygame.SRCALPHA)
@@ -110,7 +121,8 @@ class Grenade(pygame.sprite.Sprite):
         shadow.set_alpha(128)
         self.screen.blit(shadow, shadow.get_rect(center=(self.pos + vec(0, radius) - self.game.offset)))
 
-        pygame.draw.circle(self.screen, (255, 0, 0), self.pos - self.game.offset - vec(0, self.dh), radius)
+        pygame.draw.circle(self.screen, (235, 101, 70), self.pos - self.game.offset - vec(0, self.dh), radius)
+        pygame.draw.circle(self.screen, (178, 50, 22), self.pos - self.game.offset - vec(0, self.dh), radius, 3)
 
 
 class GrenadeExplosion(pygame.sprite.Sprite):
