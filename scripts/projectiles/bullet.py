@@ -15,10 +15,11 @@ from scripts.utils.CORE_FUNCS import vec, lerp
     ##############################################################################################
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, angle, col, shadow_height = None, scale_mod=1):
+    def __init__(self, game, groups, pos, angle, col, owner, shadow_height = None, scale_mod=1):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
+        self.owner = owner
         
         self.pos = vec(pos)
         self.angle = angle
@@ -54,10 +55,28 @@ class Bullet(pygame.sprite.Sprite):
                     )
                 return self.kill()
                 
-        for enemy in self.game.enemies:
-            if enemy.pos.distance_to(self.pos) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
-                enemy.knockback(self.vel * self.speed * 40)
-                enemy.take_hit(3)
+        if self.owner == self.game.player:
+            for enemy in self.game.enemies:
+                if enemy.pos.distance_to(self.pos) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
+                    enemy.knockback(self.vel * self.speed * 40)
+                    enemy.take_hit(3)
+                    for i in range(random.randint(3, 3)):
+                        Spark(
+                            self.game, 
+                            [self.game.all_sprites, self.game.particles], 
+                            self.pos, 
+                            ((self.scale + random.uniform(-4, 12)) / 3) * self.scale_mod, 
+                            self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
+                            speed=random.uniform(2, 2),
+                            shadow_height=self.shadow_height,
+                            shadow_col=(0, 0, 0, 0)
+                        )
+                    return self.kill()
+        
+        else: #definitely player
+            if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.height) - abs(self.shadow_height.y)) < 4:
+                # self.game.player.knockback(self.vel * self.speed * 40)
+                # self.game.player.take_hit(3)
                 for i in range(random.randint(3, 3)):
                     Spark(
                         self.game, 
