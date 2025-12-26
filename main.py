@@ -15,6 +15,7 @@ import numpy as np
 from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.health_bar import HealthBar
+from scripts.gui.crosshair import CrossHair
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
@@ -86,6 +87,7 @@ class Game:
         self.player = Player(self, [self.all_sprites, self.entities])
 
         HealthBar(self, [self.gui_elements])
+        CrossHair(self, [self.gui_elements])
 
     @property
     def mousePos(self) -> vec:
