@@ -117,7 +117,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and not self.jumping:
             self.jumping = True
             self.jump_time = 0
-            self.health -= 10
 
 
         #the psuedo height stuff, just projectile motion
@@ -247,4 +246,38 @@ class Player(pygame.sprite.Sprite):
         # pygame.draw.circle(temp_surf, (242, 34, 34), (self.size / 2, self.size / 2), self.size/2 * 0.95)
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         # temp_surf.set_alpha(30)
+
+
+        mousePos = self.game.mousePos
+        delta = mousePos - (self.pos - self.game.offset)
+        angle = math.atan2(delta.y, delta.x)
+        pointer_first = angle < 0
+        
+        #the lil arrow indicator. annoyed there isnt a better way to do differentiate if its infront of behind
+        if pointer_first:
+            pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
+            points = [
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (7) - vec(0, self.jump_height)
+                for a in range(0, 360, 120)
+            ]
+            shadow_points = [
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (9 * jump_scale) + vec(0, 4)
+                for a in range(0, 360, 120)
+            ]
+            pygame.draw.polygon(self.screen, (0, 0, 0), shadow_points)
+            pygame.draw.polygon(self.screen, (100, 100, 100), points)
+
         self.screen.blit(temp_surf, rect)
+
+        if not pointer_first:
+            pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
+            points = [
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (7) - vec(0, self.jump_height)
+                for a in range(0, 360, 120)
+            ]
+            shadow_points = [
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (9 * jump_scale) + vec(0, 4)
+                for a in range(0, 360, 120)
+            ]
+            pygame.draw.polygon(self.screen, (0, 0, 0), shadow_points)
+            pygame.draw.polygon(self.screen, (100, 100, 100), points)
