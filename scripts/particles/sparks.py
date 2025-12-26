@@ -81,3 +81,58 @@ class Spark(pygame.sprite.Sprite):
 
         if self.outline:
             pygame.draw.polygon(self.screen, self.outline, points, max(1, int(self.scale/4)))
+
+
+
+class Grenade_Spark(pygame.sprite.Sprite):
+    def __init__(self, game, groups, pos, scale, angle, speed=None, colour=(255, 255, 255), shadow_height=None, shadow_col=(0, 0, 0, 0), shadow_angle = 0):
+        super().__init__(groups)
+        self.game = game
+        self.screen = self.game.screen
+
+        self.pos = vec(pos)
+        self.scale = scale
+        self.angle = angle
+        self.speed = random.uniform(3, 6) if speed == None else speed
+        self.colour = colour
+        self.shadow_height = shadow_height or vec()
+        self.shadow_col = shadow_col
+        self.shadow_angle = shadow_angle
+        self.shadow_pos = self.pos.copy()
+
+        for i in range(int(self.scale)+1):
+            self.move()
+
+
+    def move(self):
+        self.pos += vec(math.cos(self.angle), math.sin(self.angle)) * self.speed
+        self.shadow_pos += vec(math.cos(self.shadow_angle), math.sin(self.shadow_angle)) * self.speed
+
+
+    def update(self):
+        self.speed -= 0.1
+        if self.speed < 0:
+            return self.kill()
+        self.move()
+        
+        self.draw()
+
+    def draw(self):
+        points = np.array([
+            vec(math.cos(self.angle), math.sin(self.angle)) * self.scale * self.speed,
+            vec(math.cos(self.angle - math.pi/2), math.sin(self.angle - math.pi/2 + math.pi / 4)) * self.scale * self.speed * 0.3,
+            vec(math.cos(self.angle - math.pi), math.sin(self.angle - math.pi)) * self.scale * self.speed * 2,
+            vec(math.cos(self.angle + math.pi/2), math.sin(self.angle + math.pi/2 - math.pi / 4)) * self.scale * self.speed * 0.3,
+        ])
+        points += self.pos - self.game.offset
+
+        shadow_points = np.array([
+            vec(math.cos(self.shadow_angle), math.sin(self.shadow_angle)) * self.scale * self.speed,
+            vec(math.cos(self.shadow_angle - math.pi/2), math.sin(self.shadow_angle - math.pi/2 + math.pi / 4)) * self.scale * self.speed * 0.3,
+            vec(math.cos(self.shadow_angle - math.pi), math.sin(self.shadow_angle - math.pi)) * self.scale * self.speed * 2,
+            vec(math.cos(self.shadow_angle + math.pi/2), math.sin(self.shadow_angle + math.pi/2 - math.pi / 4)) * self.scale * self.speed * 0.3,
+        ])
+        shadow_points += self.shadow_pos - self.game.offset
+
+        pygame.draw.polygon(self.screen, self.shadow_col, shadow_points)
+        pygame.draw.polygon(self.screen, self.colour, points + self.shadow_height)

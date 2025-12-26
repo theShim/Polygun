@@ -102,7 +102,7 @@ class Room:
         self.start_room = False
 
         self.wave_stack: list[list[EnemySpawnData]] = [
-            [EnemySpawnData(Enemy.Pentagon, 3)],
+            [EnemySpawnData(Enemy.Pentagon, 1)],
             [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy.Hexagon, 2)],
             [EnemySpawnData(Enemy, 2)],
         ]

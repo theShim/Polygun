@@ -316,7 +316,7 @@ class Pentagon(Enemy):                              #throws grenades
 
         self.attacking = False
         self.grenaded = False
-        self.range = 300
+        self.range = 400
         self.attack_timer = Timer(FPS, 1)
         self.cooldown = Timer(FPS * 2, 1)
 
