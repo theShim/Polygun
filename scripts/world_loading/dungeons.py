@@ -129,6 +129,10 @@ class Room:
                 )
 
     def update(self):
+        if self.start_room:
+            self.state = Room.CLEARED
+            self.wave_stack = []
+            
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
         #i.e. it's been entered by the player
         if self.state == Room.UNENTERED:

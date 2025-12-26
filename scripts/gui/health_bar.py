@@ -21,10 +21,14 @@ class HealthBar(pygame.sprite.Sprite):
         
         self.surf = pygame.image.load("assets/gui/health_bar.png").convert_alpha()
         self.surf.set_colorkey((0, 0, 0))
+        self.t = 0
 
 
     def update(self):
         self.draw()
 
     def draw(self):
+        t = min(1, 1 - (self.player.health / self.player.max_health))
+        self.t = self.t + (t - self.t) * 0.5
+        pygame.draw.polygon(self.screen, (237, 28, 36), [(37, 16), (37, 45), (213 - 180 * (self.t), 45), (233 - 180 * (self.t), 16)])
         self.screen.blit(self.surf, (15, 10))

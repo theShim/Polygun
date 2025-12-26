@@ -55,6 +55,9 @@ class Player(pygame.sprite.Sprite):
         self.jump_time = 0 #the current moment in time of the jump
         self.jumping = False #just a boolean of whether the play is jumping or not
 
+        self.max_health = 200
+        self.health = self.max_health
+
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
         # self.boost_timer = Timer()
@@ -114,6 +117,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and not self.jumping:
             self.jumping = True
             self.jump_time = 0
+            self.health -= 10
 
 
         #the psuedo height stuff, just projectile motion
