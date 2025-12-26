@@ -24,6 +24,7 @@ class CrossHair(pygame.sprite.Sprite):
 
         self.radius = 16
         self.angle = 0
+        self.angle_mod = 0
 
         self.spoke_angles = np.array([math.radians(a) for a in (0, 90, 180, 270)])
         self.outer_ring = self.radius * np.column_stack((np.cos(self.spoke_angles), np.sin(self.spoke_angles)))
@@ -31,12 +32,18 @@ class CrossHair(pygame.sprite.Sprite):
 
     def update(self):
         if pygame.mouse.get_pressed()[0]:
-            self.angle += math.radians(10)
+            self.angle_mod = min(15, self.angle_mod + 0.5)
+        else:
+            self.angle_mod = max(0, self.angle_mod - 1)
+            self.angle *= 0.9
+        
+        self.angle += math.radians(self.angle_mod)
+        self.angle %= (2 * math.pi)
 
         self.draw()
 
     def draw(self):
-        for inner, outer in zip(self.inner_ring, self.outer_ring):
+        for inner, outer in zip(rot_2d(self.inner_ring, self.angle), rot_2d(self.outer_ring, self.angle)):
             start = self.game.mousePos + vec(inner)
             end   = self.game.mousePos + vec(outer) * 0.95
             pygame.draw.line(self.screen, (20, 20, 20), start + vec(0, 3), end + vec(0, 3), 3)
@@ -44,7 +51,7 @@ class CrossHair(pygame.sprite.Sprite):
         pygame.draw.circle(self.screen, (20, 20, 20), self.game.mousePos + vec(0, 3), self.radius, 4)
 
         
-        for inner, outer in zip(self.inner_ring, self.outer_ring):
+        for inner, outer in zip(rot_2d(self.inner_ring, self.angle), rot_2d(self.outer_ring, self.angle)):
             start = self.game.mousePos + vec(inner)
             end   = self.game.mousePos + vec(outer) * 0.95
             pygame.draw.line(self.screen, (120, 120, 120), start, end, 3)

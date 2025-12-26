@@ -78,6 +78,7 @@ class Game:
 
         self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
+        pygame.mouse.set_visible(False)
 
         self.debugger = Debugger(self)
 
