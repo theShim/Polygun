@@ -158,6 +158,7 @@ class Game:
     def cache_sprites(self):
         Tile.cache_sprites()
         Custom_Font.init()
+        EnergyBar.cache_sprites()
         # Player.cache_sprites()
 
     def calculate_offset(self):

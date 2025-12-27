@@ -58,7 +58,8 @@ class Player(pygame.sprite.Sprite):
         self.max_health = 200
         self.health = self.max_health
         self.max_energy = 100
-        self.energy = 40
+        self.energy = 0
+        self.energy_refill_timer = Timer(FPS, 1)
 
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
@@ -209,6 +210,11 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.move()
         self.mouse_inputs()
+
+        self.energy_refill_timer.update()
+        if self.energy_refill_timer.finished:
+            self.energy_refill_timer.reset()
+            self.energy = min(self.energy + 5, self.max_energy)
 
         self.shader_draw()
 
