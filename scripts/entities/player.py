@@ -57,6 +57,8 @@ class Player(pygame.sprite.Sprite):
 
         self.max_health = 200
         self.health = self.max_health
+        self.max_energy = 100
+        self.energy = 40
 
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 

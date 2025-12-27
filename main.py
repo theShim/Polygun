@@ -16,6 +16,7 @@ from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.health_bar import HealthBar
 from scripts.gui.crosshair import CrossHair
+from scripts.gui.energy_bar import EnergyBar
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
@@ -78,7 +79,7 @@ class Game:
 
         self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
-        pygame.mouse.set_visible(False)
+        pygame.mouse.set_visible(False) 
 
         self.debugger = Debugger(self)
 
@@ -89,6 +90,7 @@ class Game:
 
         HealthBar(self, [self.gui_elements])
         CrossHair(self, [self.gui_elements])
+        EnergyBar(self, [self.gui_elements])
 
     @property
     def mousePos(self) -> vec:

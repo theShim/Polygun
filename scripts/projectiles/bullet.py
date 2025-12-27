@@ -74,7 +74,7 @@ class Bullet(pygame.sprite.Sprite):
                     return self.kill()
         
         else: #definitely player
-            if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.height) - abs(self.shadow_height.y)) < 4:
+            if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.jump_height) - abs(self.shadow_height.y)) < 4:
                 # self.game.player.knockback(self.vel * self.speed * 40)
                 # self.game.player.take_hit(3)
                 for i in range(random.randint(3, 3)):

@@ -1,87 +1,104 @@
-# def generate_dungeon(max_cells=15, branch_weight=3):
-#     """
-#     Generates a dungeon as connected rooms (cells) branching out from a start node.
+import pygame
+import numpy as np
+import math
 
-#     Args:
-#         max_cells: maximum number of cells to generate
-#         branch_weight: branching probability control (lower = more branching)
-#                        chance = 1 / (branch_weight + 1)
+# -------------------- Pygame setup --------------------
+pygame.init()
+WIDTH, HEIGHT = 800, 800
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("4D Hypercube (Tesseract)")
+clock = pygame.time.Clock()
 
-#     Returns:
-#         cells: list of all generated cell coordinates
-#         connections: dict mapping each cell to its connected neighbors
-#         boss_room: coordinate of chosen boss room (leaf node)
-#     """
+# -------------------- Hypercube data --------------------
 
-#     start = (0, 0)
-#     cells = [start]
-#     stack = [start]
-#     connections = {start: []}
+# 16 vertices of a 4D hypercube
+points_4d = np.array([
+    [x, y, z, w]
+    for x in (-1, 1)
+    for y in (-1, 1)
+    for z in (-1, 1)
+    for w in (-1, 1)
+], dtype=float)
 
-#     while len(cells) < max_cells and stack:
-#         x, y = stack.pop()
-#         # generate neighbor positions
-#         neighbors = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
-#         random.shuffle(neighbors)
+# Generate edges (vertices differing in exactly one coordinate)
+edges = []
+for i in range(len(points_4d)):
+    for j in range(i + 1, len(points_4d)):
+        if np.sum(points_4d[i] != points_4d[j]) == 1:
+            edges.append((i, j))
 
-#         for nx, ny in neighbors:
-#             if len(cells) >= max_cells:
-#                 break
+# -------------------- Rotation matrices --------------------
 
-#             if (nx, ny) not in cells and random.randint(0, branch_weight) == branch_weight:
-#                 # Add new cell
-#                 cells.append((nx, ny))
-#                 stack.append((nx, ny))
-#                 connections.setdefault((x, y), []).append((nx, ny))
-#                 connections.setdefault((nx, ny), []).append((x, y))
+def rot_xy(a):
+    return np.array([
+        [ math.cos(a), -math.sin(a), 0, 0],
+        [ math.sin(a),  math.cos(a), 0, 0],
+        [ 0, 0, 1, 0],
+        [ 0, 0, 0, 1]
+    ])
 
-#     # Find leaf nodes (rooms with only one connection)
-#     leaf_nodes = [cell for cell, links in connections.items() if len(links) == 1 and cell != start]
+def rot_zw(a):
+    return np.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0,  math.cos(a), -math.sin(a)],
+        [0, 0,  math.sin(a),  math.cos(a)]
+    ])
 
-#     # Choose a random leaf node to be the boss room
-#     boss_room = random.choice(leaf_nodes) if leaf_nodes else None
+# -------------------- Projection --------------------
 
-#     return cells, connections, boss_room
+def project_4d_to_3d(p, d=3):
+    w = 1 / (d - p[3])
+    return p[:3] * w
 
-import random
+def project_3d_to_2d(p, d=4):
+    z = 1 / (d - p[2])
+    return p[:2] * z
 
-def generate_path(min_length=5, max_length=10):
-    start = (0, 0)
-    cells = [start]
-    stack = [start]
-    connections = {}
-    target_length = random.randint(min_length, max_length)
+# -------------------- Main loop --------------------
 
-    #while there are possible cell locations and it hasn't reached the wanted target length,
-    while stack and len(cells) < target_length:
-        x, y = stack[-1] #take the top position on the stack
-        neighbours = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
-        random.shuffle(neighbours) #randomise all the possible neighbours surrounding the current cell
-        
-        #pick the next available position out of the random neighbour list
-        next_cell = None
-        for nx, ny in neighbours:
-            if (nx, ny) not in cells:
-                next_cell = (nx, ny)
-                break
+angle = 0.0
+scale = 600
+center = np.array([WIDTH // 2, HEIGHT // 2])
 
-        #if one of the positions is available, add it to stack and the cell list and repeat the process
-        if next_cell:
-            cells.append(next_cell)
-            stack.append(next_cell)
+running = True
+while running:
+    dt = clock.tick(60) / 1000
+    screen.fill((10, 10, 20))
 
-            if (x, y) not in connections:
-                connections[(x, y)] = []
-            if (nx, ny) not in connections:
-                connections[(nx, ny)] = []
-            connections[(x, y)].append((nx, ny))
-            connections[(nx, ny)].append((x, y))
-        #otherwise just get rid of the cell from the stack entirely
-        else:
-            stack.pop()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-    return cells, connections
-#
-p = generate_path()
-print(p[0])
-print(p[1])
+    # Update rotation
+    angle += 1.0 * dt
+
+    rotation = rot_xy(3) @ rot_zw(angle * 0.7)
+    rotated = points_4d @ rotation.T
+
+    # Project points
+    projected = []
+    for p in rotated:
+        p3 = project_4d_to_3d(p)
+        p2 = project_3d_to_2d(p3)
+        projected.append(p2)
+
+    projected = np.array(projected) * scale + center
+
+    # Draw edges
+    for i, j in edges:
+        pygame.draw.line(
+            screen,
+            (120, 200, 255),
+            projected[i],
+            projected[j],
+            1
+        )
+
+    # Draw vertices
+    for p in projected:
+        pygame.draw.circle(screen, (255, 255, 255), p.astype(int), 3)
+
+    pygame.display.flip()
+
+pygame.quit()
