@@ -61,6 +61,7 @@ class Player(pygame.sprite.Sprite):
         self.energy = 0
         self.energy_refill_timer = Timer(FPS, 1)
 
+        self.pickup_radius = 100
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
         # self.boost_timer = Timer()
@@ -214,7 +215,8 @@ class Player(pygame.sprite.Sprite):
         self.energy_refill_timer.update()
         if self.energy_refill_timer.finished:
             self.energy_refill_timer.reset()
-            self.energy = min(self.energy + 0.5, self.max_energy)
+            self.energy += 0.5
+        self.energy = min(self.energy, self.max_energy)
 
         # if pygame.key.get_just_pressed()[pygame.K_SPACE]:
         #     self.energy = 10

@@ -10,7 +10,7 @@ import random
 from scripts.gui.custom_fonts import Custom_Font, Font
 from scripts.utils.CORE_FUNCS import vec, lerp
 from scripts.utils.convex_hull import convex_hull
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FRIC
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FRIC, GRAV
 
     ##############################################################################################
 
@@ -32,27 +32,53 @@ class Remains(pygame.sprite.Sprite):
 
         self.surf = pygame.Surface((20, 20), pygame.SRCALPHA)
         points = []
-        for i in range(n := random.randint(4, 6)):
+        for i in range(random.randint(4, 8)):
             x = random.randint(0, self.surf.width - 1)
             y = random.randint(0, self.surf.height - 1)
             points += [(x, y)]
-        print(n, convex_hull(points))
-        pygame.draw.polygon(self.surf, self.colour, convex_hull(points))
+        
+        try:
+            pygame.draw.polygon(self.surf, self.colour, (ps := convex_hull(points)))
+        except:
+            return self.kill()
 
         self.shadow = pygame.mask.from_surface(self.surf).to_surface(setcolor=(0, 0, 0, 150), unsetcolor=(0, 0, 0, 0))
 
+        self.point_num = len(ps)
         angle = random.uniform(0, 2 * math.pi)
         self.vel = vec(math.cos(angle), math.sin(angle)) * random.uniform(2, 10)
 
+        self.to_player = False #whether it should be going towards the player or not
+
     def move(self):
+        if self.to_player:
+            delta = (self.game.player.pos - self.pos)
+            distance = delta.magnitude()
+            direction = delta.normalize()
+
+            self.vel += direction * (300 / max(distance, 20)) * 0.25
+            self.vel += vec(delta.y, -delta.x) * (50 / max(distance, 20)) * 0.005
+
         self.pos += self.vel
 
         self.vel *= FRIC
         if self.vel.magnitude() < 0.25:
             self.vel = vec()
+        
+        if self.height > 0:
+            self.height -= GRAV / 10
+        else:
+            self.height = 0
 
     def update(self):
         self.move()
+
+        if (dist := (self.pos - self.game.player.pos).magnitude()) < self.game.player.size:
+            self.game.player.energy += self.point_num
+            return self.kill()
+        
+        elif dist <= self.game.player.pickup_radius:
+            self.to_player = True
 
         self.draw()
 

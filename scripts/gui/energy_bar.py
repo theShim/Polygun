@@ -96,7 +96,7 @@ class EnergyBar(pygame.sprite.Sprite):
         # self.sinner.pos.y = self.surf.height * (1 - (self.player.energy / self.player.max_energy)) + math.sin(self.a) * 4
         # self.a += math.radians(20)
 
-        pygame.draw.polygon(self.surf, pygame.Color(255, 255, 255).lerp((111, 178, 255), (self.player.energy / self.player.max_energy)), [p.pos for p in self.springs] + [(self.surf.width, self.surf.height), (0, self.surf.height)])
+        pygame.draw.polygon(self.surf, pygame.Color(255, 255, 255).lerp((111, 178, 255), min(1, self.player.energy / self.player.max_energy)), [p.pos for p in self.springs] + [(self.surf.width, self.surf.height), (0, self.surf.height)])
         self.surf.blit(self.overlay)
         self.surf.set_colorkey((255, 0, 0))
 

@@ -291,6 +291,13 @@ class Hexagon(Enemy):                               #plants bombs on the floor
                         shadow_col=(0, 0, 0, 0),
                         grav=True,
                     )
+                    Remains(
+                        self.game,
+                        [self.game.all_sprites, self.game.particles],
+                        self.pos,
+                        (134, 0, 196),
+                        self.height
+                    )
                 return self.kill()
 
         self.draw()
@@ -399,6 +406,13 @@ class Pentagon(Enemy):                              #throws grenades
                         colour=(235, 101, 70),
                         shadow_col=(0, 0, 0, 0),
                         grav=True,
+                    )
+                    Remains(
+                        self.game,
+                        [self.game.all_sprites, self.game.particles],
+                        self.pos,
+                        (235, 101, 70),
+                        self.height
                     )
                 return self.kill()
 
