@@ -214,7 +214,10 @@ class Player(pygame.sprite.Sprite):
         self.energy_refill_timer.update()
         if self.energy_refill_timer.finished:
             self.energy_refill_timer.reset()
-            self.energy = min(self.energy + 5, self.max_energy)
+            self.energy = min(self.energy + 0.5, self.max_energy)
+
+        # if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+        #     self.energy = 10
 
         self.shader_draw()
 

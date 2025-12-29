@@ -75,6 +75,7 @@ class EnergyBar(pygame.sprite.Sprite):
         target_height = self.surf.height * (1 - (self.player.energy / self.player.max_energy))
         if (target_height - self.current_target_height) < 2:
             self.sinner = random.choice(self.springs.sprites())
+            self.current_target_height = target_height
         self.sinner.target_height = self.sinner.target_height + (target_height - self.sinner.target_height) * random.uniform(-0.75, 1)
 
         for i in range(len(self.springs)):
