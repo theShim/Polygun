@@ -9,6 +9,7 @@ import random
 
 from scripts.gui.custom_fonts import Custom_Font, Font
 from scripts.utils.CORE_FUNCS import vec, lerp
+from scripts.utils.convex_hull import convex_hull
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FRIC
 
     ##############################################################################################
@@ -30,7 +31,13 @@ class Remains(pygame.sprite.Sprite):
         self.height = initial_height
 
         self.surf = pygame.Surface((20, 20), pygame.SRCALPHA)
-        # for i in range(random.randint(4, 5))
+        points = []
+        for i in range(n := random.randint(4, 6)):
+            x = random.randint(0, self.surf.width - 1)
+            y = random.randint(0, self.surf.height - 1)
+            points += [(x, y)]
+        print(n, convex_hull(points))
+        pygame.draw.polygon(self.surf, self.colour, convex_hull(points))
 
         self.shadow = pygame.mask.from_surface(self.surf).to_surface(setcolor=(0, 0, 0, 150), unsetcolor=(0, 0, 0, 0))
 
