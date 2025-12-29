@@ -10,6 +10,7 @@ import json
 import numpy as np
 
 from scripts.particles.sparks import Spark
+from scripts.particles.remains import Remains
 from scripts.projectiles.bullet import Bullet
 from scripts.projectiles.grenade import Grenade
 
@@ -164,6 +165,13 @@ class Enemy(pygame.sprite.Sprite):
                         colour=(255, 0, 55),
                         shadow_col=(0, 0, 0, 0),
                         grav=True,
+                    )
+                    Remains(
+                        self.game,
+                        [self.game.all_sprites, self.game.particles],
+                        self.pos,
+                        (255, 0, 55),
+                        self.height
                     )
                 return self.kill()
 
