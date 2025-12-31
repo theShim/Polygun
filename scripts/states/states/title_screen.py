@@ -7,6 +7,7 @@ import math
 
 from scripts.gui.menu_buttons import Button
 from scripts.gui.delaunay import Del
+from scripts.gui.cursor import Cursor
 from scripts.states.state_loader import State
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT
@@ -25,6 +26,8 @@ class Title_Screen(State):
         self.start_button = Button(self.game, [self.buttons], "Start", (30, HEIGHT * 0.65))
         self.options_button = Button(self.game, [self.buttons], "Options", (30, HEIGHT * 0.65 + 60))
         self.quit_button = Button(self.game, [self.buttons], "Quit", (30, HEIGHT * 0.65 + 120))
+
+        Cursor(self.game, [self.game.gui_elements])
 
     def update(self):
         self.start_button.out_of_frame = False
@@ -48,3 +51,5 @@ class Title_Screen(State):
         
         elif self.quit_button.clicked:
             self.game.quit()
+
+        self.game.gui_elements.update()

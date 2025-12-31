@@ -15,6 +15,7 @@ import numpy as np
 from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.energy_bar import EnergyBar
+from scripts.gui.cursor import Cursor
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
@@ -153,6 +154,7 @@ class Game:
         Tile.cache_sprites()
         Custom_Font.init()
         EnergyBar.cache_sprites()
+        Cursor.cache_sprites()
         # Player.cache_sprites()
 
     def calculate_offset(self):

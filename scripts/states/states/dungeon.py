@@ -30,9 +30,7 @@ class Dungeon(State):
 
         self.last_available_room = None
 
-        HealthBar(self.game, [self.game.gui_elements])
-        CrossHair(self.game, [self.game.gui_elements])
-        EnergyBar(self.game, [self.game.gui_elements])
+        self.start = True
 
     def get_current_room(self, pos = None, offset: vec = vec()) -> Room:
         level: DungeonLevel = self.levels[self.current_level_index]
@@ -53,6 +51,12 @@ class Dungeon(State):
         return room
 
     def update(self):
+        if self.start:
+            HealthBar(self.game, [self.game.gui_elements])
+            CrossHair(self.game, [self.game.gui_elements])
+            EnergyBar(self.game, [self.game.gui_elements])
+            self.start = False
+            
         self.game.calculate_offset() #camera
         self.get_current_room().update()
         self.render()

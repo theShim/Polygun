@@ -58,3 +58,5 @@ class Controllers_GUI(State):
         else:
             for button in self.buttons:
                 button.out_of_frame = False
+
+        self.game.gui_elements.update()
