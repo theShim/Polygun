@@ -56,10 +56,12 @@ class Button(pygame.sprite.Sprite):
         self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 300, self.font.space_height)
         self.clicked = False
         self.out_of_frame = False
+        self.hovered = False
 
 
     def update(self):
         mousePos = self.game.mousePos
+        self.hovered = False
 
         if not self.out_of_frame:
             self.clicked = False
@@ -69,6 +71,7 @@ class Button(pygame.sprite.Sprite):
                 self.pointer_pos = self.pointer_pos.lerp(self.pointer_target_pos, 0.5)
                 self.pointer_angle = lerp(self.pointer_angle, self.pointer_target_angle, 0.5)
                 self.pointer_offset_timer += math.radians(7)
+                self.hovered = True
                 
                 if pygame.mouse.get_just_pressed()[0]:
                     self.clicked = True
@@ -245,6 +248,7 @@ class KeyboardInputButton(pygame.sprite.Sprite):
         self.hitbox = pygame.Rect(self.pos.x - 30, self.pos.y, 400, self.font.space_height)
         self.clicked = False
         self.out_of_frame = False
+        self.hovered = False
 
     def update_surf(self):
         total_string = f"{self.text:<14}{self.CONTROLS_TO_TEXT[self.key]:<14}"
@@ -276,12 +280,14 @@ class KeyboardInputButton(pygame.sprite.Sprite):
 
     def update(self):
         mousePos = self.game.mousePos
+        self.hovered = False
 
         if not self.out_of_frame:
             self.clicked = False
             if self.hitbox.collidepoint(mousePos):
                 self.line_displacement = self.line_displacement.lerp(vec(self.font.calc_surf_width(self.CONTROLS_TO_TEXT[self.key]) / 2, 0), 0.5)
-                
+                self.hovered = True
+
                 if pygame.mouse.get_just_pressed()[0]:
                     self.clicked = True
             else:

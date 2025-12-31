@@ -17,6 +17,7 @@ class Cursor(pygame.sprite.Sprite):
     def cache_sprites(cls):
         cls.SPRITES = {}
         cls.SPRITES["cursor_base"] = pygame.image.load("assets/gui/cursor_base.png").convert_alpha()
+        cls.SPRITES["cursor_hover"] = pygame.image.load("assets/gui/cursor_hover.png").convert_alpha()
 
         for spr in cls.SPRITES:
             cls.SPRITES[spr] = pygame.transform.scale_by(cls.SPRITES[spr], 0.5)
@@ -30,6 +31,14 @@ class Cursor(pygame.sprite.Sprite):
         self.state = "base"
 
     def update(self):
+        if not self.game.state_loader.current_state.name in {"title_screen", "settings", "controllers_gui", "keyboard_gui"}:
+            return
+        
+        if any([hasattr(b, "hovered") and b.hovered for b in self.game.state_loader.current_state.buttons]):
+            self.state = "hover"
+        else:
+            self.state = "base"
+
         self.draw()
 
     def draw(self):
