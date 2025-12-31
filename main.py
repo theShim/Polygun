@@ -14,8 +14,6 @@ import numpy as np
 
 from scripts.entities.player import Player
 from scripts.gui.custom_fonts import Custom_Font
-from scripts.gui.health_bar import HealthBar
-from scripts.gui.crosshair import CrossHair
 from scripts.gui.energy_bar import EnergyBar
 from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
@@ -77,7 +75,9 @@ class Game:
         self.particles = pygame.sprite.Group()
         self.gui_elements = pygame.sprite.Group()
 
-        self.state_loader = State_Loader(self, start="dungeon")
+        self.player = Player(self, [self.all_sprites, self.entities])
+
+        self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
@@ -85,12 +85,6 @@ class Game:
 
         self.surf = pygame.Surface((100, 100))
         self.k = 0
-
-        self.player = Player(self, [self.all_sprites, self.entities])
-
-        HealthBar(self, [self.gui_elements])
-        CrossHair(self, [self.gui_elements])
-        EnergyBar(self, [self.gui_elements])
 
     @property
     def mousePos(self) -> vec:
@@ -226,7 +220,6 @@ class Game:
             #     spr.update()
 
             self.state_loader.update()
-            self.gui_elements.update()
 
 
             if DEBUG:

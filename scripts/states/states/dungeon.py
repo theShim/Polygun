@@ -9,6 +9,9 @@ from scripts.entities.enemy import Enemy
 from scripts.states.state_loader import State
 from scripts.world_loading.dungeons import DungeonLevel, Room
 from scripts.world_loading.tilemap import Tile
+from scripts.gui.health_bar import HealthBar
+from scripts.gui.crosshair import CrossHair
+from scripts.gui.energy_bar import EnergyBar
 
 from scripts.utils.CORE_FUNCS import vec
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
@@ -26,6 +29,10 @@ class Dungeon(State):
         self.current_level_index = 0
 
         self.last_available_room = None
+
+        HealthBar(self.game, [self.game.gui_elements])
+        CrossHair(self.game, [self.game.gui_elements])
+        EnergyBar(self.game, [self.game.gui_elements])
 
     def get_current_room(self, pos = None, offset: vec = vec()) -> Room:
         level: DungeonLevel = self.levels[self.current_level_index]
@@ -67,3 +74,5 @@ class Dungeon(State):
 
         for spr in sorted(sprites + tiles, key=lambda s: s.rect.bottom if isinstance(s, Tile) else s.pos.y):
             spr.update()
+
+        self.game.gui_elements.update()
