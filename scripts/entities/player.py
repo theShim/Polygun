@@ -188,6 +188,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = math.atan2(delta.y, delta.x)
 
     def collisions(self, direction):
+        if self.game.state_loader.transitioning: return
         room = self.game.state_loader.current_state.get_current_room()
 
         for tile in room.tilemap.collideables(self.game.offset):

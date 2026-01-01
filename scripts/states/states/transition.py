@@ -43,7 +43,13 @@ class TransitionIn(State):
                 line.start_pos = line.target_pos
                 line.target_pos = (2 * (WIDTH + line.line_height + line.buffer), 0)
                 line.t = line.t_offset
+                line.done = False
             self.state = 2
+
+        elif self.state == 2:
+            if any([line.done for line in self.lines]):
+                self.game.state_loader.pop_state()
+                self.game.state_loader.transitioning = False
 
 class TransitionLine(pygame.sprite.Sprite):
     def __init__(self, game, groups, y, t_offset):
@@ -52,7 +58,7 @@ class TransitionLine(pygame.sprite.Sprite):
         self.screen = self.game.screen
 
         self.line_height = HEIGHT / 5
-        self.buffer = 10
+        self.buffer = 70
         self.points = np.array([
             [WIDTH, y],
             [WIDTH + self.line_height, y - self.line_height],
@@ -83,3 +89,5 @@ class TransitionLine(pygame.sprite.Sprite):
 
     def draw(self):
         pygame.draw.polygon(self.screen, (0, 0, 0), self.points - self.offset)
+        pygame.draw.line(self.screen, (255, 255, 255), self.points[0] - self.offset, self.points[1] - self.offset, 12)
+        pygame.draw.line(self.screen, (255, 255, 255), self.points[2] - self.offset, self.points[3] - self.offset, 12)
