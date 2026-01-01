@@ -30,9 +30,6 @@ class Title_Screen(State):
         Cursor(self.game, [self.game.gui_elements])
 
     def update(self):
-        self.start_button.out_of_frame = False
-        self.options_button.out_of_frame = False
-        self.quit_button.out_of_frame = False
 
         self.d.update()
         self.t += math.radians(2)
@@ -41,13 +38,19 @@ class Title_Screen(State):
 
         self.buttons.update()
 
+        if self.game.state_loader.current_state == self:
+            self.start_button.out_of_frame = False
+            self.options_button.out_of_frame = False
+            self.quit_button.out_of_frame = False
+
         
         if self.start_button.clicked:
-            self.game.state_loader.add_state(self.game.state_loader.get_state("dungeon"))
+            self.game.state_loader.add_state(self.game.state_loader.get_state("dungeon"), transition=True)
+            self.game.state_loader.current_state.prev = self
             self.start_button.out_of_frame = True
             self.options_button.out_of_frame = True
             self.quit_button.out_of_frame = True
-            self.options_button.clicked = False
+            self.start_button.clicked = False
 
         elif self.options_button.clicked:
             self.game.state_loader.add_state(self.game.state_loader.get_state("settings"))

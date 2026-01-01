@@ -22,6 +22,8 @@ class State_Loader:
 
         self.start = start #what the state machine should begin on, useful for debugging to save having to run the entire game
         self.states = {}
+        self.last_state = None
+        self.transitioning = False
 
     #storing all the states. has to be done post initialisation as the states are created after the State class below
     #is created
@@ -32,8 +34,10 @@ class State_Loader:
         from scripts.states.states.settings import Settings
         from scripts.states.states.controllers import Controllers_GUI
         from scripts.states.states.keyboard import Keyboard_GUI
+        from scripts.states.states.transition import TransitionIn
 
         self.states = {
+            "transition" : TransitionIn,
             "debug" : Debug_Stage(self.game),
             "title_screen" : Title_Screen(self.game),
             "dungeon" : Dungeon(self.game),
@@ -56,24 +60,14 @@ class State_Loader:
     def prev_state(self):
         return self.stack[-2]
 
-    #the current state's tilemap, or the last state that has a tilemap
-    # @property
-    # def tilemap(self) -> Tilemap:
-    #     try:
-    #         t = self.current_state.tilemap
-    #         return t
-    #     except AttributeError:
-    #         for i in range(len(self.stack)-2, -1, -1):
-    #             if (t := self.stack[i].tilemap): 
-    #                 break
-    #         else:
-    #             t = "No Tilemap".lower()
-    #         return t
-
         #############################################################################
 
-    def add_state(self, state):
-        self.stack.append(state)
+    def add_state(self, state, transition=False):
+        if transition:
+            self.stack.append(self.get_state("transition")(self.game, state))
+            self.transitioning = True
+        else:
+            self.stack.append(state)
 
     def pop_state(self):
         self.last_state = self.stack.pop(-1)
