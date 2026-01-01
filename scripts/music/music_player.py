@@ -3,91 +3,78 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
+from scripts.music.music import SOUNDS
+
     ##############################################################################################
 
 class Music_Player:
-    def __init__(self, channel_num = 20):
+    def __init__(self, game, channel_num = 32):
+        self.game = game
         pygame.mixer.set_num_channels(channel_num)
 
-        #every sound file loaded
-        from scripts.music.music import SOUNDS
-        self.sounds = SOUNDS
+        self.sounds: dict[str, pygame.mixer.Sound] = SOUNDS
+        self.pools: dict[str, Sound_Pool] = {}
 
-        #every sound channel to be used, gonna be more later on
-        self.background = pygame.mixer.Channel(0)
-        self.typing = pygame.mixer.Channel(1)
-        self.sound_effects = pygame.mixer.Channel(2)
-        self.paint_splats = pygame.mixer.Channel(3)
-        self.channels = [
-            self.background,
-            self.typing,
-            self.sound_effects,
-            self.paint_splats,
-        ]
-        self.volumes: list[float] = [ #needs to be the same order as self.channels
-            1.,
-            0.25,
-            1.,
-            1,
-        ]
-        for channel, v in zip(["bg", "type", "sfx", "splat"], self.volumes):
-            self.set_vol(v, channel)
+        self.channel_index = 0
+        self.channel_num = channel_num
+        self.channels = [pygame.mixer.Channel(i) for i in range(channel_num)]
 
-    def get_channel(self, channel_name):
-        match channel_name:
-            case "background" | "bg":
-                return self.background
-            case "typing" | "type":
-                return self.typing
-            case "sound_effects" | "sfx":
-                return self.sound_effects
-            case "paint_splat" | "splat":
-                return self.paint_splats
-            case _:
-                return None
-            
-    def is_playing(self, channel):
-        channel = self.get_channel(channel)
-        return channel.get_busy()
-            
+        self.create_pool("music", 1)
+        self.create_pool("sfx", 12, volume=1.0)
+        self.create_pool("ui", 4, volume=0.4)
+        self.create_pool("ambient", 6, volume=0.7)
 
-    #play a specified sound in a specified channel, with the option to constantly loop it
-    #sound should be a key straight from the self.sounds dict
-    def play(self, sound, channel, loop=False, fade_in=0):  
-        if sound == "":
-            return
+    def create_pool(self, name, count, volume=1.0):
+        channels = self.channels[self.channel_index : self.channel_index + count]
+        if len(channels) < count:
+            raise BaseException("Too many channels.")
         
-        sound_ = self.sounds.get(sound, None)
-        if sound_ == None: return print(Exception(f"{sound} not found."))
-        channel = self.get_channel(channel)
-        channel.play(sound_, loops=-1 if loop else 0, fade_ms=fade_in)
+        self.channel_index += count
+        self.pools[name] = Sound_Pool(name, channels, volume)
 
-    #queue a song to play after the current one in a specified channel
-    def queue_sound(self, sound, channel):  
-        sound = self.sounds[sound]
-        channel = self.get_channel(channel)
-        channel.queue(sound)
+    def play(self, sound: str, pool: str="sfx", loop=False, fadein_ms=0):
+        sound = self.sounds.get(sound, None)
+        if not sound: raise BaseException(f"{sound} not found.")
 
-    #stop the playback of a specified channel or all, with an optional fade out timer
-    def stop(self, channel="all", fadeout_ms=1000):
-        if channel == "all":
-            for c in self.channels:
-                c.fadeout(fadeout_ms)
-            return
-        
-        self.get_channel(channel).fadeout(fadeout_ms)
-    
-    #change vol with float between 0 and 1 for specified channels
-    def set_vol(self, vol: float, channel="all", force=False):
-        if channel == "all":
-            for i, c in enumerate(self.channels):
-                c.set_volume(vol)
-                self.volumes[i] = vol
-            return
-        
-        if force:
-            self.get_channel(channel).set_volume(vol)
-            self.volumes[self.channels.index(self.get_channel(channel))] = vol #updates volume data store
-        else:
-            clamp = self.volumes[self.channels.index(self.get_channel(channel))]
-            self.get_channel(channel).set_volume(vol * clamp)
+        pool = self.pools[pool]
+        channel = pool.get_free_channel()
+        channel.play(sound, loops=-1 if loop else 0, fade_ms=fadein_ms)
+
+    def stop(self, pool="music", fadeout_ms=1000):
+        self.pools[pool].stop(fadeout_ms)
+
+    def set_master_volume(self, vol):
+        pygame.mixer.music.set_volume(vol)
+        for pool in self.pools.values():
+            pool.set_volume(pool.volume * vol)
+
+    def set_pool_volume(self, pool, volume):
+        self.pools[pool].set_volume(volume)  
+
+    def save_json(self):
+        pass
+
+
+class Sound_Pool:
+    def __init__(self, name, channels, volume=1.0):
+        self.name: str = name
+        self.channels: list[pygame.mixer.Channel] = channels
+        self.volume: float = volume
+
+        for c in self.channels:
+            c.set_volume(self.volume)
+
+    def stop(self, fadeout_ms=1000):
+        for c in self.channels:
+            c.fadeout(fadeout_ms)
+
+    def set_volume(self, vol):
+        self.volume = vol
+        for c in self.channels:
+            c.set_volume(self.volume)
+
+    def get_free_channel(self):
+        for c in self.channels:
+            if not c.get_busy():
+                return c
+        return self.channels[0]

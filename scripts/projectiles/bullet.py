@@ -39,6 +39,7 @@ class Bullet(pygame.sprite.Sprite):
         self.pos += self.vel * self.speed
 
     def collisions(self):
+        if self.game.state_loader.transitioning: return
         room = self.game.state_loader.current_state.get_current_room(pos=self.pos)
         for tile in room.tilemap.collideables(self.game.offset):
             if tile.hitbox.collidepoint(self.pos):

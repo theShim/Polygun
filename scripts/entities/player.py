@@ -103,6 +103,7 @@ class Player(pygame.sprite.Sprite):
             mouseAngle = math.atan2(mousePos.y - self.pos.y + self.game.offset.y, mousePos.x - self.pos.x + self.game.offset.x)
 
             b = Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height), owner=self)
+            self.game.music_player.play("gunshot", pool="sfx", loop=False)
 
             for i in range(random.randint(3, 3)):
                 Spark(

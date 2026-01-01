@@ -68,6 +68,9 @@ class Game:
         self.cache_sprites()
         
         self.controls_handler = ControlsHandler(self)
+        
+        from scripts.music.music_player import Music_Player
+        self.music_player = Music_Player(self, channel_num=32)
 
         #groups
         self.all_sprites = pygame.sprite.Group()

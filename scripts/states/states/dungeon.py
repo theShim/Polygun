@@ -55,6 +55,8 @@ class Dungeon(State):
             HealthBar(self.game, [self.game.gui_elements])
             CrossHair(self.game, [self.game.gui_elements])
             EnergyBar(self.game, [self.game.gui_elements])
+            
+            self.game.music_player.play("xqc_dungeon", pool="music", loop=True)
             self.start = False
             
         self.game.calculate_offset() #camera
