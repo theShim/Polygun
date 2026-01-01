@@ -136,8 +136,9 @@ class Player(pygame.sprite.Sprite):
     def dash(self):
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_LCTRL]:
-            if self.vel.magnitude():
+            if self.vel.magnitude() and self.energy >= 30:
                 self.vel = self.vel.normalize() * self.dash_speed
+                self.energy -= 30
 
     def apply_forces(self):
         #actually applying acceleration to the player velocity

@@ -15,7 +15,7 @@ from scripts.utils.CORE_FUNCS import vec, lerp
     ##############################################################################################
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, angle, col, owner, shadow_height = None, scale_mod=1):
+    def __init__(self, game, groups, pos, angle, col, owner, speed=14, shadow_height = None, scale_mod=1):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
@@ -24,7 +24,7 @@ class Bullet(pygame.sprite.Sprite):
         self.pos = vec(pos)
         self.angle = angle
         self.vel = vec(math.cos(self.angle), math.sin(self.angle))
-        self.speed = 14
+        self.speed = speed
         self.col = col
         self.scale_mod = scale_mod
         self.scale = 4 * scale_mod
@@ -74,10 +74,10 @@ class Bullet(pygame.sprite.Sprite):
                         )
                     return self.kill()
         
-        else: #definitely player
+        else: #definitely hitting player
             if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.jump_height) - abs(self.shadow_height.y)) < 4:
                 # self.game.player.knockback(self.vel * self.speed * 40)
-                # self.game.player.take_hit(3)
+                self.game.player.health -= 3
                 for i in range(random.randint(3, 3)):
                     Spark(
                         self.game, 

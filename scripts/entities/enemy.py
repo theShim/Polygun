@@ -45,8 +45,8 @@ class Enemy(pygame.sprite.Sprite):
 
         #shooting
         self.bullet_spread = math.pi/20 #+- spread angle in radians
-        self.shoot_timer = Timer(20, 1)
-        for i in range(random.randint(0, 20)):
+        self.shoot_timer = Timer(60, 1)
+        for i in range(random.randint(0, 60)):
             self.shoot_timer.update()
 
         #damage indicator stuff
@@ -141,8 +141,9 @@ class Enemy(pygame.sprite.Sprite):
         if not (self.hurt or self.dying):
             self.shoot_timer.update()
             if self.shoot_timer.finished:
-                Bullet(self.game, [self.game.all_sprites], self.pos, self.angle + random.uniform(-self.bullet_spread, self.bullet_spread), (255 - 55, 0, 55 - 55), shadow_height=-vec(0, 0), scale_mod=0.75, owner=self)
+                Bullet(self.game, [self.game.all_sprites], self.pos, self.angle + random.uniform(-self.bullet_spread, self.bullet_spread), (255 - 55, 0, 55 - 55), speed=10, shadow_height=-vec(0, 0), scale_mod=0.75, owner=self)
                 self.shoot_timer.reset()
+                self.game.music_player.play("gunshot", pool="sfx", loop=False)
 
         if self.hurt:
             self.damage_timer.update()

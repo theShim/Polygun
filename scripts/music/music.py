@@ -13,5 +13,5 @@ class Sound(pygame.mixer.Sound):
 
 SOUNDS = {
     "xqc_dungeon" : Sound("audio/xqc_dungeon.mp3"),
-    "gunshot" : Sound("audio/gun.wav"),
+    "gunshot" : Sound("audio/gun.mp3"),
 }

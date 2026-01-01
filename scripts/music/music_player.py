@@ -20,7 +20,7 @@ class Music_Player:
         self.channels = [pygame.mixer.Channel(i) for i in range(channel_num)]
 
         self.create_pool("music", 1)
-        self.create_pool("sfx", 12, volume=1.0)
+        self.create_pool("sfx", 12, volume=0.7)
         self.create_pool("ui", 4, volume=0.4)
         self.create_pool("ambient", 6, volume=0.7)
 
