@@ -10,6 +10,7 @@ import json
 import numpy as np
 
 from scripts.particles.sparks import Spark
+from scripts.particles.bullet_casing import Bullet_Casing
 from scripts.projectiles.bullet import Bullet
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
@@ -104,6 +105,7 @@ class Player(pygame.sprite.Sprite):
 
             b = Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height), owner=self)
             self.game.music_player.play("gunshot", pool="sfx", loop=False)
+            Bullet_Casing(self.game, [self.game.all_sprites, self.game.particles], self.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.jump_height))
 
             for i in range(random.randint(3, 3)):
                 Spark(

@@ -58,12 +58,12 @@ class TransitionLine(pygame.sprite.Sprite):
         self.screen = self.game.screen
 
         self.line_height = HEIGHT / 5
-        self.buffer = 70
+        self.buffer = 50
         self.points = np.array([
             [WIDTH, y],
             [WIDTH + self.line_height, y - self.line_height],
-            [WIDTH + self.line_height + WIDTH + self.line_height + self.buffer, y - self.line_height],
-            [WIDTH + WIDTH + self.line_height + self.buffer, y]
+            [WIDTH + self.line_height + WIDTH + self.line_height + self.buffer + 10, y - self.line_height],
+            [WIDTH + WIDTH + self.line_height + self.buffer + 10, y]
         ])
 
         self.start_pos = vec()
