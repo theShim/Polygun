@@ -13,6 +13,8 @@ from scripts.particles.sparks import Spark
 from scripts.particles.bullet_casing import Bullet_Casing
 from scripts.projectiles.bullet import Bullet
 
+from scripts.weapons.gun import Gun
+
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 
@@ -46,8 +48,9 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.bullet_spread = math.pi/80 #+- spread angle in radians
-        self.shoot_timer = Timer(10, 1)
+        self.primary = Gun.Pistol(self.game, [])
+        self.primary.shoot_timer.t = self.primary.shoot_timer.end
+        self.secondary = None
         
         #jumping
         self.jump_vel = 50 #the velocity applied upwards
@@ -97,28 +100,10 @@ class Player(pygame.sprite.Sprite):
     def mouse_inputs(self):
         mouse = pygame.mouse.get_pressed()
 
-        self.shoot_timer.update()
-        if mouse[0] and (pygame.key.get_pressed()[pygame.K_LSHIFT] or self.shoot_timer.finished):
-            self.shoot_timer.reset()
-            
-            mousePos = self.game.mousePos + vec(0, self.jump_height)
-            mouseAngle = math.atan2(mousePos.y - self.pos.y + self.game.offset.y, mousePos.x - self.pos.x + self.game.offset.x)
-
-            b = Bullet(self.game, [self.game.all_sprites], self.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.jump_height), owner=self)
-            self.game.music_player.play("gunshot", pool="sfx", loop=False)
-            Bullet_Casing(self.game, [self.game.all_sprites, self.game.particles], self.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.jump_height))
-
-            for i in range(random.randint(3, 3)):
-                Spark(
-                    self.game, 
-                    [self.game.all_sprites, self.game.particles], 
-                    b.pos, 
-                    (self.size + random.uniform(-4, 12)) / 6, 
-                    mouseAngle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1),
-                    speed=random.uniform(2, 2),
-                    shadow_height=-vec(0, self.jump_height),
-                    shadow_col=(0, 0, 0, 0)
-                )
+        self.primary.shoot_timer.update()
+        if mouse[0] and (pygame.key.get_pressed()[pygame.K_LSHIFT] or self.primary.shoot_timer.finished):
+            self.primary.shoot_timer.reset()
+            self.primary.update()
 
 
     def jump(self, keys):

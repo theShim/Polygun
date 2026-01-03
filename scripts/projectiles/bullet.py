@@ -10,12 +10,12 @@ import random
 from scripts.particles.sparks import Spark
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, SIZE, FPS, GRAV, FRIC, TILE_SIZE
-from scripts.utils.CORE_FUNCS import vec, lerp
+from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 
     ##############################################################################################
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, angle, col, owner, speed=14, shadow_height = None, scale_mod=1):
+    def __init__(self, game, groups, pos, angle, col, owner, speed=14, shadow_height = None, scale_mod=1, lifetime=FPS * 60, damage=3):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
@@ -29,11 +29,14 @@ class Bullet(pygame.sprite.Sprite):
         self.scale_mod = scale_mod
         self.scale = 4 * scale_mod
         self.shadow_height = shadow_height
+        self.damage = damage
 
         self.w = vec(math.cos(self.angle - math.pi / 2), math.sin(self.angle - math.pi / 2)) * self.scale
         
         for i in range(1):
             self.move()
+
+        self.lifetime = Timer(lifetime, 1)
 
     def move(self):
         self.pos += self.vel * self.speed
@@ -60,7 +63,7 @@ class Bullet(pygame.sprite.Sprite):
             for enemy in self.game.enemies:
                 if enemy.pos.distance_to(self.pos) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
                     enemy.knockback(self.vel * self.speed * 40)
-                    enemy.take_hit(3)
+                    enemy.take_hit(self.damage)
                     for i in range(random.randint(3, 3)):
                         Spark(
                             self.game, 
@@ -77,7 +80,7 @@ class Bullet(pygame.sprite.Sprite):
         else: #definitely hitting player
             if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.jump_height) - abs(self.shadow_height.y)) < 4:
                 # self.game.player.knockback(self.vel * self.speed * 40)
-                self.game.player.health -= 3
+                self.game.player.health -= self.damage
                 for i in range(random.randint(3, 3)):
                     Spark(
                         self.game, 
@@ -98,6 +101,21 @@ class Bullet(pygame.sprite.Sprite):
         pass
 
     def update(self):
+        self.lifetime.update()
+        if self.lifetime.finished:
+            for i in range(random.randint(3, 3)):
+                Spark(
+                    self.game, 
+                    [self.game.all_sprites, self.game.particles], 
+                    self.pos, 
+                    ((self.scale + random.uniform(-4, 12)) / 3) * self.scale_mod, 
+                    self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
+                    speed=random.uniform(2, 2),
+                    shadow_height=self.shadow_height,
+                    shadow_col=(0, 0, 0, 0)
+                )
+            return self.kill()
+        
         self.move()
         self.collisions()
         self.player_collisions()
