@@ -3,8 +3,12 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
+import random
+
 # from scripts.world_loading.tiles import Tile
 # from scripts.world_loading.nature.manager import Nature_Manager
+
+from scripts.world_loading.rooms import ROOMS
 
 from scripts.utils.CORE_FUNCS import vec
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
@@ -25,22 +29,23 @@ class Tilemap:
         self.load()
 
     def load(self):
+        room = random.choices(ROOMS, [10, 1], k=1)[0]
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):
                 pos = (int(x + self.room_pos.x * LEVEL_SIZE), int(y + self.room_pos.y * LEVEL_SIZE))
-                self.tilemap[pos] = Tile(self.game, pos, 0)
+                self.tilemap[pos] = Tile(self.game, pos, room[y][x])
 
-        for x in range(LEVEL_SIZE):
-            pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)
-            self.tilemap[pos] = Tile(self.game, pos, 1)
-            pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE + LEVEL_SIZE - 1)
-            self.tilemap[pos] = Tile(self.game, pos, 1)
+        # for x in range(LEVEL_SIZE):
+        #     pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)
+        #     self.tilemap[pos] = Tile(self.game, pos, 1)
+        #     pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE + LEVEL_SIZE - 1)
+        #     self.tilemap[pos] = Tile(self.game, pos, 1)
 
-        for y in range(LEVEL_SIZE):
-            pos = (self.room_pos.x * LEVEL_SIZE, y + self.room_pos.y * LEVEL_SIZE)
-            self.tilemap[pos] = Tile(self.game, pos, 1)
-            pos = (self.room_pos.x * LEVEL_SIZE + LEVEL_SIZE - 1, y + self.room_pos.y * LEVEL_SIZE)
-            self.tilemap[pos] = Tile(self.game, pos, 1)
+        # for y in range(LEVEL_SIZE):
+        #     pos = (self.room_pos.x * LEVEL_SIZE, y + self.room_pos.y * LEVEL_SIZE)
+        #     self.tilemap[pos] = Tile(self.game, pos, 1)
+        #     pos = (self.room_pos.x * LEVEL_SIZE + LEVEL_SIZE - 1, y + self.room_pos.y * LEVEL_SIZE)
+        #     self.tilemap[pos] = Tile(self.game, pos, 1)
 
         self.remove_corridoors()
 
@@ -88,13 +93,20 @@ class Tilemap:
                             neighbours.append((dx, dy))
 
                     else:
-                        for room_x, room_y in self.room.conns:
-                            to_check_room = (int(room_x), int(room_y))
-                            to_check_tilemap = self.room.parent_level.rooms[to_check_room].tilemap.tilemap
-                            if to_check in to_check_tilemap:
-                                if to_check_tilemap[to_check].index:
-                                    neighbours.append((dx, dy))
-                                    break
+                        for ddx in range(-1, 2):
+                            for ddy in range(-1, 2):
+                                if abs(ddx) == abs(ddy): continue
+
+                                room_x = self.room_pos.x + ddx
+                                room_y = self.room_pos.y + ddy
+                        # for room_x, room_y in self.room.conns:
+                                to_check_room = (int(room_x), int(room_y))
+                                if to_check_room in self.room.parent_level.rooms:
+                                    to_check_tilemap = self.room.parent_level.rooms[to_check_room].tilemap.tilemap
+                                    if to_check in to_check_tilemap:
+                                        if to_check_tilemap[to_check].index:
+                                            neighbours.append((dx, dy))
+                                            break
 
             room_type = Tile.AUTO_TILE_MAP[tuple(sorted(neighbours))]
             tile.index = room_type

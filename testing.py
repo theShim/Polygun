@@ -37,12 +37,28 @@ def rot_xy(a):
         [ 0, 0, 0, 1]
     ])
 
+def rot_xz(a):
+    return np.array([
+        [math.cos(a), 0, math.sin(a), 0],
+        [0, 1, 0, 0],
+        [-math.sin(a), 0, math.cos(a), 0],
+        [0, 0, 0, 1]
+    ])
+
 def rot_zw(a):
     return np.array([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
         [0, 0,  math.cos(a), -math.sin(a)],
         [0, 0,  math.sin(a),  math.cos(a)]
+    ])
+
+def rot_xw(a):
+    return np.array([
+        [math.cos(a), 0, 0, -math.sin(a)],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [math.sin(a), 0, 0, math.cos(a)]
     ])
 
 # -------------------- Projection --------------------
@@ -58,7 +74,7 @@ def project_3d_to_2d(p, d=4):
 # -------------------- Main loop --------------------
 
 angle = 0.0
-scale = 600
+scale = 1200
 center = np.array([WIDTH // 2, HEIGHT // 2])
 
 running = True
@@ -73,7 +89,7 @@ while running:
     # Update rotation
     angle += 1.0 * dt
 
-    rotation = rot_xy(3) @ rot_zw(angle * 0.7)
+    rotation = rot_zw(angle) @ rot_xw(0.4) @ rot_xz(angle)
     rotated = points_4d @ rotation.T
 
     # Project points

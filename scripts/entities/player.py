@@ -48,7 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.primary = Gun.Pistol(self.game, [])
+        self.primary = Gun.Shotgun(self.game, [])
         self.primary.shoot_timer.t = self.primary.shoot_timer.end
         self.secondary = None
         

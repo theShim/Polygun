@@ -83,5 +83,5 @@ class Pistol(Gun):
 
 
 Gun.Rifle = Rifle
-Gun.ShotGun = Shotgun
+Gun.Shotgun = Shotgun
 Gun.Pistol = Pistol
