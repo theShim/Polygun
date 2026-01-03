@@ -13,6 +13,7 @@ from array import array
 import numpy as np
 
 from scripts.entities.player import Player
+from scripts.entities.silver import Silver
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.energy_bar import EnergyBar
 from scripts.gui.cursor import Cursor
@@ -81,7 +82,7 @@ class Game:
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
-        self.state_loader = State_Loader(self, start="title_screen")
+        self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
@@ -158,6 +159,7 @@ class Game:
         Custom_Font.init()
         EnergyBar.cache_sprites()
         Cursor.cache_sprites()
+        Silver.cache_sprites()
         # Player.cache_sprites()
 
     def calculate_offset(self):

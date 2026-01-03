@@ -42,7 +42,7 @@ class Bullet_Casing(pygame.sprite.Sprite):
         self.height = intial_height
         self.height_mod = -random.uniform(8, 10)
 
-        self.lifetime = Timer(FPS * 5, 1)
+        self.lifetime = Timer(FPS * 4, 1)
         self.alpha_flash = Timer(20, 1)
         self.alpha = True
 
@@ -63,7 +63,7 @@ class Bullet_Casing(pygame.sprite.Sprite):
         if self.lifetime.finished:
             return self.kill()
 
-        elif self.lifetime.t / self.lifetime.end >= 0.6:
+        elif self.lifetime.t / self.lifetime.end >= 0.5:
             self.alpha_flash.update()
             if self.alpha_flash.finished:
                 self.alpha_flash.reset()

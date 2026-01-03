@@ -9,6 +9,7 @@ import random
 import json
 import numpy as np
 
+from scripts.entities.silver import Silver
 from scripts.particles.sparks import Spark
 from scripts.entities.remains import Remains
 from scripts.projectiles.bullet import Bullet
@@ -97,6 +98,10 @@ class Enemy(pygame.sprite.Sprite):
                 (255, 0, 55),
                 self.height
             )
+
+        for i in range(random.randint(1, 4)):
+            Silver(self.game, [self.game.all_sprites, self.game.entities], self.pos, -vec(0, self.height))
+            
         return self.kill()
 
         #############################################################################
@@ -306,6 +311,8 @@ class Hexagon(Enemy):                               #plants bombs on the floor
                         (134, 0, 196),
                         self.height
                     )
+                for i in range(random.randint(1, 4)):
+                    Silver(self.game, [self.game.all_sprites, self.game.entities], self.pos, -vec(0, self.height))
                 return self.kill()
 
         self.draw()
@@ -422,6 +429,8 @@ class Pentagon(Enemy):                              #throws grenades
                         (235, 101, 70),
                         self.height
                     )
+                for i in range(random.randint(1, 4)):
+                    Silver(self.game, [self.game.all_sprites, self.game.entities], self.pos, -vec(0, self.height))
                 return self.kill()
 
         self.draw()
