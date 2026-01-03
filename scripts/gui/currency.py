@@ -62,7 +62,7 @@ class CurrencyGUI(pygame.sprite.Sprite):
         for y in range(-1, 2):
             for x in range(-1, 2):
                 if x != y:
-                    self.screen.blit(self.outline, (37 + 40 + self.size * x, 80 - 16 + self.size * y))
-        self.screen.blit(self.surf, (37 + 40, 80 - 16))
+                    self.screen.blit(self.outline, (37 + 40 + self.size * x, 80 - 16 + 1 + self.size * y))
+        self.screen.blit(self.surf, (37 + 40, 80 - 16 + 1))
 
-        self.screen.blit(self.text, (37 + 40 + self.size * 8, 80 - 16))
+        self.screen.blit(self.text, (37 + 40 + self.size * 8, 80 - 16 + 1))

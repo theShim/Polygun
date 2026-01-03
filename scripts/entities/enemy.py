@@ -14,6 +14,7 @@ from scripts.particles.sparks import Spark
 from scripts.entities.remains import Remains
 from scripts.projectiles.bullet import Bullet
 from scripts.projectiles.grenade import Grenade
+from scripts.projectiles.shockwave import Shockwave
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
@@ -268,11 +269,11 @@ class Hexagon(Enemy):                               #plants bombs on the floor
                 self.attack_delay.update()
                 if self.attack_delay.finished:
                     self.attack_t += self.game.dt * 5
-                    # self.height = (50 / ((self.attack_duration / 2) ** 4)) * ((self.attack_t - (self.attack_duration / 2)) ** 4)
+                    self.height = (50 / ((self.attack_duration / 2) ** 4)) * ((self.attack_t - (self.attack_duration / 2)) ** 4)
                     if self.attack_t >= self.attack_duration / 2 and not self.spawned_blackhole:
                         # Grenade(self.game, [self.game.all_sprites], self.pos, self.pos)
                         # self.take_hit()
-                        pass
+                        Shockwave(self.game, [self.game.all_sprites], self.pos)
                     if self.attack_t >= self.attack_duration:
                         self.attack_t = 0
                         self.chase_timer.reset()
