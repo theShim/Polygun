@@ -19,7 +19,7 @@ class Title_Screen(State):
         super().__init__(game, "title_screen")
 
         self.d = Del(game, 100)
-        self.logo = pygame.image.load("assets/gui/logo.png").convert_alpha()
+        self.logo = pygame.image.load("assets/gui/polygun_logo.png").convert_alpha()
         self.t = 0
 
         self.buttons = pygame.sprite.Group()
@@ -34,7 +34,7 @@ class Title_Screen(State):
         self.d.update()
         self.t += math.radians(2)
 
-        self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2, self.logo.height / 2 + 30 + math.sin(self.t) * 8)))
+        self.screen.blit(self.logo, self.logo.get_rect(center=(WIDTH/2- 12, self.logo.height / 2 + 40 + math.sin(self.t) * 8)))
 
         self.buttons.update()
 

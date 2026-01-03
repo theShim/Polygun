@@ -257,10 +257,11 @@ class Hexagon(Enemy):                               #plants bombs on the floor
                 self.attack_delay.update()
                 if self.attack_delay.finished:
                     self.attack_t += self.game.dt * 5
-                    self.height = (50 / ((self.attack_duration / 2) ** 4)) * ((self.attack_t - (self.attack_duration / 2)) ** 4)
+                    # self.height = (50 / ((self.attack_duration / 2) ** 4)) * ((self.attack_t - (self.attack_duration / 2)) ** 4)
                     if self.attack_t >= self.attack_duration / 2 and not self.spawned_blackhole:
-                        # Blackhole_Mini()
-                        self.take_hit()
+                        # Grenade(self.game, [self.game.all_sprites], self.pos, self.pos)
+                        # self.take_hit()
+                        pass
                     if self.attack_t >= self.attack_duration:
                         self.attack_t = 0
                         self.chase_timer.reset()
