@@ -27,7 +27,7 @@ class Lightning(pygame.sprite.Sprite):
         self.interp = 0
         self.speed = lambda: random.uniform(speed*0.8, speed*1.2)
 
-        self.offset = 4
+        self.offset = 14
         self.generations = 3
         self.colours = colours
         self.line_width = line_width
@@ -75,14 +75,20 @@ class Lightning(pygame.sprite.Sprite):
                 int(self.line_width)
             )
             i += 0.5 if i < 128 else 0
+            pygame.draw.circle(self.screen, (0, 0, 0), segment[0] - self.game.offset + vec(0, 3), self.line_width // 2)
+            pygame.draw.circle(self.screen, (0, 0, 0), segment[1] - self.game.offset + vec(0, 3), self.line_width // 2)
+
+        for segment in self.segments:
             pygame.draw.line(
                 self.screen, 
-                [max(c-i, 0) for c in random.choice(self.colours)], 
+                col := [max(c-i, 0) for c in random.choice(self.colours)], 
                 segment[0] - self.game.offset, 
                 segment[1] - self.game.offset, 
                 int(self.line_width)
             )
             i += 0.5 if i < 128 else 0
+            pygame.draw.circle(self.screen, col, segment[0] - self.game.offset, self.line_width // 2)
+            pygame.draw.circle(self.screen, col, segment[1] - self.game.offset, self.line_width // 2)
 
 
 class Shockwave(pygame.sprite.Sprite):
@@ -92,11 +98,12 @@ class Shockwave(pygame.sprite.Sprite):
         self.screen = self.game.screen
 
         self.size = 1
-        self.size_mod = 12
+        self.size_mod = 10
         angles = np.linspace(0, 2 * math.pi, 7)
         self.points = np.column_stack((np.cos(angles), np.sin(angles))) * self.size
         self.pos = vec(pos)
         self.angle = 0
+        self.hit = False
 
         self.lightnings = pygame.sprite.Group()
         self.edges = [
@@ -109,13 +116,18 @@ class Shockwave(pygame.sprite.Sprite):
         ]
         for edge in self.edges:
             p1, p2 = self.points[edge]
-            Lightning(game, [self.lightnings], [p1, p2], line_width=7, colours=[(156, 0, 161), (140, 0, 210), (114, 0, 73), (110, 0, 143)])
+            Lightning(game, [self.lightnings], [p1, p2], line_width=12, colours=[(156, 0, 161), (140, 0, 210), (114 + 30, 0, 73 + 30)])
 
     def update(self):
         self.size += self.size_mod
         self.size_mod *= 0.95
         if self.size_mod < 0.1:
             return self.kill()
+        
+        if not self.hit:
+            if self.game.player.jump_height < 4 and self.size * 0.9 < (self.game.player.pos - self.pos).magnitude() < self.size:
+                self.game.player.health -= 8
+                self.hit = True
         
         self.angle += math.radians(2)
 

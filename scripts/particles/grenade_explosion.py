@@ -25,7 +25,7 @@ class Grenade_Explosion(pygame.sprite.Sprite):
         self.pos = vec(pos)
 
         self.parts = pygame.sprite.Group()
-        Grenade_Explosion.Circle(self.game, [self.parts], self.pos, 20, 7, (30 - 15, 28 - 15, 38 - 15))
+        self.outer = Grenade_Explosion.Circle(self.game, [self.parts], self.pos, 20, 7, (30 - 15, 28 - 15, 38 - 15))
         Grenade_Explosion.Circle(self.game, [self.parts], self.pos, 16, 4, (235, 101, 70))
         Grenade_Explosion.Circle(self.game, [self.parts], self.pos, 10, 2, (253, 252, 211))
 
@@ -47,8 +47,16 @@ class Grenade_Explosion(pygame.sprite.Sprite):
                 random.choice(colours)
             )
 
+        self.hit = False
+
     def update(self):
         self.parts.update()
+        
+        if not self.hit:
+            if self.game.player.jump_height < 4 and (self.game.player.pos - self.pos).magnitude() < self.outer.radius * 0.9:
+                self.game.player.health -= 10
+                self.hit = True
+                # self.game.player.jump_height += 20
 
     class Circle(pygame.sprite.Sprite):
         def __init__(self, game, groups, pos, width, radius_mod, colour):

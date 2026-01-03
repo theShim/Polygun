@@ -229,7 +229,7 @@ class Hexagon(Enemy):                               #plants bombs on the floor
         self.attack_t = 0
         self.attack_duration = 3.2
         self.attack_delay = Timer(30, 1)
-        self.spawned_blackhole = False
+        self.spawned_shockwave = False
         
         for i in range(random.randint(0, FPS * 5)):
             self.attack_cycle_timer.update()
@@ -270,16 +270,16 @@ class Hexagon(Enemy):                               #plants bombs on the floor
                 if self.attack_delay.finished:
                     self.attack_t += self.game.dt * 5
                     self.height = (50 / ((self.attack_duration / 2) ** 4)) * ((self.attack_t - (self.attack_duration / 2)) ** 4)
-                    if self.attack_t >= self.attack_duration / 2 and not self.spawned_blackhole:
-                        # Grenade(self.game, [self.game.all_sprites], self.pos, self.pos)
-                        # self.take_hit()
+                    if self.attack_t >= self.attack_duration / 2 and not self.spawned_shockwave:
                         Shockwave(self.game, [self.game.all_sprites], self.pos)
+                        self.spawned_shockwave = True
                     if self.attack_t >= self.attack_duration:
                         self.attack_t = 0
                         self.chase_timer.reset()
                         self.attack_cycle_timer.reset()
                         self.attack_delay.reset()
                         self.height = 50
+                        self.spawned_shockwave = False
 
         self.move()
 

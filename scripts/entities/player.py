@@ -126,7 +126,6 @@ class Player(pygame.sprite.Sprite):
             self.jumping = True
             self.jump_time = 0
 
-
         #the psuedo height stuff, just projectile motion
         if self.jumping:
             self.jump_time += self.game.dt * 10
@@ -135,6 +134,12 @@ class Player(pygame.sprite.Sprite):
             if self.jump_height <= 0:
                 self.jump_height = 0
                 self.jumping = 0
+
+        else:
+            if self.jump_height > 0:
+                self.jump_height -= GRAV / 10
+            if self.jump_height <= 0:
+                self.jump_height = 0
 
     def dash(self):
         keys = pygame.key.get_just_pressed()
