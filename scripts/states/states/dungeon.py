@@ -12,6 +12,7 @@ from scripts.world_loading.tilemap import Tile
 from scripts.gui.health_bar import HealthBar
 from scripts.gui.crosshair import CrossHair
 from scripts.gui.energy_bar import EnergyBar
+from scripts.gui.currency import CurrencyGUI
 
 from scripts.utils.CORE_FUNCS import vec
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
@@ -55,6 +56,7 @@ class Dungeon(State):
             HealthBar(self.game, [self.game.gui_elements])
             CrossHair(self.game, [self.game.gui_elements])
             EnergyBar(self.game, [self.game.gui_elements])
+            CurrencyGUI(self.game, [self.game.gui_elements])
             
             self.game.music_player.play("xqc_dungeon", pool="music", loop=True)
             self.start = False
