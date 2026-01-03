@@ -61,8 +61,9 @@ class Player(pygame.sprite.Sprite):
         self.max_energy = 100
         self.energy = 0
         self.energy_refill_timer = Timer(FPS, 1)
+        self.currency = 0
+        self.pickup_radius = 100 #remains and money
 
-        self.pickup_radius = 100
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
         # self.boost_timer = Timer()

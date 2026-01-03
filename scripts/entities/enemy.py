@@ -10,7 +10,7 @@ import json
 import numpy as np
 
 from scripts.particles.sparks import Spark
-from scripts.particles.remains import Remains
+from scripts.entities.remains import Remains
 from scripts.projectiles.bullet import Bullet
 from scripts.projectiles.grenade import Grenade
 
@@ -76,6 +76,30 @@ class Enemy(pygame.sprite.Sprite):
 
     def trigger_death(self):
         self.dying = True
+
+    def death(self):
+        for i in range(random.randint(3, 5)):
+            Spark(
+                self.game, 
+                [self.game.all_sprites, self.game.particles], 
+                self.pos - vec(0, self.height), 
+                (12 + random.uniform(-4, 12)) / 6, 
+                random.uniform(0, 2 * math.pi),
+                speed=random.uniform(2, 3),
+                colour=(255, 0, 55),
+                shadow_col=(0, 0, 0, 0),
+                grav=True,
+            )
+            Remains(
+                self.game,
+                [self.game.all_sprites],
+                self.pos,
+                (255, 0, 55),
+                self.height
+            )
+        return self.kill()
+
+        #############################################################################
 
     def collisions(self, direction):
         room = self.game.state_loader.current_state.get_current_room(self.pos)
@@ -155,26 +179,8 @@ class Enemy(pygame.sprite.Sprite):
             self.angle += math.radians(20)
             
             if self.points[0, 0] < 0.25:
-                for i in range(random.randint(3, 5)):
-                    Spark(
-                        self.game, 
-                        [self.game.all_sprites, self.game.particles], 
-                        self.pos - vec(0, self.height), 
-                        (12 + random.uniform(-4, 12)) / 6, 
-                        random.uniform(0, 2 * math.pi),
-                        speed=random.uniform(2, 3),
-                        colour=(255, 0, 55),
-                        shadow_col=(0, 0, 0, 0),
-                        grav=True,
-                    )
-                    Remains(
-                        self.game,
-                        [self.game.all_sprites, self.game.particles],
-                        self.pos,
-                        (255, 0, 55),
-                        self.height
-                    )
-                return self.kill()
+                self.death()
+                return
 
         self.draw()
 
