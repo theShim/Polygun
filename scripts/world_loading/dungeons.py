@@ -136,7 +136,7 @@ class Room:
             self.wave_stack = []
 
             if self.temp:
-                Tesseract(self.game, [self.game.all_sprites, self.game.entities])
+                Tesseract(self.game, [self.game.all_sprites, self.game.entities, self.game.bosses])
                 self.temp = False
             
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 

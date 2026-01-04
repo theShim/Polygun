@@ -77,6 +77,7 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.bosses = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
         self.gui_elements = pygame.sprite.Group()
 

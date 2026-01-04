@@ -76,6 +76,21 @@ class Bullet(pygame.sprite.Sprite):
                             shadow_col=(0, 0, 0, 0)
                         )
                     return self.kill()
+
+            for boss in self.game.bosses:
+                if boss.bullet_collide(self):
+                    for i in range(random.randint(3, 3)):
+                        Spark(
+                            self.game, 
+                            [self.game.all_sprites, self.game.particles], 
+                            self.pos, 
+                            ((self.scale + random.uniform(-4, 12)) / 3) * self.scale_mod, 
+                            self.angle + random.uniform(-math.pi/5 * 1.1, math.pi/5 * 1.1) + math.pi,
+                            speed=random.uniform(2, 2),
+                            shadow_height=self.shadow_height,
+                            shadow_col=(0, 0, 0, 0)
+                        )
+                    return self.kill()
         
         else: #definitely hitting player
             if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.jump_height) - abs(self.shadow_height.y)) < 4:

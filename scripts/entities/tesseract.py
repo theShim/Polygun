@@ -9,9 +9,11 @@ import random
 import numpy as np
 
 from scripts.particles.sparks import Spark
+from scripts.projectiles.bullet import Bullet
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE, SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.convex_hull import convex_hull
 
     ##############################################################################################
 
@@ -97,7 +99,46 @@ class Tesseract(pygame.sprite.Sprite):
         self.scale = 900
         
         self.pos = vec(WIDTH / 2, HEIGHT)
+
+        self.health = 1000
+
+    def bullet_collide(self, bullet: Bullet):
+        rotated = self.points @ (Transform4D.rot_zw(self.angle) @ Transform4D.rot_xw(0) @ Transform4D.rot_xz(self.angle) @ Transform4D.rot_yz(2.93)).T
+        projected = []
+        for p in rotated:
+            p3 = project_4d_to_3d(p)
+            p2 = project_3d_to_2d(p3)
+            projected.append(p2)
+        projected = np.array(projected) * self.scale + self.pos
+
+        points = projected.tolist()
+        self.hitbox = convex_hull(points)
+
+        if self.ray_intersects(self.hitbox, bullet.pos.x, bullet.pos.y):
+            self.health -= bullet.damage
+            return True
+        return False
         
+    def get_edges(self, points):
+        edges = []
+        for i in range(len(points)):
+            start = points[i]
+            end = points[(i + 1) % len(points)]
+            edges.append((start, end))
+        return edges
+        
+    def ray_intersects(self, hitbox_points, ray_end_x, ray_y): #separating axis theorem
+        intersections = 0
+
+        for edge in self.get_edges(hitbox_points):
+            start, end = edge
+            if (start[1] > ray_y and end[1] < ray_y) or (start[1] < ray_y and end[1] > ray_y):
+                t = (ray_y - start[1]) / (end[1] - start[1])
+                intersection_x = start[0] + t * (end[0] - start[0])
+                if intersection_x < ray_end_x:  # Check if the intersection is to the right of the start
+                    intersections += 1
+        
+        return intersections % 2 == 1  #odd intersections mean inside, even means outside
 
     def update(self):
         # d = -1 if (keys := pygame.key.get_pressed())[pygame.K_u] else (1 if keys[pygame.K_j] else 0)
@@ -110,17 +151,13 @@ class Tesseract(pygame.sprite.Sprite):
         
         projected = []
         projected_3d = []
-        # projected_shadow = []
         for p in rotated:
             p3 = project_4d_to_3d(p)
             projected_3d.append(p3)
             p2 = project_3d_to_2d(p3)
-            # p3 = p3.tolist()
-            # projected_shadow.append(project_3d_to_2d(np.array([p3[0], p3[1] / 4, 0])))
             projected.append(p2)
 
         projected = np.array(projected) * self.scale + self.pos - self.game.offset
-        # projected_shadow = np.array(projected_shadow) * self.scale + self.pos - self.game.offset + vec(0, 100)
         
         for i, j in self.edges:
             pygame.draw.line(
