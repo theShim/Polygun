@@ -6,6 +6,7 @@ with contextlib.redirect_stdout(None):
 import random
 
 from scripts.entities.enemy import Enemy, EnemySpawnData
+from scripts.entities.tesseract import Tesseract
 from scripts.world_loading.tilemap import Tilemap
 
 from scripts.utils.CORE_FUNCS import vec
@@ -100,6 +101,7 @@ class Room:
 
         self.state = Room.UNENTERED
         self.start_room = False
+        self.temp = True
 
         self.wave_stack: list[list[EnemySpawnData]] = [
             [EnemySpawnData(Enemy.Hexagon, 3)],
@@ -132,6 +134,10 @@ class Room:
         if self.start_room:
             self.state = Room.CLEARED
             self.wave_stack = []
+
+            if self.temp:
+                Tesseract(self.game, [self.game.all_sprites, self.game.entities])
+                self.temp = False
             
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
         #i.e. it's been entered by the player
