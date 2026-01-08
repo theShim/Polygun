@@ -98,3 +98,33 @@ class Bullet_Casing(pygame.sprite.Sprite):
         
         self.screen.blit(shadow, shadow.get_rect(center=self.pos - self.game.offset + vec(0, 2)))
         self.screen.blit(surf, surf.get_rect(center=self.pos - self.game.offset + self.height))
+
+class Shotgun_Casing(Bullet_Casing):
+
+    SHOTGUN_SPRITES = {}
+
+    def __init__(self, game, groups, pos, angle, initial_height):
+        super().__init__(game, groups, pos, angle, initial_height)
+
+    def draw(self):
+        a = round(self.angle, 2)
+        if (cached := self.SHOTGUN_SPRITES.get(a, None)) == None:
+            surf = pygame.Surface((self.size * 1.5, self.size * 1.5), pygame.SRCALPHA)
+            points = self.points.copy()
+            pygame.draw.polygon(surf, (255, 0, 47), rot_2d(points, a) + vec(surf.size) / 2)
+            points[:, 0] *= 0.3
+            points[:, 0] += -0.7 * self.size / 2
+            pygame.draw.polygon(surf, (240, 152, 0), rot_2d(points, a) + vec(surf.size) / 2)
+
+            shadow = pygame.Surface((self.size * 1.5, self.size * 1.5), pygame.SRCALPHA)
+            pygame.draw.polygon(shadow, (0, 0, 0), rot_2d(self.points, a) + vec(shadow.size) / 2)
+            
+            cached = (surf, shadow)
+            self.SHOTGUN_SPRITES[a] = cached
+
+        surf, shadow = cached
+        surf.set_alpha(255 if self.alpha else 108)
+        shadow.set_alpha(255 if self.alpha else 108)
+        
+        self.screen.blit(shadow, shadow.get_rect(center=self.pos - self.game.offset + vec(0, 2)))
+        self.screen.blit(surf, surf.get_rect(center=self.pos - self.game.offset + self.height))

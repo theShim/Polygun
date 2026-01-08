@@ -10,7 +10,7 @@ import json
 import numpy as np
 
 from scripts.particles.sparks import Spark
-from scripts.particles.bullet_casing import Bullet_Casing
+from scripts.particles.bullet_casing import Bullet_Casing, Shotgun_Casing
 from scripts.projectiles.bullet import Bullet
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
@@ -30,6 +30,9 @@ class Gun(pygame.sprite.Sprite):
     def play_sound(self):
         self.game.music_player.play("gunshot", pool="sfx", loop=False)
 
+    def spawn_casing(self, mouseAngle):
+        Bullet_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
+
     def shoot(self, mouseAngle):
         Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)
 
@@ -40,8 +43,8 @@ class Gun(pygame.sprite.Sprite):
         mouseAngle = math.atan2(mousePos.y - self.game.player.pos.y + self.game.offset.y, mousePos.x - self.game.player.pos.x + self.game.offset.x)
 
         self.shoot(mouseAngle)
+        self.spawn_casing(mouseAngle)
         
-        Bullet_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
         for i in range(random.randint(3, 3)):
             Spark(
                 self.game, 
@@ -64,6 +67,9 @@ class Shotgun(Gun):
         super().__init__(game, groups)
         self.shoot_timer = Timer(FPS * 0.8, 1)
         self.cone = math.pi / 6
+        
+    def spawn_casing(self, mouseAngle):
+        Shotgun_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
 
     def shoot(self, mouseAngle):
         Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)

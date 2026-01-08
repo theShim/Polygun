@@ -49,7 +49,7 @@ class Player(pygame.sprite.Sprite):
         
         #shooting
         self.primary = Gun.Shotgun(self.game, [])
-        self.primary.shoot_timer.t = self.primary.shoot_timer.end
+        self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
         self.secondary = None
         
         #jumping

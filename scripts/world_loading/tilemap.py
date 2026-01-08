@@ -193,7 +193,7 @@ class Tile(pygame.sprite.Sprite):
         tuple(sorted([(0, -1), (-1, 0), (0, 1)]))         : 16,
     }
 
-    CORNER_PIXEL_MAP = {
+    CORNER_PIXEL_MAP = { #more like ohnepixel
         13 : {
             tuple(sorted([3, 6])) : 38
         },
