@@ -104,8 +104,8 @@ class Room:
         self.temp = True
 
         self.wave_stack: list[list[EnemySpawnData]] = [
-            [EnemySpawnData(Enemy.Hexagon, 3)],
-            [EnemySpawnData(Enemy.Pentagon, 2), EnemySpawnData(Enemy.Hexagon, 2)],
+            [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 4)],
+            [EnemySpawnData(Enemy.Pentagon, 2), EnemySpawnData(Enemy.Hexagon, 1)],
             [EnemySpawnData(Enemy, 2)],
         ]
         self.max_waves = len(self.wave_stack)

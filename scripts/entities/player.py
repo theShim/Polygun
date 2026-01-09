@@ -48,7 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.primary = Gun.Shotgun(self.game, [])
+        self.primary = Gun.Rifle(self.game, [])
         self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
         self.secondary = None
         
@@ -186,8 +186,11 @@ class Player(pygame.sprite.Sprite):
         if self.game.state_loader.transitioning: return
         room = self.game.state_loader.current_state.get_current_room()
 
+        #creating a rectangular hitbox regardless of rotation, centred at the player position
+        hitbox = pygame.Rect(self.pos.x - self.size/2, self.pos.y - self.size/2, self.size, self.size)
         for tile in room.tilemap.collideables(self.game.offset):
-            if tile.hitbox.collidepoint(self.pos):
+            if tile.hitbox.colliderect(hitbox): #rect collision instead of point
+
                 if direction == "vertical":
                     if self.pos.y - self.size / 2 < tile.hitbox.bottom and self.vel.y < 0:
                         self.pos.y = tile.hitbox.bottom + self.size / 2

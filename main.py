@@ -34,6 +34,11 @@ if DEBUG:
 
 # print(countLinesIn(os.path.dirname(os.path.abspath(__file__))))
 
+dark = pygame.Surface(SIZE, pygame.SRCALPHA)
+dark.fill((255, 255, 255))
+for y in range(HEIGHT):
+    dark.fill((0, 0, 0, 255 * (1 - y/HEIGHT)), [0, y, *SIZE])
+
     ##############################################################################################
 
 def create_noise_texture(ctx: moderngl.Context, size=256):
