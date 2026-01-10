@@ -166,8 +166,8 @@ class Game:
         
         # with open("scripts/shaders/bright.glsl") as file:
         #     bright_frag = "".join(file.readlines())
-        # with open("scripts/shaders/blur.glsl") as file:
-        #     blur_frag = "".join(file.readlines())
+        with open("scripts/shaders/blur.glsl") as file:
+            blur_frag = "".join(file.readlines())
         # with open("scripts/shaders/composite.glsl") as file:
         #     composite_frag = "".join(file.readlines())
 
@@ -175,10 +175,10 @@ class Game:
         #     vertex_shader=self.vertex_shader,
         #     fragment_shader=bright_frag
         # )
-        # self.blur_prog = self.ctx.program(
-        #     vertex_shader=self.vertex_shader,
-        #     fragment_shader=blur_frag
-        # )
+        self.blur_prog = self.ctx.program(
+            vertex_shader=self.vertex_shader,
+            fragment_shader=blur_frag
+        )
         # self.composite_prog = self.ctx.program(
         #     vertex_shader=self.vertex_shader,
         #     fragment_shader=composite_frag
@@ -209,6 +209,12 @@ class Game:
         #have the screen offset to kind of lerp to the player location
         target_x = self.player.pos.x - WIDTH/2
         target_y = self.player.pos.y - HEIGHT/2
+
+        mouse_dx = max(-WIDTH/2, min(WIDTH/2, self.mousePos.x - WIDTH / 2)) / 3.5
+        mouse_dy = max(-HEIGHT/2, min(HEIGHT/2, self.mousePos.y - HEIGHT / 2)) / 3.5
+
+        target_x += mouse_dx
+        target_y += mouse_dy
         
         #lerp the offset (a + (b-a) * t)
         self.offset.x += (target_x - self.offset.x) / CAMERA_FOLLOW_SPEED
@@ -250,24 +256,12 @@ class Game:
                     self.controls_handler.remove_controller(event.instance_id)
                     
             self.screen.fill((35, 34, 43))
-            self.emissive_surf.fill((0, 0, 0, 0)) #reset lighting
+            self.emissive_surf.fill((0, 0, 0, 255)) #reset lighting and notably reset alpha
             # self.calculate_offset()
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
-
-            # self.k += math.radians(4)
-            # surf = self.surf
-            # self.surf.fill((255 * abs(math.sin(self.k)), 0, 0), [0, 0, 100, 100])
-            # self.surf.fill((0, 0, 255), [50, 0, 50, 100])
-            # surf = self.shader_handler.SHADERS["invert"].apply(self.surf)
-            # surf.set_colorkey((0, 0, 0, 0))
-            # self.screen.blit(surf, (100, 40) - self.offset)
-
-
-            # for spr in sorted(self.all_sprites, key=lambda spr: spr.pos.y):
-            #     spr.update()
 
             self.state_loader.update()
 
@@ -298,18 +292,48 @@ class Game:
             # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
 
             frame_tex = self.surf_to_text(self.screen)
-            self.apply_bloom(frame_tex)
+            emissive_tex = self.surf_to_text(self.emissive_surf)
+
+            # self.apply_bloom(frame_tex)
+
+            self.blur_fbo.use()
+            self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+            emissive_tex.use(0)
+            self.blur_prog["image"].value = 0
+            self.blur_prog["axis"].value = (1.0, 0.0)
+            self.blur_prog["texelSize"].value = (1.0 / WIDTH, 1.0 / HEIGHT)
+            self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+
+            # data = self.blur_fbo.read(components=4, alignment=1)
+            # surf = pygame.image.frombytes(data, SIZE, "RGBA", True)
+            # pygame.image.save(surf, "rast.png")
+
+            self.emissive_fbo.use()
+            self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+            self.blur_tex.use(0)
+            self.blur_prog["image"].value = 0
+            self.blur_prog["axis"].value = (0.0, 1.0)
+            self.blur_prog["texelSize"].value = (1.0 / WIDTH, 1.0 / HEIGHT)
+            self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+
+            self.ctx.screen.use()
+            self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+            self.ctx.viewport = (0, 0, *pygame.display.get_window_size())
             frame_tex.use(0)
+            self.emissive_tex.use(2)
 
             self.program["tex"] = 0 #dict assignment usually means uniform
             self.program["time"] = self.t
             self.program["zoom"] = self.zoom
+            self.program["bloomTex"].value = 2
             
             self.noise_tex.use(1)  # bind to texture unit 1
             self.program['noiseTex'].value = 1
 
             self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
             frame_tex.release()
+            # self.emissive_tex.release()
+            # self.blur_tex.release()
 
             pygame.display.flip()
             self.clock.tick(60)
