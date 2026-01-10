@@ -16,7 +16,6 @@ class Shader_Handler:
 
         self.SHADERS = {
             "grayscale" : Sprite_Shader(self.game, "vertex_shader", "grayscale"),
-            "glow"      : Sprite_Shader(self.game, "vertex_shader", "glow"),
             "invert"    : Sprite_Shader(self.game, "vertex_shader", "invert"),
         }
 

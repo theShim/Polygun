@@ -281,6 +281,13 @@ class Player(pygame.sprite.Sprite):
 
         self.screen.blit(temp_surf, rect)
 
+        bright_image = temp_surf.copy()
+        bright_image.fill(
+            (255, 200, 80),
+            special_flags=pygame.BLEND_RGB_ADD
+        )
+        self.game.emissive_surf.blit(bright_image, rect)
+
         if not pointer_first:
             pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
             points = [

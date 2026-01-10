@@ -5,7 +5,7 @@ uniform sampler2D noiseTex;
 uniform float time;
 
 in vec2 uvs;
-out vec4 f_color;
+out vec4 f_colour;
 
 vec2 pixelate(vec2 uv) {
     float Pixels = 512.0 * 2048;
@@ -25,10 +25,30 @@ vec3 vignette(vec2 uv, vec3 col) {
     return col * mix(0.4, 1.1, vig); // inner = darker edge
 }
 
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float circle(vec2 uv, vec2 pos, float radius) {
+    return smoothstep(radius, radius - 0.01, distance(uv, pos));
+}
+
 void main() {
     time;
     noiseTex;
-    f_color = vec4(texture(tex, pixelate(uvs)).rgb, 1.0);
+
+    // float brightness = dot(texture(tex, uvs).rgb , vec3(0.2126, 0.7152, 0.0722));
+    // if(brightness > 0.8) f_colour = vec4(0., 0., 0., 1.0);
+    // else
+
+    vec3 final_colour = texture(tex, pixelate(uvs)).rgb;
+    f_colour = vec4(final_colour, 1.0);
+
+    // vec4 colour = texture(tex, uvs);
+    // if (colour.a < 0.01) discard;
+    // vec3 emissive = vec3(1.0, 0.8, 0.3);
+    // vec3 hdr = colour.rgb + emissive * 1.0 * colour.a;
+    // f_colour = vec4(hdr, 1.0);
 
     
     // vec2 uv = uvs;
@@ -48,8 +68,8 @@ void main() {
     // // Optional: tiny warm tint (looks like paper reflection)
     // pencil *= vec3(1.05, 1.02, 0.97);
 
-    // vec3 final_colour = vignette(uvs, pencil);
+    // vec3 final_colour = vignette(uvs, texture(tex, pixelate(uvs)).rgb);
 
-    // f_color = vec4(final_colour, 1.0);
+    // f_colour = vec4(final_colour, 1.0);
 
 }

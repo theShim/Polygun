@@ -136,15 +136,53 @@ class Game:
             self.vertex_shader = "".join(file.readlines())
 
         with open("scripts/shaders/main_shader.glsl") as file:
-            self.frag_shader = "".join(file.readlines())
+            self.main_shader = "".join(file.readlines())
 
-        self.program = self.ctx.program(vertex_shader=self.vertex_shader, fragment_shader=self.frag_shader)
+        self.program = self.ctx.program(vertex_shader=self.vertex_shader, fragment_shader=self.main_shader)
+        #vao
         self.opengl_renderer = self.ctx.vertex_array(self.program, [(self.quad_buffer, "2f 2f", "vert", "texcoord")])
         
         self.noise_tex = create_noise_texture(self.ctx)
         
         self.shader_handler = Shader_Handler(self)
         # self.original_viewport = [i for i in self.ctx.viewport]
+
+        #bloom lighting stuff
+        self.emissive_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
+
+        self.emissive_tex = self.ctx.texture(SIZE, 4, dtype="f2")
+        self.blur_tex     = self.ctx.texture(SIZE, 4, dtype="f2")
+
+        self.emissive_fbo = self.ctx.framebuffer([self.emissive_tex])
+        self.blur_fbo     = self.ctx.framebuffer([self.blur_tex])
+
+        # self.scene_tex  = self.ctx.texture(SIZE, 4, dtype='f2')
+        # self.bright_tex = self.ctx.texture(SIZE, 4, dtype='f2')
+        # self.blur_tex   = self.ctx.texture(SIZE, 4, dtype='f2')
+
+        # self.scene_fbo  = self.ctx.framebuffer([self.scene_tex])
+        # self.bright_fbo = self.ctx.framebuffer([self.bright_tex])
+        # self.blur_fbo   = self.ctx.framebuffer([self.blur_tex])
+        
+        # with open("scripts/shaders/bright.glsl") as file:
+        #     bright_frag = "".join(file.readlines())
+        # with open("scripts/shaders/blur.glsl") as file:
+        #     blur_frag = "".join(file.readlines())
+        # with open("scripts/shaders/composite.glsl") as file:
+        #     composite_frag = "".join(file.readlines())
+
+        # self.bright_prog = self.ctx.program(
+        #     vertex_shader=self.vertex_shader,
+        #     fragment_shader=bright_frag
+        # )
+        # self.blur_prog = self.ctx.program(
+        #     vertex_shader=self.vertex_shader,
+        #     fragment_shader=blur_frag
+        # )
+        # self.composite_prog = self.ctx.program(
+        #     vertex_shader=self.vertex_shader,
+        #     fragment_shader=composite_frag
+        # )
 
     def surf_to_text(self, surf: pygame.Surface) -> moderngl.Texture:
         tex = self.ctx.texture(surf.get_size(), 4)
@@ -153,10 +191,9 @@ class Game:
         tex.repeat_x = tex.repeat_y = not False
         tex.write(surf.get_view("1"))
         return tex
-    
-    def quit(self):
-        self.running = False
-        self.controls_handler.save_json()
+
+    def apply_bloom(self, frame_tex: moderngl.Texture):
+        pass
 
         ####################################################################################
 
@@ -167,23 +204,22 @@ class Game:
         Cursor.cache_sprites()
         Silver.cache_sprites()
         # Player.cache_sprites()
-
+ 
     def calculate_offset(self):
-        #have the screen offset kinda lerp to the player location
+        #have the screen offset to kind of lerp to the player location
         target_x = self.player.pos.x - WIDTH/2
         target_y = self.player.pos.y - HEIGHT/2
-
-        mouse_dx = max(-WIDTH/2, min(WIDTH/2, self.mousePos.x - WIDTH / 2)) / 3.5
-        mouse_dy = max(-HEIGHT/2, min(HEIGHT/2, self.mousePos.y - HEIGHT / 2)) / 3.5
-
-        target_x += mouse_dx
-        target_y += mouse_dy
         
+        #lerp the offset (a + (b-a) * t)
         self.offset.x += (target_x - self.offset.x) / CAMERA_FOLLOW_SPEED
         self.offset.y += (target_y - self.offset.y) / CAMERA_FOLLOW_SPEED
 
     def calculate_zoom(self):
         pass
+    
+    def quit(self):
+        self.running = False
+        self.controls_handler.save_json()
 
         ####################################################################################
 
@@ -214,6 +250,7 @@ class Game:
                     self.controls_handler.remove_controller(event.instance_id)
                     
             self.screen.fill((35, 34, 43))
+            self.emissive_surf.fill((0, 0, 0, 0)) #reset lighting
             # self.calculate_offset()
 
             keys = pygame.key.get_pressed()
@@ -234,7 +271,6 @@ class Game:
 
             self.state_loader.update()
 
-
             if DEBUG:
                 debug_info = f"FPS: {int(self.clock.get_fps())}"
                 self.debugger.add_text(debug_info)
@@ -243,7 +279,26 @@ class Game:
             
             #opengl drawing
             self.t += self.dt * 1000
+
+            # frame_tex = self.surf_to_text(self.screen)
+            # self.scene_fbo.use()
+            # frame_tex.use(0)
+            # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+
+            # self.apply_bloom(self.scene_tex)
+
+            # self.ctx.screen.use()
+            # self.ctx.viewport = (0, 0, *pygame.display.get_window_size())
+            # self.scene_tex.use(0)
+            # self.blur_tex.use(1)
+
+            # self.composite_prog["sceneTex"].value = 0
+            # self.composite_prog["bloomTex"].value = 1
+
+            # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+
             frame_tex = self.surf_to_text(self.screen)
+            self.apply_bloom(frame_tex)
             frame_tex.use(0)
 
             self.program["tex"] = 0 #dict assignment usually means uniform

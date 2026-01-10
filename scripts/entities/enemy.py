@@ -348,8 +348,8 @@ class Pentagon(Enemy):                              #throws grenades
         self.attacking = False
         self.grenaded = False
         self.range = 400
-        self.attack_timer = Timer(1, 1)
-        self.cooldown = Timer(1, 1)
+        self.attack_timer = Timer(FPS, 1)
+        self.cooldown = Timer(FPS * 2, 1)
 
         for i in range(random.randint(0, FPS)):
             self.attack_timer.update()
