@@ -12,7 +12,7 @@ import numpy as np
 from scripts.particles.sparks import Spark
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.CORE_FUNCS import vec, lerp, Timer, saturate_colour
 
     ##############################################################################################
 
@@ -81,3 +81,5 @@ class Grenade_Explosion(pygame.sprite.Sprite):
 
             pygame.draw.circle(self.screen, (0, 0, 0), self.pos - self.game.offset + vec(0, 4), self.radius, math.ceil(self.width))
             pygame.draw.circle(self.screen, self.colour, self.pos - self.game.offset, self.radius, math.ceil(self.width))
+            
+            pygame.draw.circle(self.game.emissive_surf, saturate_colour(self.colour, 3), self.pos - self.game.offset, self.radius * 1.1, math.ceil(self.width * 1.1))

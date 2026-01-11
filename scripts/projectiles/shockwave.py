@@ -86,9 +86,18 @@ class Lightning(pygame.sprite.Sprite):
                 segment[1] - self.game.offset, 
                 int(self.line_width)
             )
+            pygame.draw.line(
+                self.game.emissive_surf, 
+                col := [max(c-i, 0) for c in random.choice(self.colours)], 
+                segment[0] - self.game.offset, 
+                segment[1] - self.game.offset, 
+                int(self.line_width) + 2
+            )
             i += 0.5 if i < 128 else 0
             pygame.draw.circle(self.screen, col, segment[0] - self.game.offset, self.line_width // 2)
             pygame.draw.circle(self.screen, col, segment[1] - self.game.offset, self.line_width // 2)
+            pygame.draw.circle(self.game.emissive_surf, col, segment[0] - self.game.offset, self.line_width // 2)
+            pygame.draw.circle(self.game.emissive_surf, col, segment[1] - self.game.offset, self.line_width // 2)
 
 
 class Shockwave(pygame.sprite.Sprite):

@@ -15,6 +15,17 @@ vec3 = pygame.math.Vector3
 def gen_rand_colour() -> tuple[float]:
     return (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
 
+def saturate_colour(color, amount: float):
+    rgb = color[:3]
+    luma = sum(c * w for c, w in zip(rgb, (0.2126, 0.7152, 0.0722)))
+
+    saturated = [
+        max(0, min(255, int(luma + (c - luma) * amount)))
+        for c in rgb
+    ]
+
+    return (*saturated, color[3]) if len(color) == 4 else tuple(saturated)
+
 def euclidean_distance(point1: list[float], point2: list[float]) -> float:
     return (((point1[0] - point2[0]) ** 2) + ((point1[1] - point2[1]) ** 2) ** 0.5)
 

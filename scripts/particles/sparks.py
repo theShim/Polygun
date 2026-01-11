@@ -11,7 +11,7 @@ import numpy as np
 
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.CORE_FUNCS import vec, lerp, Timer, saturate_colour
 
     ##############################################################################################
 
@@ -75,11 +75,11 @@ class Spark(pygame.sprite.Sprite):
         if not self.shadow_height:
             pygame.draw.polygon(self.screen, self.shadow_col, points + [0, 2])
             pygame.draw.polygon(self.screen, self.colour, points)
-            pygame.draw.polygon(self.game.emissive_surf, self.colour, points)
+            pygame.draw.polygon(self.game.emissive_surf, saturate_colour(self.colour, 1.3), points)
         else:
             pygame.draw.polygon(self.screen, self.shadow_col, points)
             pygame.draw.polygon(self.screen, self.colour, points + self.shadow_height)
-            pygame.draw.polygon(self.game.emissive_surf, self.colour, points + self.shadow_height)
+            pygame.draw.polygon(self.game.emissive_surf, saturate_colour(self.colour, 1.3), points + self.shadow_height)
 
         if self.outline:
             pygame.draw.polygon(self.screen, self.outline, points, max(1, int(self.scale/4)))

@@ -12,7 +12,7 @@ from scripts.particles.sparks import Spark
 from scripts.projectiles.bullet import Bullet
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE, SIZE
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.CORE_FUNCS import vec, lerp, Timer, saturate_colour
 from scripts.utils.convex_hull import convex_hull
 
     ##############################################################################################
@@ -89,6 +89,7 @@ class Tesseract(pygame.sprite.Sprite):
             for w in (-1, 1)
         ], dtype=float)
         
+        #
         self.edges = []
         for i in range(len(self.points)):
             for j in range(i + 1, len(self.points)):
@@ -183,7 +184,15 @@ class Tesseract(pygame.sprite.Sprite):
                 projected[j],
                 8
             )
+            pygame.draw.line(
+                self.game.emissive_surf,
+                saturate_colour((120, 200, 255), 1.4),
+                projected[i] + vec(0, 5 + (projected_3d[i][2] + 1) * 15),
+                projected[j] + vec(0, 5 + (projected_3d[j][2] + 1) * 15),
+                8
+            )
 
         for p in projected:
             pygame.draw.circle(self.screen, (120, 200, 255), p.astype(int), 9)
+            pygame.draw.circle(self.game.emissive_surf, saturate_colour((120, 200, 255), 2), p.astype(int), 9)
             # pygame.draw.circle(self.game.emissive_surf, (20, 50, 55), p.astype(int), 9)

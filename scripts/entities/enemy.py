@@ -17,7 +17,7 @@ from scripts.projectiles.grenade import Grenade
 from scripts.projectiles.shockwave import Shockwave
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.CORE_FUNCS import vec, lerp, Timer, saturate_colour
 
     ##############################################################################################
 
@@ -204,7 +204,7 @@ class Enemy(pygame.sprite.Sprite):
         pygame.draw.polygon(temp_surf, (114, 0, 2) if not self.hurt else (255, 255, 255), points * 1.3 + center)
         pygame.draw.polygon(temp_surf, (255, 0, 55) if not self.hurt else (255, 255, 255), points + center)
 
-        pygame.draw.polygon(self.game.emissive_surf, (255, 0, 55) if not self.hurt else (255, 255, 255), points * 1.3 + self.pos - self.game.offset, 0)
+        pygame.draw.polygon(self.game.emissive_surf, saturate_colour((255, 0, 55), 1.7) if not self.hurt else (255, 255, 255), points * 1.3 + self.pos - self.game.offset, 0)
 
         # Apply shader only to that region
         # temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
@@ -335,7 +335,7 @@ class Hexagon(Enemy):                               #plants bombs on the floor
         pygame.draw.polygon(temp_surf, (66, 0, 83) if not self.hurt else (255, 255, 255), points * 1.4 + center - vec(0, self.height))
         pygame.draw.polygon(temp_surf, (134, 0, 196) if not self.hurt else (255, 255, 255), points + center - vec(0, self.height))
 
-        pygame.draw.polygon(self.game.emissive_surf, (134, 0, 196) if not self.hurt else (255, 255, 255), points * 1.4 + self.pos - self.game.offset - vec(0, self.height), 0)
+        pygame.draw.polygon(self.game.emissive_surf, saturate_colour((134 - 60, 0, 196 - 60), 5) if not self.hurt else (255, 255, 255), points * 1.4 + self.pos - self.game.offset - vec(0, self.height), 0)
 
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)
@@ -455,7 +455,7 @@ class Pentagon(Enemy):                              #throws grenades
         pygame.draw.polygon(temp_surf, (198, 70, 42) if not self.hurt else (255, 255, 255), points * 1.4 + center - vec(0, self.height))
         pygame.draw.polygon(temp_surf, (235, 101, 70) if not self.hurt else (255, 255, 255), points + center - vec(0, self.height))
 
-        pygame.draw.polygon(self.game.emissive_surf, (235, 101, 70) if not self.hurt else (255, 255, 255), points * 1.4 + self.pos - self.game.offset - vec(0, self.height))
+        pygame.draw.polygon(self.game.emissive_surf, saturate_colour((235, 101, 70), 4) if not self.hurt else (255, 255, 255), points * 1.55 + self.pos - self.game.offset - vec(0, self.height))
 
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)
