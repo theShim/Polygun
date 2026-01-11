@@ -223,7 +223,7 @@ class Tile(pygame.sprite.Sprite):
         tilemap = pygame.transform.scale_by(pygame.image.load("assets/tiles/tilemap.png"), 4).convert_alpha()
         tilemap.set_colorkey((0, 0, 0))
 
-        surf = pygame.Surface((TILE_SIZE, TILE_SIZE)) #floor
+        surf = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA) #floor
         surf.fill((255, 34, 34))
         cls.SPRITES[0] = surf
 
@@ -232,8 +232,17 @@ class Tile(pygame.sprite.Sprite):
                 id_ = y * 10 + x + 1
                 if id_ == 46: break
 
-                surf = tilemap.subsurface([x * TILE_SIZE, y * (2 * TILE_SIZE), TILE_SIZE, 2 * TILE_SIZE])
+                surf = tilemap.subsurface([x * TILE_SIZE, y * (2 * TILE_SIZE), TILE_SIZE, 2 * TILE_SIZE]).convert_alpha()
                 cls.SPRITES[id_] = surf
+
+        cls.LIGHT_TINTS = {}
+        for id_ in cls.SPRITES.keys():
+            surf = cls.SPRITES[id_].copy().convert_alpha()
+            for dy in range(surf.height):
+                for dx in range(surf.width):
+                    if surf.get_at((dx, dy)) in [(59, 57, 65), (21, 20, 23)]:
+                        surf.set_at((dx, dy), (0, 0, 0, 0))
+            cls.LIGHT_TINTS[id_] = surf
     
     def __init__(self, game, pos: tuple, index: int):
         super().__init__()
@@ -251,6 +260,8 @@ class Tile(pygame.sprite.Sprite):
         if self.index:
             image = self.SPRITES[self.index]
             self.screen.blit(image, self.rect.topleft - self.game.offset)
+            light_tint = self.LIGHT_TINTS[self.index]
+            self.game.emissive_surf.blit(light_tint, self.rect.topleft - self.game.offset)
 
         # self.screen.blit((surf := self.font.render(f"{self.index}", False, (255, 0, 0))), surf.get_rect(topleft=self.rect.topleft - self.game.offset))
     
