@@ -268,7 +268,7 @@ class Game:
             self.blur_prog["axis"].value = (1.0, 0.0)
             self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
             self.blur_prog["radius"].value = 12
-            self.blur_prog["sigma"].value = 3.0
+            self.blur_prog["sigma"].value = 5
             self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
             emissive_tex.release()
 
@@ -282,7 +282,7 @@ class Game:
             self.blur_prog["axis"].value = (0.0, 1.0)
             self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
             self.blur_prog["radius"].value = 12
-            self.blur_prog["sigma"].value = 3.0
+            self.blur_prog["sigma"].value = 5
             self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
             # self.blur_tex.release()
 

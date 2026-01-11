@@ -286,7 +286,7 @@ class Player(pygame.sprite.Sprite):
 
         # pygame.draw.polygon(self.game.emissive_surf, (0, 0, 0, 0), (points * (jump_scale * 1.25)) + self.pos + vec(0, 4) - self.game.offset)
         # pygame.draw.polygon(self.game.emissive_surf, (0, 114, 110), points * 1.25 + self.pos - vec(0, self.jump_height) - self.game.offset)
-        pygame.draw.polygon(self.game.emissive_surf, (100 - 100, 255 - 100, 255 - 100), points * 1.25 + self.pos - vec(0, self.jump_height) - self.game.offset,)
+        pygame.draw.polygon(self.game.emissive_surf, (100 - 100, 255 - 100, 255 - 100), points * 1.75 + self.pos - vec(0, self.jump_height) - self.game.offset,)
 
         if not pointer_first:
             pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
