@@ -253,11 +253,7 @@ class Player(pygame.sprite.Sprite):
         # Apply shader only to that region
         # temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
 
-        # Blit result to the main screen
-        # pygame.draw.circle(temp_surf, (11, 164, 29), (self.size / 2, self.size / 2), self.size/2)
-        # pygame.draw.circle(temp_surf, (242, 34, 34), (self.size / 2, self.size / 2), self.size/2 * 0.95)
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
-        # temp_surf.set_alpha(30)
 
 
         mousePos = self.game.mousePos
@@ -268,7 +264,7 @@ class Player(pygame.sprite.Sprite):
         #the lil arrow indicator. annoyed there isnt a better way to do differentiate if its infront of behind
         if pointer_first:
             pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
-            points = [
+            points_ = [
                 pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (7) - vec(0, self.jump_height)
                 for a in range(0, 360, 120)
             ]
@@ -277,16 +273,20 @@ class Player(pygame.sprite.Sprite):
                 for a in range(0, 360, 120)
             ]
             pygame.draw.polygon(self.screen, (0, 0, 0), shadow_points)
-            pygame.draw.polygon(self.screen, (100, 100, 100), points)
+            pygame.draw.polygon(self.screen, (100, 100, 100), points_)
 
         self.screen.blit(temp_surf, rect)
 
-        bright_image = temp_surf.copy()
-        bright_image.fill(
-            (255, 200, 80),
-            special_flags=pygame.BLEND_RGB_ADD
-        )
-        self.game.emissive_surf.blit(bright_image, rect)
+        # bright_image = temp_surf.copy()
+        # bright_image.fill(
+        #     (255, 200, 80),
+        #     special_flags=pygame.BLEND_RGB_ADD
+        # )
+        # self.game.emissive_surf.blit(bright_image, rect)
+
+        # pygame.draw.polygon(self.game.emissive_surf, (0, 0, 0, 0), (points * (jump_scale * 1.25)) + self.pos + vec(0, 4) - self.game.offset)
+        # pygame.draw.polygon(self.game.emissive_surf, (0, 114, 110), points * 1.25 + self.pos - vec(0, self.jump_height) - self.game.offset)
+        pygame.draw.polygon(self.game.emissive_surf, (100 - 100, 255 - 100, 255 - 100), points * 1.25 + self.pos - vec(0, self.jump_height) - self.game.offset,)
 
         if not pointer_first:
             pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5

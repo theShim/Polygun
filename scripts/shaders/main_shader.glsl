@@ -30,7 +30,7 @@ void main() {
     // if(brightness > 0.8) f_colour = vec4(0., 0., 0., 1.0);
     // else
 
-    vec3 final_colour = texture(tex, pixelate(uvs)).rgb + texture(bloomTex, uvs).rgb;
+    vec3 final_colour = texture(tex, uvs).rgb + texture(bloomTex, uvs).rgb;
     f_colour = vec4(final_colour, 1.0);
 
     // vec4 colour = texture(tex, uvs);

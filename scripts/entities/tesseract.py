@@ -186,3 +186,4 @@ class Tesseract(pygame.sprite.Sprite):
 
         for p in projected:
             pygame.draw.circle(self.screen, (120, 200, 255), p.astype(int), 9)
+            # pygame.draw.circle(self.game.emissive_surf, (20, 50, 55), p.astype(int), 9)

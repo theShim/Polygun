@@ -34,11 +34,6 @@ if DEBUG:
 
 # print(countLinesIn(os.path.dirname(os.path.abspath(__file__))))
 
-dark = pygame.Surface(SIZE, pygame.SRCALPHA)
-dark.fill((255, 255, 255))
-for y in range(HEIGHT):
-    dark.fill((0, 0, 0, 255 * (1 - y/HEIGHT)), [0, y, *SIZE])
-
     ##############################################################################################
 
 def create_noise_texture(ctx: moderngl.Context, size=256):
@@ -88,7 +83,7 @@ class Game:
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
-        self.state_loader = State_Loader(self, start="title_screen")
+        self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
@@ -136,10 +131,9 @@ class Game:
             self.vertex_shader = "".join(file.readlines())
 
         with open("scripts/shaders/main_shader.glsl") as file:
-            self.main_shader = "".join(file.readlines())
+            self.frag_shader = "".join(file.readlines())
 
-        self.program = self.ctx.program(vertex_shader=self.vertex_shader, fragment_shader=self.main_shader)
-        #vao
+        self.program = self.ctx.program(vertex_shader=self.vertex_shader, fragment_shader=self.frag_shader)
         self.opengl_renderer = self.ctx.vertex_array(self.program, [(self.quad_buffer, "2f 2f", "vert", "texcoord")])
         
         self.noise_tex = create_noise_texture(self.ctx)
@@ -147,42 +141,30 @@ class Game:
         self.shader_handler = Shader_Handler(self)
         # self.original_viewport = [i for i in self.ctx.viewport]
 
+        
         #bloom lighting stuff
         self.emissive_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
 
-        self.emissive_tex = self.ctx.texture(SIZE, 4, dtype="f2")
-        self.blur_tex     = self.ctx.texture(SIZE, 4, dtype="f2")
-
-        self.emissive_fbo = self.ctx.framebuffer([self.emissive_tex])
-        self.blur_fbo     = self.ctx.framebuffer([self.blur_tex])
-
-        # self.scene_tex  = self.ctx.texture(SIZE, 4, dtype='f2')
-        # self.bright_tex = self.ctx.texture(SIZE, 4, dtype='f2')
-        # self.blur_tex   = self.ctx.texture(SIZE, 4, dtype='f2')
-
-        # self.scene_fbo  = self.ctx.framebuffer([self.scene_tex])
-        # self.bright_fbo = self.ctx.framebuffer([self.bright_tex])
-        # self.blur_fbo   = self.ctx.framebuffer([self.blur_tex])
-        
-        # with open("scripts/shaders/bright.glsl") as file:
-        #     bright_frag = "".join(file.readlines())
+        with open("scripts/shaders/vertex_shader2.glsl") as file:
+            self.vertex_shader2 = "".join(file.readlines())
         with open("scripts/shaders/blur.glsl") as file:
-            blur_frag = "".join(file.readlines())
-        # with open("scripts/shaders/composite.glsl") as file:
-        #     composite_frag = "".join(file.readlines())
+            self.blur_shader = "".join(file.readlines())
+        
+        quad_vertices = np.array([
+            -1.0, -1.0,
+            1.0, -1.0,
+            -1.0,  1.0,
+            1.0,  1.0,
+        ], dtype='f4')
+        self.vbo = self.ctx.buffer(quad_vertices.tobytes())
 
-        # self.bright_prog = self.ctx.program(
-        #     vertex_shader=self.vertex_shader,
-        #     fragment_shader=bright_frag
-        # )
-        self.blur_prog = self.ctx.program(
-            vertex_shader=self.vertex_shader,
-            fragment_shader=blur_frag
-        )
-        # self.composite_prog = self.ctx.program(
-        #     vertex_shader=self.vertex_shader,
-        #     fragment_shader=composite_frag
-        # )
+        self.blur_prog = self.ctx.program(vertex_shader=self.vertex_shader2, fragment_shader=self.blur_shader)
+        self.blur_vao = self.ctx.vertex_array(self.blur_prog, [(self.vbo, "2f", "vert")])   
+        self.blur_tex  = self.ctx.texture(SIZE, 4, dtype="f2")
+        self.blur_fbo  = self.ctx.framebuffer([self.blur_tex])
+
+        self.bloom_tex = self.ctx.texture(SIZE, 4, dtype="f2")
+        self.bloom_fbo  = self.ctx.framebuffer([self.bloom_tex])
 
     def surf_to_text(self, surf: pygame.Surface) -> moderngl.Texture:
         tex = self.ctx.texture(surf.get_size(), 4)
@@ -191,9 +173,10 @@ class Game:
         tex.repeat_x = tex.repeat_y = not False
         tex.write(surf.get_view("1"))
         return tex
-
-    def apply_bloom(self, frame_tex: moderngl.Texture):
-        pass
+    
+    def quit(self):
+        self.running = False
+        self.controls_handler.save_json()
 
         ####################################################################################
 
@@ -204,9 +187,9 @@ class Game:
         Cursor.cache_sprites()
         Silver.cache_sprites()
         # Player.cache_sprites()
- 
+
     def calculate_offset(self):
-        #have the screen offset to kind of lerp to the player location
+        #have the screen offset kinda lerp to the player location
         target_x = self.player.pos.x - WIDTH/2
         target_y = self.player.pos.y - HEIGHT/2
 
@@ -216,16 +199,11 @@ class Game:
         target_x += mouse_dx
         target_y += mouse_dy
         
-        #lerp the offset (a + (b-a) * t)
         self.offset.x += (target_x - self.offset.x) / CAMERA_FOLLOW_SPEED
         self.offset.y += (target_y - self.offset.y) / CAMERA_FOLLOW_SPEED
 
     def calculate_zoom(self):
         pass
-    
-    def quit(self):
-        self.running = False
-        self.controls_handler.save_json()
 
         ####################################################################################
 
@@ -256,14 +234,21 @@ class Game:
                     self.controls_handler.remove_controller(event.instance_id)
                     
             self.screen.fill((35, 34, 43))
-            self.emissive_surf.fill((0, 0, 0, 255)) #reset lighting and notably reset alpha
+            self.emissive_surf.fill((0, 0, 0, 0))
             # self.calculate_offset()
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
 
+            # self.emissive_surf.fill((255, 0, 0), [100, 100, 500, 100])
+
+
+            # for spr in sorted(self.all_sprites, key=lambda spr: spr.pos.y):
+            #     spr.update()
+
             self.state_loader.update()
+
 
             if DEBUG:
                 debug_info = f"FPS: {int(self.clock.get_fps())}"
@@ -273,67 +258,62 @@ class Game:
             
             #opengl drawing
             self.t += self.dt * 1000
-
-            # frame_tex = self.surf_to_text(self.screen)
-            # self.scene_fbo.use()
-            # frame_tex.use(0)
-            # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
-
-            # self.apply_bloom(self.scene_tex)
-
-            # self.ctx.screen.use()
-            # self.ctx.viewport = (0, 0, *pygame.display.get_window_size())
-            # self.scene_tex.use(0)
-            # self.blur_tex.use(1)
-
-            # self.composite_prog["sceneTex"].value = 0
-            # self.composite_prog["bloomTex"].value = 1
-
-            # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
-
             frame_tex = self.surf_to_text(self.screen)
             emissive_tex = self.surf_to_text(self.emissive_surf)
 
-            # self.apply_bloom(frame_tex)
-
             self.blur_fbo.use()
-            self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+            self.ctx.clear(0, 0, 0, 0)
             emissive_tex.use(0)
             self.blur_prog["image"].value = 0
             self.blur_prog["axis"].value = (1.0, 0.0)
-            self.blur_prog["texelSize"].value = (1.0 / WIDTH, 1.0 / HEIGHT)
-            self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+            self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
+            self.blur_prog["radius"].value = 12
+            self.blur_prog["sigma"].value = 3.0
+            self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
+            emissive_tex.release()
 
             # data = self.blur_fbo.read(components=4, alignment=1)
-            # surf = pygame.image.frombytes(data, SIZE, "RGBA", True)
-            # pygame.image.save(surf, "rast.png")
+            # pygame.image.save(pygame.image.frombytes(data, SIZE, "RGBA", True), "rast.png")
 
-            self.emissive_fbo.use()
-            self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+            self.bloom_fbo.use()
+            self.ctx.clear(0, 0, 0, 0)
             self.blur_tex.use(0)
             self.blur_prog["image"].value = 0
             self.blur_prog["axis"].value = (0.0, 1.0)
-            self.blur_prog["texelSize"].value = (1.0 / WIDTH, 1.0 / HEIGHT)
-            self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+            self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
+            self.blur_prog["radius"].value = 12
+            self.blur_prog["sigma"].value = 3.0
+            self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
+            # self.blur_tex.release()
 
             self.ctx.screen.use()
-            self.ctx.clear(0.0, 0.0, 0.0, 1.0)
             self.ctx.viewport = (0, 0, *pygame.display.get_window_size())
+            self.ctx.clear(0, 0, 0, 0)
             frame_tex.use(0)
-            self.emissive_tex.use(2)
-
-            self.program["tex"] = 0 #dict assignment usually means uniform
-            self.program["time"] = self.t
-            self.program["zoom"] = self.zoom
-            self.program["bloomTex"].value = 2
-            
-            self.noise_tex.use(1)  # bind to texture unit 1
-            self.program['noiseTex'].value = 1
-
+            self.bloom_tex.use(1)
+            self.noise_tex.use(2)
+            self.program["tex"].value = 0
+            self.program["noiseTex"].value = 2
+            self.program["bloomTex"].value = 1
+            self.program["time"].value = self.t
+            self.program["zoom"].value = self.zoom
             self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
             frame_tex.release()
-            # self.emissive_tex.release()
-            # self.blur_tex.release()
+
+            # frame_tex.use(0)
+            # emissive_tex = self.surf_to_text(self.emissive_surf)
+            # emissive_tex.use(2)
+
+            # self.program["tex"] = 0 #dict assignment usually means uniform
+            # self.program["time"] = self.t
+            # self.program["zoom"] = self.zoom
+            
+            # self.noise_tex.use(1)  # bind to texture unit 1
+            # self.program['noiseTex'].value = 1
+            # self.program['bloomTex'].value = 2
+
+            # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
+            # frame_tex.release()
 
             pygame.display.flip()
             self.clock.tick(60)
