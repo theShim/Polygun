@@ -10,7 +10,7 @@ import random
 from scripts.particles.sparks import Spark
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, SIZE, FPS, GRAV, FRIC, TILE_SIZE
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.CORE_FUNCS import vec, lerp, Timer, vec3
 
     ##############################################################################################
 
@@ -162,5 +162,7 @@ class Bullet(pygame.sprite.Sprite):
         self.screen.blit(shadow_surface, (min_x, min_y))
         if self.shadow_height:
             self.screen.blit(bullet_surface, (min_x, min_y) + self.shadow_height)
+            pygame.draw.polygon(self.game.emissive_surf, [min(255, self.col[i] + 80) for i in range(3)], [(c := vec((min_x + max_x)/2, (min_y + max_y)/2)) + 1.25 * (p - c) + self.shadow_height for p in points])
         else:
             self.screen.blit(bullet_surface, (min_x, min_y))
+            pygame.draw.polygon(self.game.emissive_surf, [min(255, self.col[i] + 80) for i in range(3)], [(c := vec((min_x + max_x)/2, (min_y + max_y)/2)) + 1.25 * (p - c) for p in points])

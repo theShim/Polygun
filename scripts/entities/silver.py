@@ -56,6 +56,7 @@ class Silver(pygame.sprite.Sprite):
         self.alpha = True
 
         self.to_player = False #whether it should be going towards the player or not
+        self.player_tracking_t = 1
 
     def move(self):
         if self.to_player:
@@ -63,7 +64,8 @@ class Silver(pygame.sprite.Sprite):
             distance = delta.magnitude()
             direction = delta.normalize()
 
-            self.vel += direction * (300 / max(distance, 20)) * 0.25
+            self.player_tracking_t += self.game.dt
+            self.vel += direction * (300 / max(distance, 20)) * 0.25 * self.player_tracking_t
             self.vel += vec(delta.y, -delta.x) * (50 / max(distance, 20)) * 0.005
 
         self.pos += self.vel
@@ -108,3 +110,4 @@ class Silver(pygame.sprite.Sprite):
         
         self.screen.blit(shadow, shadow.get_rect(center=self.pos - self.game.offset + vec(0, 4)))
         self.screen.blit(surf, surf.get_rect(center=self.pos - self.game.offset + self.height))
+        self.game.emissive_surf.blit(surf, surf.get_rect(center=self.pos - self.game.offset + self.height))

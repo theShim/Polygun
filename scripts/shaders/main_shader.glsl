@@ -31,7 +31,7 @@ void main() {
     // else
 
     vec3 final_colour = texture(tex, uvs).rgb * 0.45 + texture(bloomTex, uvs).rgb;
-    f_colour = vec4(final_colour, 1.0);
+    // f_colour = vec4(final_colour, 1.0);
 
     // vec4 colour = texture(tex, uvs);
     // if (colour.a < 0.01) discard;
@@ -57,7 +57,7 @@ void main() {
     // // Optional: tiny warm tint (looks like paper reflection)
     // pencil *= vec3(1.05, 1.02, 0.97);
 
-    // final_colour = vignette(uvs, texture(tex, pixelate(uvs)).rgb);
+    final_colour = vignette(uvs, final_colour);
 
     f_colour = vec4(final_colour, 1.0);
 

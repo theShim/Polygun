@@ -49,6 +49,7 @@ class Remains(pygame.sprite.Sprite):
         self.vel = vec(math.cos(angle), math.sin(angle)) * random.uniform(2, 10)
 
         self.to_player = False #whether it should be going towards the player or not
+        self.player_tracking_t = 1
 
     def move(self):
         if self.to_player:
@@ -56,7 +57,8 @@ class Remains(pygame.sprite.Sprite):
             distance = delta.magnitude()
             direction = delta.normalize()
 
-            self.vel += direction * (300 / max(distance, 20)) * 0.25
+            self.player_tracking_t += self.game.dt
+            self.vel += direction * (300 / max(distance, 20)) * 0.25 * self.player_tracking_t
             self.vel += vec(delta.y, -delta.x) * (50 / max(distance, 20)) * 0.005
 
         self.pos += self.vel
@@ -85,3 +87,4 @@ class Remains(pygame.sprite.Sprite):
     def draw(self):
         self.screen.blit(self.shadow, self.surf.get_rect(center=self.pos - self.game.offset + vec(0, 3)))
         self.screen.blit(self.surf, self.surf.get_rect(center=self.pos - self.game.offset + vec(0, -self.height)))
+        self.game.emissive_surf.blit(self.surf, self.surf.get_rect(center=self.pos - self.game.offset + vec(0, -self.height)))

@@ -75,9 +75,11 @@ class Spark(pygame.sprite.Sprite):
         if not self.shadow_height:
             pygame.draw.polygon(self.screen, self.shadow_col, points + [0, 2])
             pygame.draw.polygon(self.screen, self.colour, points)
+            pygame.draw.polygon(self.game.emissive_surf, self.colour, points)
         else:
             pygame.draw.polygon(self.screen, self.shadow_col, points)
             pygame.draw.polygon(self.screen, self.colour, points + self.shadow_height)
+            pygame.draw.polygon(self.game.emissive_surf, self.colour, points + self.shadow_height)
 
         if self.outline:
             pygame.draw.polygon(self.screen, self.outline, points, max(1, int(self.scale/4)))
@@ -136,3 +138,5 @@ class Grenade_Spark(pygame.sprite.Sprite):
 
         pygame.draw.polygon(self.screen, self.shadow_col, shadow_points)
         pygame.draw.polygon(self.screen, self.colour, points + self.shadow_height)
+        
+        pygame.draw.polygon(self.game.emissive_surf, self.colour, points + self.shadow_height)
