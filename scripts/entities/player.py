@@ -14,6 +14,7 @@ from scripts.particles.bullet_casing import Bullet_Casing
 from scripts.projectiles.bullet import Bullet
 
 from scripts.weapons.gun import Gun
+from scripts.weapons.spikeball import Spikeball
 
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
@@ -48,8 +49,9 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.primary = Gun.Rifle(self.game, [])
-        self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
+        # self.primary = Gun.Rifle(self.game, [])
+        # self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
+        self.primary = Spikeball(self.game, [], self.pos)
         self.secondary = None
         
         #jumping
@@ -100,10 +102,16 @@ class Player(pygame.sprite.Sprite):
     def mouse_inputs(self):
         mouse = pygame.mouse.get_pressed()
 
-        self.primary.shoot_timer.update()
-        if mouse[0] and (pygame.key.get_pressed()[pygame.K_LSHIFT] or self.primary.shoot_timer.finished):
-            self.primary.shoot_timer.reset()
+        if self.primary.TYPE == "ranged":
+            self.primary.shoot_timer.update()
+            if mouse[0] and (pygame.key.get_pressed()[pygame.K_LSHIFT] or self.primary.shoot_timer.finished):
+                self.primary.shoot_timer.reset()
+                self.primary.update()
+        elif self.primary.TYPE == "melee":
             self.primary.update()
+
+        else:
+            raise BaseException("vveapon error")
 
 
     def jump(self, keys):
