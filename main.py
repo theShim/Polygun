@@ -26,6 +26,9 @@ from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
 from scripts.utils.debugger import Debugger
 
+from pympler.tracker import SummaryTracker
+# tracker = SummaryTracker()
+
 if DEBUG:
     #code profiling for performance optimisations
     import pstats
@@ -331,6 +334,8 @@ class Game:
             PROFILER.dump_stats("test.stats")
             pstats.Stats("test.stats", stream=(s:=io.StringIO())).sort_stats((sortby:=pstats.SortKey.CUMULATIVE)).print_stats()
             print(s.getvalue())
+
+            # tracker.print_diff()
 
         pygame.quit()
         sys.exit()

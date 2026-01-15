@@ -78,7 +78,8 @@ class Dungeon(State):
                 if spr in self.get_current_room().enemies_to_kill:
                     sprites += [spr]
             else:
-                sprites += [spr]
+                if (self.game.player.pos - spr.pos).magnitude() < 1300:
+                    sprites += [spr]
 
         for spr in sorted(sprites + tiles, key=lambda s: s.rect.bottom if isinstance(s, Tile) else s.pos.y):
             spr.update()

@@ -127,6 +127,7 @@ class Tesseract(pygame.sprite.Sprite):
     def update(self):
         # d = -1 if (keys := pygame.key.get_pressed())[pygame.K_u] else (1 if keys[pygame.K_j] else 0)
         self.angle += 1. * self.game.dt
+        self.angle %= (2*math.pi)
 
         self.game.debugger.add_text(f"{self.angle}")
 
