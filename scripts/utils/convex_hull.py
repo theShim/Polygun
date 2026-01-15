@@ -20,4 +20,6 @@ def convex_hull(points: list[tuple]): #monotone chain method
             upper.pop()
         upper.append(p)
 
-    return lower[:-1] + upper[:-1] #return the points (already ordered), removing the end points that would be repeated
+    #return the points (already ordered), removing the end points that would be repeated
+    return lower[:-1] + upper[:-1]
+

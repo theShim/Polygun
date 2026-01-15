@@ -17,6 +17,7 @@ from scripts.utils.convex_hull import convex_hull
 
     ##############################################################################################
 
+#projection functions that divide the coordinates by the homogenous and z coordinate.
 def project_4d_to_3d(p, d=3):
     w = 1 / (d - p[3])
     return p[:3] * w
@@ -25,37 +26,19 @@ def project_3d_to_2d(p, d=4):
     z = 1 / (d - p[2])
     return p[:2] * z
 
-class Transform4D:
-
-    @staticmethod    
-    def rot_xy(a):
-        return np.array([
-            [ math.cos(a), -math.sin(a), 0, 0],
-            [ math.sin(a),  math.cos(a), 0, 0],
-            [ 0, 0, 1, 0],
-            [ 0, 0, 0, 1]
-        ])
+class Transform4D: #4D rotation matrices
 
     @staticmethod
-    def rot_xz(a):
+    def rot_xz(a): #rotate in the xz plane by a radians
         return np.array([
             [math.cos(a), 0, math.sin(a), 0],
             [0, 1, 0, 0],
             [-math.sin(a), 0, math.cos(a), 0],
             [0, 0, 0, 1]
         ])
-
-    @staticmethod
-    def rot_xw(a):
-        return np.array([
-            [math.cos(a), 0, 0, -math.sin(a)],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [math.sin(a), 0, 0, math.cos(a)]
-        ])
     
     @staticmethod
-    def rot_yz(a):
+    def rot_yz(a): #rotate in the yz plane by a radians
         return np.array([
             [1, 0, 0, 0],
             [0, math.cos(a), -math.sin(a), 0],
@@ -64,7 +47,7 @@ class Transform4D:
         ])
 
     @staticmethod
-    def rot_zw(a):
+    def rot_zw(a): #rotate in the zw plane by a radians
         return np.array([
             [1, 0, 0, 0],
             [0, 1, 0, 0],
@@ -104,7 +87,7 @@ class Tesseract(pygame.sprite.Sprite):
         self.health = 1000
 
     def bullet_collide(self, bullet: Bullet):
-        rotated = self.points @ (Transform4D.rot_zw(self.angle) @ Transform4D.rot_xw(0) @ Transform4D.rot_xz(self.angle) @ Transform4D.rot_yz(2.93)).T
+        rotated = self.points @ (Transform4D.rot_zw(self.angle) @ Transform4D.rot_xz(self.angle) @ Transform4D.rot_yz(2.93)).T
         projected = []
         for p in rotated:
             p3 = project_4d_to_3d(p)
@@ -147,20 +130,25 @@ class Tesseract(pygame.sprite.Sprite):
 
         self.game.debugger.add_text(f"{self.angle}")
 
-        #zw = special 4d one the funny looking one
-        rotated = self.points @ (Transform4D.rot_zw(self.angle) @ Transform4D.rot_xw(0) @ Transform4D.rot_xz(self.angle) @ Transform4D.rot_yz(2.93)).T
+        #rotating the points by various axis
+        #zw = special 4d one - the cool looking one
+        rotated = self.points @ (Transform4D.rot_zw(self.angle) @ Transform4D.rot_xz(self.angle) @ Transform4D.rot_yz(2.93)).T
         
+        #after rotating, project it from 4D points to 3D, then from 3D to 2D
         projected = []
         projected_3d = []
         for p in rotated:
             p3 = project_4d_to_3d(p)
-            projected_3d.append(p3)
+            projected_3d.append(p3) #store intermediate 3D points
             p2 = project_3d_to_2d(p3)
             projected.append(p2)
 
+        #scale the tesseract back up to a 4D scale and center it to the relevant position
         projected = np.array(projected) * self.scale + self.pos - self.game.offset
         
+        #drawing the shadows
         for i, j in self.edges:
+            #shadow on the floor that scales to it's theoretical 3D vertical position
             pygame.draw.line(
                 self.screen,
                 (0, 0, 0),
@@ -169,7 +157,9 @@ class Tesseract(pygame.sprite.Sprite):
                 8
             )
         
+        #drawing the actual tesseract
         for i, j in self.edges:
+            #outlining edges with a darker colour for depth
             pygame.draw.line(
                 self.screen,
                 (120-60, 200-60, 255-60),
@@ -177,6 +167,7 @@ class Tesseract(pygame.sprite.Sprite):
                 projected[j] + vec(3),
                 8
             )
+            #draw actual edges in colour
             pygame.draw.line(
                 self.screen,
                 (120, 200, 255),
@@ -184,15 +175,24 @@ class Tesseract(pygame.sprite.Sprite):
                 projected[j],
                 8
             )
+            
+            #holographic shadow effect
             pygame.draw.line(
                 self.game.emissive_surf,
                 saturate_colour((120, 200, 255), 1.4),
                 projected[i] + vec(0, 5 + (projected_3d[i][2] + 1) * 15),
                 projected[j] + vec(0, 5 + (projected_3d[j][2] + 1) * 15),
-                8
+                10
+            )
+            #actual lighting glow
+            pygame.draw.line(
+                self.game.emissive_surf,
+                saturate_colour((120, 200, 255), 1.4),
+                projected[i],
+                projected[j],
+                10
             )
 
         for p in projected:
             pygame.draw.circle(self.screen, (120, 200, 255), p.astype(int), 9)
             pygame.draw.circle(self.game.emissive_surf, saturate_colour((120, 200, 255), 2), p.astype(int), 9)
-            # pygame.draw.circle(self.game.emissive_surf, (20, 50, 55), p.astype(int), 9)

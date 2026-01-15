@@ -20,7 +20,7 @@ class CrossHair(pygame.sprite.Sprite):
     def __init__(self, game, groups):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
 
         self.radius = 16
         self.angle = 0

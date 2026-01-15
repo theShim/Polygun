@@ -141,6 +141,11 @@ class Game:
         self.shader_handler = Shader_Handler(self)
         # self.original_viewport = [i for i in self.ctx.viewport]
 
+        #extra fbo for gui elements since the lighting messes it up
+        self.gui_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
+        self.gui_tex = self.ctx.texture(SIZE, 4, dtype="f2")
+        self.gui_fbo  = self.ctx.framebuffer([self.gui_tex])
+
         
         #bloom lighting stuff
         self.emissive_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
@@ -235,6 +240,7 @@ class Game:
                     
             self.screen.fill((35, 34, 43))
             self.emissive_surf.fill((0, 0, 0, 0))
+            self.gui_surf.fill((0, 0, 0, 0))
             # self.calculate_offset()
 
             keys = pygame.key.get_pressed()
@@ -242,7 +248,6 @@ class Game:
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
 
             # self.emissive_surf.fill((255, 0, 0), [100, 100, 500, 100])
-
 
             # for spr in sorted(self.all_sprites, key=lambda spr: spr.pos.y):
             #     spr.update()
@@ -260,6 +265,7 @@ class Game:
             self.t += self.dt * 1000
             frame_tex = self.surf_to_text(self.screen)
             emissive_tex = self.surf_to_text(self.emissive_surf)
+            self.gui_tex = self.surf_to_text(self.gui_surf)
 
             self.blur_fbo.use()
             self.ctx.clear(0, 0, 0, 0)
@@ -292,9 +298,11 @@ class Game:
             frame_tex.use(0)
             self.bloom_tex.use(1)
             self.noise_tex.use(2)
+            self.gui_tex.use(3)
             self.program["tex"].value = 0
             self.program["noiseTex"].value = 2
             self.program["bloomTex"].value = 1
+            self.program["guiTex"].value = 3
             self.program["time"].value = self.t
             self.program["zoom"].value = self.zoom
             self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)

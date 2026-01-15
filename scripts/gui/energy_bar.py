@@ -52,7 +52,7 @@ class EnergyBar(pygame.sprite.Sprite):
     def __init__(self, game, groups):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
         self.player = self.game.player
 
         self.surf = pygame.Surface((48, 48), pygame.SRCALPHA)
@@ -107,4 +107,4 @@ class EnergyBar(pygame.sprite.Sprite):
 
     def draw(self):
         self.screen.blit(self.surf, (37 - 24, 80 - 24))
-        pygame.draw.circle(self.screen, (0, 0, 0), (37, 80), 24, 3)
+        pygame.draw.circle(self.screen, (0, 0, 1), (37, 80), 24, 3)

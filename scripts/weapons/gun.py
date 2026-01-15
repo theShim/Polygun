@@ -19,6 +19,8 @@ from scripts.utils.CORE_FUNCS import vec, lerp, Timer
     ##############################################################################################
 
 class Gun(pygame.sprite.Sprite):
+    TYPE = "ranged"
+    
     def __init__(self, game, groups):
         super().__init__(groups)
         self.game = game

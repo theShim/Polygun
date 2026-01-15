@@ -3,6 +3,7 @@
 uniform sampler2D tex;
 uniform sampler2D noiseTex;
 uniform sampler2D bloomTex;
+uniform sampler2D guiTex;
 uniform float time;
 
 in vec2 uvs;
@@ -25,13 +26,13 @@ vec3 vignette(vec2 uv, vec3 col) {
 void main() {
     time;
     noiseTex;
+    guiTex;
 
     // float brightness = dot(texture(tex, uvs).rgb , vec3(0.2126, 0.7152, 0.0722));
     // if(brightness > 0.8) f_colour = vec4(0., 0., 0., 1.0);
     // else
 
     vec3 final_colour = texture(tex, uvs).rgb * 0.45 + texture(bloomTex, uvs).rgb;
-    // f_colour = vec4(final_colour, 1.0);
 
     // vec4 colour = texture(tex, uvs);
     // if (colour.a < 0.01) discard;
@@ -60,5 +61,10 @@ void main() {
     final_colour = vignette(uvs, final_colour);
 
     f_colour = vec4(final_colour, 1.0);
+
+    vec4 gui_col = texture(guiTex, uvs);
+    if (gui_col.a > 0.0) {
+        f_colour = gui_col;
+    }
 
 }
