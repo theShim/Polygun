@@ -34,13 +34,19 @@ class Spikeball(pygame.sprite.Sprite):
 
     def move(self):
         mousePos = self.game.mousePos
-        self.vel += (mousePos + self.game.offset - self.pos) * 0.2
+        self.vel += (mousePos + self.game.offset - self.pos) * 0.25
+        self.vel *= 0.9
 
-        if (delta := self.pos - self.game.player.pos).magnitude() > 150:
-            self.vel += -delta * 0.9
+        if (delta := self.pos - self.game.player.pos).magnitude() > 100:
+            self.vel += -delta * 0.7
+
+        tang = vec(-self.vel.y, self.vel.x) * 0.1
+        self.vel += tang
+        self.vel += self.game.player.vel * 0.6
+        
             
-        self.vel *= 0.7
-        self.pos += self.vel * 0.1
+        # self.vel.clamp_magnitude_ip()
+        self.pos += self.vel * 0.05
 
     def update(self):
         self.move()
@@ -66,9 +72,9 @@ class Rope(pygame.sprite.Sprite):
         self.length = 20
         self.start = VerletParticle(self.game, [self.points], pos)
         self.start.pinned = True
-        for i in range(self.length, 150, self.length):
+        for i in range(self.length, 100, self.length):
             VerletParticle(self.game, [self.points], pos + vec(i, 0))
-        self.end = VerletParticle(self.game, [self.points], pos + vec(150, 0))
+        self.end = VerletParticle(self.game, [self.points], pos + vec(100, 0))
         self.end.pinned = True
 
         self.links = [[i, i+1] for i in range(len(self.points) - 1)] + [[0, 1] for i in range(5)]
@@ -113,7 +119,7 @@ class VerletParticle(pygame.sprite.Sprite):
     def move(self):
         if self.pinned: return
 
-        self.acc = vec(0, GRAV * 0) * self.game.dt
+        self.acc = vec(0, GRAV * 0.01) * self.game.dt
 
         self.vel = self.pos - self.prev_pos
         self.vel.x *= 0.97
