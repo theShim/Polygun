@@ -29,23 +29,11 @@ class Tilemap:
         self.load()
 
     def load(self):
-        room = random.choices(ROOMS, [10, 1], k=1)[0]
+        room = random.choices(ROOMS, [10, 1, 100], k=1)[0]
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):
                 pos = (int(x + self.room_pos.x * LEVEL_SIZE), int(y + self.room_pos.y * LEVEL_SIZE))
                 self.tilemap[pos] = Tile(self.game, pos, room[y][x])
-
-        # for x in range(LEVEL_SIZE):
-        #     pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)
-        #     self.tilemap[pos] = Tile(self.game, pos, 1)
-        #     pos = (x + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE + LEVEL_SIZE - 1)
-        #     self.tilemap[pos] = Tile(self.game, pos, 1)
-
-        # for y in range(LEVEL_SIZE):
-        #     pos = (self.room_pos.x * LEVEL_SIZE, y + self.room_pos.y * LEVEL_SIZE)
-        #     self.tilemap[pos] = Tile(self.game, pos, 1)
-        #     pos = (self.room_pos.x * LEVEL_SIZE + LEVEL_SIZE - 1, y + self.room_pos.y * LEVEL_SIZE)
-        #     self.tilemap[pos] = Tile(self.game, pos, 1)
 
         self.remove_corridoors()
 
@@ -82,6 +70,10 @@ class Tilemap:
             tile = self.tilemap[pos]
             if not tile.index: continue
 
+            if tile.index == 100:
+                self.tilemap[pos] = Lava_Tile(tile.game, tile.pos / TILE_SIZE)
+                continue
+
             neighbours = []
             for dx in range(-1, 2):
                 for dy in range(-1, 2):
@@ -115,6 +107,7 @@ class Tilemap:
         for pos in self.tilemap:
             tile = self.tilemap[pos]
             if not tile.index: continue
+            if tile.index == 100: continue
 
             neighbours = []
             for dx in range(-1, 2):
@@ -167,7 +160,7 @@ class Tilemap:
 
     def collideables(self, offset, buffer=[0, 0]):
         for tile in self.on_screen_tiles(offset, buffer):
-            if tile.index:
+            if 0 < tile.index < 100:
                 yield tile
 
 
@@ -265,3 +258,17 @@ class Tile(pygame.sprite.Sprite):
 
         # self.screen.blit((surf := self.font.render(f"{self.index}", False, (255, 0, 0))), surf.get_rect(topleft=self.rect.topleft - self.game.offset))
     
+class Lava_Tile(Tile):
+    def __init__(self, game, pos: tuple):
+        super().__init__(game, pos, 100)
+        
+        self.hitbox = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE)
+
+        self.lava = True
+        self.surf = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+        self.surf.fill((255, 102, 0))
+
+    def update(self):
+        # pygame.draw.rect(self.screen, (20, 20, 20), [*(self.rect.topleft - self.game.offset), *self.rect.size])
+        self.screen.blit(self.surf, self.rect.topleft - self.game.offset + vec(0, TILE_SIZE / 2))
+        pygame.draw.rect(self.game.emissive_surf, (255, 102, 0), [*(self.rect.topleft - self.game.offset + vec(0, TILE_SIZE / 2)), *self.rect.size])
