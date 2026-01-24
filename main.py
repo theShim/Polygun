@@ -26,7 +26,6 @@ from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
 from scripts.utils.debugger import Debugger
 
-from pympler.tracker import SummaryTracker
 # tracker = SummaryTracker()
 
 if DEBUG:
@@ -55,10 +54,9 @@ class Game:
         self.initialise()
 
         #initalising pygame window
-        flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL
+        flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL | pygame.FULLSCREEN
         self.window = pygame.display.set_mode(SIZE, flags, vsync=1)
         self.screen = pygame.Surface(SIZE, pygame.SRCALPHA)
-        pygame.display.toggle_fullscreen()
         self.clock = pygame.time.Clock()
         self.offset = vec()
         self.zoom = 1.0
@@ -86,7 +84,7 @@ class Game:
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
-        self.state_loader = State_Loader(self, start="dungeon")
+        self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
@@ -146,12 +144,17 @@ class Game:
 
         #extra fbo for gui elements since the lighting messes it up
         self.gui_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
-        self.gui_tex = self.ctx.texture(SIZE, 4, dtype="f2")
+        self.gui_tex = self.ctx.texture(SIZE, 4)
+        self.gui_tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+        self.gui_tex.swizzle = "BGRA"
         self.gui_fbo  = self.ctx.framebuffer([self.gui_tex])
 
         
         #bloom lighting stuff
         self.emissive_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
+        self.emissive_tex  = self.ctx.texture(self.emissive_surf.get_size(), 4)
+        self.emissive_tex.filter = (moderngl.LINEAR, moderngl.LINEAR)
+        # self.emissive_tex.swizzle = "BGRA"
 
         with open("scripts/shaders/vertex_shader2.glsl") as file:
             self.vertex_shader2 = "".join(file.readlines())
@@ -169,6 +172,9 @@ class Game:
         self.blur_prog = self.ctx.program(vertex_shader=self.vertex_shader2, fragment_shader=self.blur_shader)
         self.blur_vao = self.ctx.vertex_array(self.blur_prog, [(self.vbo, "2f", "vert")])   
         self.blur_tex  = self.ctx.texture(SIZE, 4, dtype="f2")
+        self.blur_tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+        self.blur_tex.swizzle = "BGRA"
+        self.blur_tex.repeat_x = self.blur_tex.repeat_y = not False
         self.blur_fbo  = self.ctx.framebuffer([self.blur_tex])
 
         self.bloom_tex = self.ctx.texture(SIZE, 4, dtype="f2")
@@ -267,19 +273,18 @@ class Game:
             #opengl drawing
             self.t += self.dt * 1000
             frame_tex = self.surf_to_text(self.screen)
-            emissive_tex = self.surf_to_text(self.emissive_surf)
-            self.gui_tex = self.surf_to_text(self.gui_surf)
+            self.emissive_tex.write(self.emissive_surf.get_view("1"))
+            self.gui_tex.write(self.gui_surf.get_view("1"))
 
             self.blur_fbo.use()
             self.ctx.clear(0, 0, 0, 0)
-            emissive_tex.use(0)
+            self.emissive_tex.use(0)
             self.blur_prog["image"].value = 0
             self.blur_prog["axis"].value = (1.0, 0.0)
             self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
             self.blur_prog["radius"].value = 12
             self.blur_prog["sigma"].value = 5
             self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
-            emissive_tex.release()
 
             # data = self.blur_fbo.read(components=4, alignment=1)
             # pygame.image.save(pygame.image.frombytes(data, SIZE, "RGBA", True), "rast.png")

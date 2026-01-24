@@ -29,7 +29,12 @@ class Title_Screen(State):
 
         Cursor(self.game, [self.game.gui_elements])
 
+        self.start = True
+
     def update(self):
+        if self.start:
+            self.game.music_player.play("main_menu", pool="music", loop=True)
+            self.start = False
 
         self.d.update()
         self.t += math.radians(2)
