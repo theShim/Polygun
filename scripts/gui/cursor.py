@@ -26,7 +26,7 @@ class Cursor(pygame.sprite.Sprite):
     def __init__(self, game, groups):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
 
         self.state = "base"
 

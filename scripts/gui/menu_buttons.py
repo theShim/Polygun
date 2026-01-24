@@ -20,7 +20,7 @@ class Button(pygame.sprite.Sprite):
     def __init__(self, game, groups, text: str, pos: vec, font = Custom_Font.font2_5):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
         self.font: Font = font
         
         self.text = text
@@ -101,7 +101,7 @@ class Label(pygame.sprite.Sprite):
     def __init__(self, game, groups, text: str, pos: vec, font = Custom_Font.font2_5):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
         self.font: Font = font
         
         self.text = text
@@ -229,7 +229,7 @@ class KeyboardInputButton(pygame.sprite.Sprite):
     def __init__(self, game, groups, text, pos, key, font=Custom_Font.font2_5):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
         self.font: Font = font
         
         self.text = text # f"{text:<13}{self.CONTROLS_TO_TEXT[key]:<10}"

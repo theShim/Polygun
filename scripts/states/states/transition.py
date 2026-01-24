@@ -55,7 +55,7 @@ class TransitionLine(pygame.sprite.Sprite):
     def __init__(self, game, groups, y, t_offset):
         super().__init__(groups)
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
 
         self.line_height = HEIGHT / 5
         self.buffer = 50

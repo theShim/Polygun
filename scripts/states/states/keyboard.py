@@ -17,6 +17,7 @@ from scripts.utils.CORE_FUNCS import vec, Timer
 class Keyboard_GUI(State):
     def __init__(self, game):
         super().__init__(game, "keyboard_gui")
+        self.screen = self.game.gui_surf
 
         self.shadow1 = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
         for y in range(math.ceil(self.shadow1.height * 0.6)):

@@ -19,7 +19,7 @@ from scripts.utils.CORE_FUNCS import vec
 class Del:
     def __init__(self, game, point_num=100):
         self.game = game
-        self.screen = self.game.screen
+        self.screen = self.game.gui_surf
 
         self.points = np.array([
             vec(random.uniform(-50, WIDTH+50), random.uniform(-50, HEIGHT+50)) for i in range(point_num)

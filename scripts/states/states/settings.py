@@ -17,6 +17,8 @@ from scripts.utils.CORE_FUNCS import vec
 class Settings(State):
     def __init__(self, game):
         super().__init__(game, "settings")
+        self.screen = self.game.gui_surf
+        
         self.shadow = pygame.Surface((WIDTH * 0.5, HEIGHT), pygame.SRCALPHA)
         for x in range(self.shadow.width):
             pygame.draw.line(self.shadow, (0, 0, 0, 255 * (1 - (x/self.shadow.width))), (x, 0), (x, self.shadow.height))

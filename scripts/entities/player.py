@@ -49,9 +49,9 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        # self.primary = Gun.Rifle(self.game, [])
-        # self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
-        self.primary = Spikeball(self.game, [], self.pos)
+        self.primary = Gun.Rifle(self.game, [])
+        self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
+        # self.primary = Spikeball(self.game, [], self.pos)
         self.secondary = None
         
         #jumping

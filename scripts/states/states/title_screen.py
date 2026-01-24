@@ -17,6 +17,7 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT
 class Title_Screen(State):
     def __init__(self, game):
         super().__init__(game, "title_screen")
+        self.screen = self.game.gui_surf
 
         self.d = Del(game, 100)
         self.logo = pygame.image.load("assets/gui/polygun_logo.png").convert_alpha()
