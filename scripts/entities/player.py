@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
             [size/2, size/2],
             [-size/2, size/2]
         ])
-        self.pos = vec(WIDTH/2 - size/2, HEIGHT/2 - size/2)
+        self.pos = vec(WIDTH/2 - size/2, HEIGHT/2 - size/2 - TILE_SIZE)
 
         #movement
         self.vel = vec()
@@ -60,6 +60,7 @@ class Player(pygame.sprite.Sprite):
         self.max_jump_height = (self.jump_vel ** 2) / (2 * GRAV) #projectile motion equation
         self.jump_time = 0 #the current moment in time of the jump
         self.jumping = False #just a boolean of whether the play is jumping or not
+        self.fallen = False
 
         self.max_health = 200
         self.health = self.max_health
@@ -72,6 +73,16 @@ class Player(pygame.sprite.Sprite):
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
         # self.boost_timer = Timer()
+
+    def change_size(self, new_size: int):
+        new_size = max(1, new_size)
+        self.size = size = new_size
+        self.points = np.array([
+            [-size/2, -size/2],
+            [size/2, -size/2],
+            [size/2, size/2],
+            [-size/2, size/2]
+        ])
 
     def move(self):
         self.acc = vec()
@@ -196,7 +207,7 @@ class Player(pygame.sprite.Sprite):
 
         #creating a rectangular hitbox regardless of rotation, centred at the player position
         hitbox = pygame.Rect(self.pos.x - self.size/2, self.pos.y - self.size/2, self.size, self.size)
-        for tile in room.tilemap.collideables(self.game.offset):
+        for tile in room.tilemap.collideables(self.game.offset, include_floor=self.fallen):
             if tile.hitbox.colliderect(hitbox): #rect collision instead of point
 
                 if direction == "vertical":
@@ -273,11 +284,11 @@ class Player(pygame.sprite.Sprite):
         if pointer_first:
             pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
             points_ = [
-                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (7) - vec(0, self.jump_height)
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * ((self.size / 16) * 7) - vec(0, self.jump_height)
                 for a in range(0, 360, 120)
             ]
             shadow_points = [
-                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (9 * jump_scale) + vec(0, 4)
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * ((self.size / 16) * 9 * jump_scale) + vec(0, 4)
                 for a in range(0, 360, 120)
             ]
             pygame.draw.polygon(self.screen, (0, 0, 0), shadow_points)

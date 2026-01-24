@@ -77,6 +77,7 @@ class DungeonLevel:
             self.rooms[node] = Room(self.game, node, conns[node], self)
         for node in nodes:
            self.rooms[node].tilemap.auto_tile()
+           self.rooms[node].tilemap.lava_region_dfs()
 
         self.rooms[(0, 0)].start_room = True
 

@@ -4,6 +4,7 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 
 import random
+import math
 
 # from scripts.world_loading.tiles import Tile
 # from scripts.world_loading.nature.manager import Nature_Manager
@@ -26,6 +27,8 @@ class Tilemap:
         self.room = parent_room
         self.room_pos = vec(parent_room.pos)
 
+        self.lava_regions: list[LavaRegion] = None
+
         self.load()
 
     def load(self):
@@ -45,11 +48,11 @@ class Tilemap:
             self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)].index = 0
             self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
         if (self.room_pos.x, self.room_pos.y + 1) in self.room.conns:
-            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
-            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
+            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
+            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
         if (self.room_pos.x, self.room_pos.y - 1) in self.room.conns:
-            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)].index = 0
-            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)].index = 0
+            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE - 1, self.room_pos.y * LEVEL_SIZE)].index = 0
+            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE - 1, self.room_pos.y * LEVEL_SIZE)].index = 0
 
     def fill_corridoors(self):
         if (self.room_pos.x + 1, self.room_pos.y) in self.room.conns:
@@ -59,11 +62,11 @@ class Tilemap:
             self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)].index = 1
             self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
         if (self.room_pos.x, self.room_pos.y + 1) in self.room.conns:
-            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
-            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
+            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
+            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
         if (self.room_pos.x, self.room_pos.y - 1) in self.room.conns:
-            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)].index = 1
-            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE, self.room_pos.y * LEVEL_SIZE)].index = 1
+            self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE - 1, self.room_pos.y * LEVEL_SIZE)].index = 1
+            self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE - 1, self.room_pos.y * LEVEL_SIZE)].index = 1
 
     def auto_tile(self):
         for pos in self.tilemap:
@@ -143,6 +146,44 @@ class Tilemap:
             tile.index = room_type
 
 
+    def lava_region_dfs(self):
+        visited = set()
+        regions = []
+
+        for pos, tile in self.tilemap.items():
+            if tile.index != 100 or pos in visited: continue
+
+            region = LavaRegion(self.game)
+            stack = [pos]
+            min_x = min_y = math.inf
+            max_x = max_y = -math.inf
+
+            while stack:
+                current = stack.pop()
+                if current in visited: continue
+
+                t: Lava_Tile = self.tilemap.get(current)
+                if not t or t.index != 100: continue
+
+                visited.add(current)
+                region.tiles.append(t)
+                t.lava_region = region
+                
+                min_x = min(min_x, t.rect.left // TILE_SIZE)
+                min_y = min(min_y, t.rect.top // TILE_SIZE)
+                max_x = max(max_x, t.rect.right // TILE_SIZE)
+                max_y = max(max_y, t.rect.bottom // TILE_SIZE)
+                
+                for dx, dy in ((1,0), (-1,0), (0,1), (0,-1)):
+                    stack.append((current[0] + dx, current[1] + dy))
+        
+            region.pos = vec(min_x, max_x) * TILE_SIZE
+            region.bounds = pygame.Rect(min_x * TILE_SIZE, min_y * TILE_SIZE, (max_x - min_x) * TILE_SIZE, (max_y - min_y) * TILE_SIZE)
+            regions.append(region)
+
+        self.lava_regions = regions
+
+
     def on_screen_tiles(self, offset, buffer=[0, 0]):
         start_x = int(offset[0] // (self.tile_size) - buffer[0])
         start_y = int(offset[1] // (self.tile_size) - buffer[1])
@@ -160,11 +201,16 @@ class Tilemap:
                 loc = (x, y)
                 if loc in self.tilemap:
                     tile: Tile = self.tilemap[loc]
+                    if tile.index == 100: continue
                     yield tile
 
-    def collideables(self, offset, buffer=[0, 0]):
+        # for lava_region in self.lava_regions:
+        #     for tile in lava_region.tiles:
+        #         yield tile
+
+    def collideables(self, offset, buffer=[0, 0], include_floor=False):
         for tile in self.on_screen_tiles(offset, buffer):
-            if 0 < tile.index < 100:
+            if (0 if not include_floor else -1) < tile.index < 100:
                 yield tile
 
 
@@ -262,6 +308,10 @@ class Tile(pygame.sprite.Sprite):
 
         # self.screen.blit((surf := self.font.render(f"{self.index}", False, (255, 0, 0))), surf.get_rect(topleft=self.rect.topleft - self.game.offset))
     
+
+
+########## LAVA
+
 class Lava_Tile(Tile):
     def __init__(self, game, pos: tuple, top_edge = False, bottom_edge = False):
         super().__init__(game, pos, 100)
@@ -269,6 +319,7 @@ class Lava_Tile(Tile):
         self.hitbox = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE)
 
         self.lava = True
+        self.lava_region = None
         self.top_edge = top_edge
         self.bottom_edge = bottom_edge
 
@@ -284,3 +335,22 @@ class Lava_Tile(Tile):
             pygame.draw.rect(self.game.emissive_surf, (20, 20, 20), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height * 0.75])
         
         # pygame.draw.rect(self.screen, (255, 0, 0), [*(self.rect.topleft - self.game.offset), *self.rect.size], 2)
+
+
+class LavaRegion:
+    def __init__(self, game):
+        self.game = game
+        
+        self.tiles: list[Lava_Tile] = []
+        self.pos = None
+        self.bounds: pygame.Rect = None
+        self.t_offset = random.random() * 1000
+
+    def player_collide(self):
+        player = self.game.player
+        if self.bounds.collidepoint(player.pos) and player.jump_height == 0:
+            for tile in self.tiles:
+                if tile.hitbox.collidepoint(player.pos):
+                    player.change_size(player.size * 0.95)
+                    player.fallen = True
+                    break

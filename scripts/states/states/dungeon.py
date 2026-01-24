@@ -69,8 +69,12 @@ class Dungeon(State):
         pygame.draw.circle(self.screen, (255, 0, 0, 120), (WIDTH * 0.7, HEIGHT/2) - self.game.offset, 50)
 
         tiles = []
+        lava_tiles = []
         for room in self.levels[self.current_level_index].rooms.values():
             tiles += list(room.tilemap.on_screen_tiles(self.game.offset, buffer=[1, 1]))
+            for lava_region in room.tilemap.lava_regions:
+                lava_region.player_collide()
+                lava_tiles += lava_region.tiles
 
         sprites = []
         for spr in self.game.all_sprites:
@@ -80,6 +84,9 @@ class Dungeon(State):
             else:
                 if (self.game.player.pos - spr.pos).magnitude() < 1300:
                     sprites += [spr]
+
+        for spr in lava_tiles:
+            spr.update()
 
         for spr in sorted(sprites + tiles, key=lambda s: s.rect.bottom if isinstance(s, Tile) else s.pos.y):
             spr.update()
