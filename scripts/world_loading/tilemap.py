@@ -71,7 +71,11 @@ class Tilemap:
             if not tile.index: continue
 
             if tile.index == 100:
-                self.tilemap[pos] = Lava_Tile(tile.game, tile.pos / TILE_SIZE)
+                to_check = (pos[0], pos[1] - 1)
+                top_edge = not (self.tilemap[to_check].index == 100)
+                to_check = (pos[0], pos[1] + 1)
+                bottom_edge = not (self.tilemap[to_check].index == 100)
+                self.tilemap[pos] = Lava_Tile(tile.game, tile.pos / TILE_SIZE, top_edge, bottom_edge)
                 continue
 
             neighbours = []
@@ -259,16 +263,24 @@ class Tile(pygame.sprite.Sprite):
         # self.screen.blit((surf := self.font.render(f"{self.index}", False, (255, 0, 0))), surf.get_rect(topleft=self.rect.topleft - self.game.offset))
     
 class Lava_Tile(Tile):
-    def __init__(self, game, pos: tuple):
+    def __init__(self, game, pos: tuple, top_edge = False, bottom_edge = False):
         super().__init__(game, pos, 100)
         
         self.hitbox = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE)
 
         self.lava = True
-        self.surf = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+        self.top_edge = top_edge
+        self.bottom_edge = bottom_edge
+
+        self.surf = pygame.Surface((TILE_SIZE, TILE_SIZE * 1), pygame.SRCALPHA)
         self.surf.fill((255, 102, 0))
 
     def update(self):
-        # pygame.draw.rect(self.screen, (20, 20, 20), [*(self.rect.topleft - self.game.offset), *self.rect.size])
-        self.screen.blit(self.surf, self.rect.topleft - self.game.offset + vec(0, TILE_SIZE / 2))
-        pygame.draw.rect(self.game.emissive_surf, (255, 102, 0), [*(self.rect.topleft - self.game.offset + vec(0, TILE_SIZE / 2)), *self.rect.size])
+        self.screen.blit(self.surf, self.rect.topleft - self.game.offset)
+        pygame.draw.rect(self.game.emissive_surf, (255, 102, 0), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height])
+
+        if self.top_edge:
+            pygame.draw.rect(self.screen, (20, 20, 20), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height * 0.75])
+            pygame.draw.rect(self.game.emissive_surf, (20, 20, 20), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height * 0.75])
+        
+        # pygame.draw.rect(self.screen, (255, 0, 0), [*(self.rect.topleft - self.game.offset), *self.rect.size], 2)
