@@ -350,9 +350,12 @@ class LavaRegion:
 
     def player_collide(self):
         player = self.game.player
-        if self.bounds.collidepoint(player.pos) and player.jump_height == 0:
-            for tile in self.tiles:
-                if tile.hitbox.collidepoint(player.pos):
-                    player.change_size(player.size * 0.95)
-                    player.fallen = True
-                    break
+        if not player.fallen:
+            if self.bounds.collidepoint(player.pos) and player.jump_height == 0:
+                for tile in self.tiles:
+                    if tile.hitbox.inflate(-8, -8).collidepoint(player.pos):
+                        player.fallen = True
+                        break
+        
+        if player.fallen:
+            player.change_size(player.size * 0.975)

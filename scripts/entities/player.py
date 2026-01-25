@@ -88,9 +88,10 @@ class Player(pygame.sprite.Sprite):
         self.acc = vec()
         keys = pygame.key.get_pressed()
 
-        self.directional_inputs(keys)
-        self.dash()
-        self.jump(keys)
+        if not self.fallen:
+            self.directional_inputs(keys)
+            self.dash()
+            self.jump(keys)
         self.apply_forces()
 
     def directional_inputs(self, keys):
@@ -228,7 +229,9 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.move()
-        self.mouse_inputs()
+
+        if not self.fallen:
+            self.mouse_inputs()
 
         self.energy_refill_timer.update()
         if self.energy_refill_timer.finished:
