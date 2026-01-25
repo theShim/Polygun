@@ -11,6 +11,6 @@ void main() {
     uvs = texcoord;
     gl_Position = vec4(vert, 0.0, 1.0);
 
-    // vec2 center = vec2(0.5, 0.5);
-    // uvs = (texcoord - center) / zoom + center;
+    vec2 center = vec2(0.5, 0.5);
+    uvs = (texcoord - center) / 1.015 + center;
 }

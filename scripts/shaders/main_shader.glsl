@@ -119,6 +119,16 @@ int secondary_lava_type(vec2 uv, vec2 offset) {
     return 0;
 }
 
+bool is_lava(vec2 uv) {
+    if (uv.x < 0.0 || uv.x > 1.0) {
+        return false;
+    }
+    else if (uv.y < 0.0 || uv.y > 1.0) {
+        return false;
+    }
+    return rgb_distance(texture(tex, uv).rgb, vec3(247,118,34)/255.0) < 0.2;
+}
+
 void main() {
     time;
     noiseTex;
@@ -127,7 +137,7 @@ void main() {
 
     vec3 final_colour = texture(tex, uvs).rgb * 0.45 + texture(bloomTex, uvs).rgb;
 
-    bool flag = (rgb_distance(texture(tex, uvs).rgb, vec3(247, 118, 34) / 255) < 0.2);
+    bool flag = is_lava(uvs);
     if (flag == true) {
         vec3 p = vec3((uvs + playerOffset / vec2(960, 540)) * 256.0, time * 0.005);
         p.y *= 54.0 / 96.0;
@@ -140,6 +150,7 @@ void main() {
         }
         
 
+
         int lavaT = secondary_lava_type((uvs + playerOffset / vec2(960, 540)), vec2(0.0, 0.0));
         int lavaAboveT = secondary_lava_type((uvs + playerOffset / vec2(960, 540)), vec2(0, 6));
         
@@ -149,7 +160,42 @@ void main() {
         if (lavaT == 1) {
             final_colour = vec3(253, 173, 51) / 255;
         };
-    };
+
+
+
+    vec2 px = vec2(1.0/960.0, 1.0/540.0);
+    float wave_dist = (sin(time * 0.001) + 1.25) * (0.01) * (0.5 * (sin(time * 0.001 - 20 * (uvs.x + playerOffset.x / 960)) + 1));
+    int steps = (int(wave_dist / px.y) + 1);
+    for (int i=0; i <= steps; i++) {
+        vec2 to_check = vec2(uvs.x, uvs.y + float(i) * px.y);
+
+        if (is_lava(to_check) && !is_lava(to_check - vec2(0.0, px.y))) {
+            
+            vec3 p = vec3((to_check + playerOffset / vec2(960, 540)) * 256.0, time * 0.005);
+            p.y *= 54.0 / 96.0;
+            p = floor(p) / 32.0;
+            float n = cnoise(p);
+
+            final_colour = vec3(247, 118, 34) / 255;
+            if (n > 0.05) {
+                final_colour = vec3(228, 59, 68) / 255;
+            }
+            
+            int lavaT = secondary_lava_type((to_check + playerOffset / vec2(960, 540)), vec2(0.0, 0.0));
+            int lavaAboveT = secondary_lava_type((to_check + playerOffset / vec2(960, 540)), vec2(0, 6));
+            
+            if (lavaAboveT == 1) {
+                final_colour = vec3(160, 38, 53) / 255;
+            };
+            if (lavaT == 1) {
+                final_colour = vec3(253, 173, 51) / 255;
+            };
+
+            if (i > steps - 5) {
+                final_colour += vec3(0.4, 0.0, -0.2) / 2;
+            };
+        }
+    }
 
     f_colour = vec4(final_colour, 1.0);
 
