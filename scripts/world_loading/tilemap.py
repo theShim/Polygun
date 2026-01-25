@@ -326,7 +326,7 @@ class Lava_Tile(Tile):
         self.bottom_edge = bottom_edge
 
         self.surf = pygame.Surface((TILE_SIZE, TILE_SIZE * 1), pygame.SRCALPHA)
-        self.surf.fill((255, 102, 0))
+        self.surf.fill((247, 118, 34))
 
     def update(self):
         self.screen.blit(self.surf, self.rect.topleft - self.game.offset)

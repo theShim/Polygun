@@ -104,22 +104,18 @@ float rgb_distance(vec3 a, vec3 b) {
     );
 }
 
-int lava_type(vec2 uv) {
-    bool base = rgb_distance(texture(tex, uv).rgb, vec3(1.0,0.4,0.0)) < 0.2;
-    if (!base) {
-        return 0; //base lava
-    }
-
-    vec3 p = vec3(uv * 256.0, time * 0.005);
+int secondary_lava_type(vec2 uv, vec2 offset) {
+    vec3 p = vec3(uv * 256.0, 5 + time * 0.01);
+    p.xy -= offset;
     p.y *= 54.0 / 96.0;
     p = floor(p) / 32.0;
     float n = cnoise(p);
 
     if (n > 0.1) {
-        return 2; //highlighty yellow lava
+        return 1;
     }
 
-    return 1; //darker mid red lava
+    return 0;
 }
 
 void main() {
@@ -130,7 +126,7 @@ void main() {
 
     vec3 final_colour = texture(tex, uvs).rgb * 0.45 + texture(bloomTex, uvs).rgb;
 
-    bool flag = (rgb_distance(texture(tex, uvs).rgb, vec3(1.0, 0.4, 0.0)) < 0.2);
+    bool flag = (rgb_distance(texture(tex, uvs).rgb, vec3(247, 118, 34) / 255) < 0.2);
     if (flag == true) {
         vec3 p = vec3(uvs * 256.0, time * 0.005);
         p.y *= 54.0 / 96.0;
@@ -138,18 +134,20 @@ void main() {
         float n = cnoise(p);
 
         final_colour = vec3(247, 118, 34) / 255;
-        if (n > 0.1) {
+        if (n > 0.05) {
             final_colour = vec3(228, 59, 68) / 255;
         }
         
-        p = vec3(uvs * 256.0, time * 0.01);
-        p.y *= 54.0 / 96.0;
-        p = floor(p) / 32.0;
-        n = cnoise(p);
 
-        if (n > 0.05) {
-            final_colour = vec3(253, 173, 53) / 255;
-        }
+        int lavaT = secondary_lava_type(uvs, vec2(0.0, 0.0));
+        int lavaAboveT = secondary_lava_type(uvs, vec2(0, 6));
+        
+        if (lavaAboveT == 1) {
+            final_colour = vec3(160, 38, 53) / 255;
+        };
+        if (lavaT == 1) {
+            final_colour = vec3(253, 173, 51) / 255;
+        };
     };
 
     f_colour = vec4(final_colour, 1.0);
