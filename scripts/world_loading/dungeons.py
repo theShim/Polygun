@@ -7,6 +7,7 @@ import random
 
 from scripts.entities.enemy import Enemy, EnemySpawnData
 from scripts.entities.tesseract import Tesseract
+from scripts.world_loading.exit_portal import ExitPortal
 from scripts.world_loading.tilemap import Tilemap
 
 from scripts.utils.CORE_FUNCS import vec
@@ -63,11 +64,16 @@ class DungeonLevel:
 
         self.rooms: dict[tuple, Room] = {}
         self.conns: dict[tuple, list[tuple]] = {}
+
         self.current_room = None
+        self.start_room: Room = None
         self.exit_room: Room = None
         self.boss_room: Room = None
 
         self.generate_dungeon()
+
+    def get_leaves(self) -> list[tuple]:
+        return [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]
 
     def generate_dungeon(self):
         nodes, conns = generate_path()
@@ -79,10 +85,23 @@ class DungeonLevel:
            self.rooms[node].tilemap.auto_tile()
            self.rooms[node].tilemap.lava_region_dfs()
 
+        self.generate_start_room()
+        self.generate_exit_room()
+
+    def generate_start_room(self):
         self.rooms[(0, 0)].start_room = True
+        self.start_room = self.rooms[(0, 0)]
+
+    def generate_exit_room(self):
+        # leaves = self.get_leaves()
+        # self.exit_room = self.rooms[random.choice(leaves)]
+        # self.exit_room.exit_room = True
+        
+        self.rooms[(0, 0)].exit_room = True
+        self.exit_room = self.rooms[(0, 0)]
 
     def generate_boss_room(self):
-        leaves = [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]
+        leaves = self.get_leaves()
         self.boss_room = random.choice(leaves)
 
 
@@ -92,11 +111,13 @@ class Room:
     PLAYER_FIGHTING = 1
     CLEARED = 2
 
-    def __init__(self, game, pos, conns, parent_level, start_room = False):
+    def __init__(self, game, pos, conns, parent_level, start_room = False, exit_room = False):
         self.game = game
 
         self.state = Room.UNENTERED
         self.start_room = start_room
+        self.exit_room = exit_room
+        self.exit_portal_spawned = False
         self.temp = True
 
         self.pos = pos
@@ -112,6 +133,14 @@ class Room:
         self.max_waves = len(self.wave_stack)
 
         self.enemies_to_kill = pygame.sprite.Group()
+
+
+    def spawn_exit_portal(self):
+        if not self.exit_room: return
+        if self.exit_portal_spawned: return
+
+        self.exit_portal_spawned = True
+        ExitPortal(self.game, [self.game.all_sprites], [self.pos[0] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2, self.pos[1] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2])
 
         
     def spawn_wave(self):
@@ -136,8 +165,11 @@ class Room:
             self.state = Room.CLEARED
             self.wave_stack = []
 
+        if self.exit_room:
             if self.temp:
-                # Tesseract(self.game, [self.game.all_sprites, self.game.entities, self.game.bosses])
+                # pos = [self.pos[0] * TILE_SIZE * LEVEL_SIZE,
+                #         self.pos[1] * TILE_SIZE * LEVEL_SIZE]
+                # Tesseract(self.game, [self.game.all_sprites, self.game.entities, self.game.bosses], pos)
                 self.temp = False
             
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
@@ -180,3 +212,6 @@ class Room:
             self.tilemap.auto_tile()
             for conn in self.conns:
                 self.parent_level.rooms[conn].tilemap.auto_tile()
+
+        elif self.state == Room.CLEARED:
+            self.spawn_exit_portal()

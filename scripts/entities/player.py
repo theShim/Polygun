@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
             [size/2, size/2],
             [-size/2, size/2]
         ])
-        self.pos = vec(WIDTH/2 - size/2, HEIGHT/2 - size/2 - TILE_SIZE)
+        self.pos = vec(WIDTH/2 - size/2, HEIGHT/2 - size/2 + TILE_SIZE * 5)
 
         #movement
         self.vel = vec()

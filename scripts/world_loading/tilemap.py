@@ -33,7 +33,7 @@ class Tilemap:
 
     def load(self):
         room = random.choices(ROOMS, [10, 1, 1], k=1)[0]
-        if self.room.start_room: room = ROOMS[-1]
+        if self.room.start_room: room = ROOMS[0]
         
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):
@@ -44,11 +44,11 @@ class Tilemap:
 
     def remove_corridoors(self):
         if (self.room_pos.x + 1, self.room_pos.y) in self.room.conns:
-            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)].index = 0
-            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
+            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE - 1)].index = 0
+            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE - 1)].index = 0
         if (self.room_pos.x - 1, self.room_pos.y) in self.room.conns:
-            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)].index = 0
-            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
+            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE - 1)].index = 0
+            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE - 1)].index = 0
         if (self.room_pos.x, self.room_pos.y + 1) in self.room.conns:
             self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
             self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 0
@@ -58,11 +58,11 @@ class Tilemap:
 
     def fill_corridoors(self):
         if (self.room_pos.x + 1, self.room_pos.y) in self.room.conns:
-            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)].index = 1
-            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
+            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE - 1)].index = 1
+            self.tilemap[(LEVEL_SIZE - 1 + self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE - 1)].index = 1
         if (self.room_pos.x - 1, self.room_pos.y) in self.room.conns:
-            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE)].index = 1
-            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
+            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + self.room_pos.y * LEVEL_SIZE - 1)].index = 1
+            self.tilemap[(self.room_pos.x * LEVEL_SIZE, LEVEL_SIZE//2 + 1 + self.room_pos.y * LEVEL_SIZE - 1)].index = 1
         if (self.room_pos.x, self.room_pos.y + 1) in self.room.conns:
             self.tilemap[(LEVEL_SIZE//2 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 1
             self.tilemap[(LEVEL_SIZE//2 + 1 + self.room_pos.x * LEVEL_SIZE - 1, LEVEL_SIZE - 1 + self.room_pos.y * LEVEL_SIZE)].index = 1

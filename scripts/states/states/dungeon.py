@@ -20,7 +20,7 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
     ##############################################################################################
 
 class Dungeon(State):
-    LEVEL_NUM = 1
+    LEVEL_NUM = 2
 
     def __init__(self, game, prev=None):
         super().__init__(game, "dungeon", prev)
@@ -60,6 +60,9 @@ class Dungeon(State):
             
             self.game.music_player.play("xqc_dungeon", pool="music", loop=True)
             self.start = False
+
+        # if pygame.key.get_just_pressed()[pygame.K_SEMICOLON]:
+        #     self.current_level_index += 1
             
         self.game.calculate_offset() #camera
         self.get_current_room().update()

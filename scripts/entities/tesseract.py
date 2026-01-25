@@ -58,7 +58,7 @@ class Transform4D: #4D rotation matrices
     ##############################################################################################
 
 class Tesseract(pygame.sprite.Sprite):
-    def __init__(self, game, groups):
+    def __init__(self, game, groups, pos=vec()):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
@@ -82,7 +82,7 @@ class Tesseract(pygame.sprite.Sprite):
         self.angle = 0.0
         self.scale = 900
         
-        self.pos = vec(WIDTH / 2, HEIGHT)
+        self.pos = vec(pos) + vec(WIDTH / 2, HEIGHT)
 
         self.health = 1000
 
