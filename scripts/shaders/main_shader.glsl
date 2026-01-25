@@ -161,7 +161,7 @@ void main() {
             final_colour = vec3(253, 173, 51) / 255;
         };
 
-
+    };
 
     vec2 px = vec2(1.0/960.0, 1.0/540.0);
     float wave_dist = (sin(time * 0.001) + 1.25) * (0.01) * (0.5 * (sin(time * 0.001 - 20 * (uvs.x + playerOffset.x / 960)) + 1));
