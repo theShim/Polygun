@@ -310,11 +310,11 @@ class Player(pygame.sprite.Sprite):
         if not pointer_first:
             pos = -self.game.offset + self.pos + vec(math.cos(angle), math.sin(angle)) * self.size * 1.5
             points = [
-                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (7) - vec(0, self.jump_height)
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * ((self.size / 16) * 7) - vec(0, self.jump_height)
                 for a in range(0, 360, 120)
             ]
             shadow_points = [
-                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * (9 * jump_scale) + vec(0, 4)
+                pos + vec(math.cos(math.radians(a) + angle), math.sin(math.radians(a) + angle)) * ((self.size / 16) * 9 * jump_scale) + vec(0, 4)
                 for a in range(0, 360, 120)
             ]
             pygame.draw.polygon(self.screen, (0, 0, 0), shadow_points)

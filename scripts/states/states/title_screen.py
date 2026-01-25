@@ -34,7 +34,7 @@ class Title_Screen(State):
 
     def update(self):
         if self.start:
-            self.game.music_player.play("main_menu", pool="music", loop=True)
+            self.game.music_player.play("main_menu", pool="music", loop=True, fadein_ms=2000)
             self.start = False
 
         self.d.update()
@@ -51,6 +51,7 @@ class Title_Screen(State):
 
         
         if self.start_button.clicked:
+            self.game.music_player.stop(pool="music", fadeout_ms=1000)
             self.game.state_loader.add_state(self.game.state_loader.get_state("dungeon"), transition=True)
             self.game.state_loader.current_state.prev = self
             self.start_button.out_of_frame = True

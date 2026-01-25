@@ -74,7 +74,7 @@ class DungeonLevel:
         self.conns = conns
 
         for node in nodes:
-            self.rooms[node] = Room(self.game, node, conns[node], self)
+            self.rooms[node] = Room(self.game, node, conns[node], self, node == (0, 0))
         for node in nodes:
            self.rooms[node].tilemap.auto_tile()
            self.rooms[node].tilemap.lava_region_dfs()
@@ -92,17 +92,17 @@ class Room:
     PLAYER_FIGHTING = 1
     CLEARED = 2
 
-    def __init__(self, game, pos, conns, parent_level):
+    def __init__(self, game, pos, conns, parent_level, start_room = False):
         self.game = game
+
+        self.state = Room.UNENTERED
+        self.start_room = start_room
+        self.temp = True
 
         self.pos = pos
         self.conns = conns
         self.parent_level = parent_level
         self.tilemap = Tilemap(self.game, self)
-
-        self.state = Room.UNENTERED
-        self.start_room = False
-        self.temp = True
 
         self.wave_stack: list[list[EnemySpawnData]] = [
             [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 4)],

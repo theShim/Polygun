@@ -32,7 +32,9 @@ class Tilemap:
         self.load()
 
     def load(self):
-        room = random.choices(ROOMS, [10, 1, 100], k=1)[0]
+        room = random.choices(ROOMS, [10, 1, 1], k=1)[0]
+        if self.room.start_room: room = ROOMS[-1]
+        
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):
                 pos = (int(x + self.room_pos.x * LEVEL_SIZE), int(y + self.room_pos.y * LEVEL_SIZE))
