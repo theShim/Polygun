@@ -313,6 +313,7 @@ class Game:
             self.program["guiTex"].value = 3
             self.program["time"].value = self.t
             self.program["zoom"].value = self.zoom
+            self.program["playerOffset"].value = self.offset
             self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
             frame_tex.release()
 

@@ -5,6 +5,7 @@ uniform sampler2D noiseTex;
 uniform sampler2D bloomTex;
 uniform sampler2D guiTex;
 uniform float time;
+uniform vec2 playerOffset;
 
 in vec2 uvs;
 out vec4 f_colour;
@@ -128,7 +129,7 @@ void main() {
 
     bool flag = (rgb_distance(texture(tex, uvs).rgb, vec3(247, 118, 34) / 255) < 0.2);
     if (flag == true) {
-        vec3 p = vec3(uvs * 256.0, time * 0.005);
+        vec3 p = vec3((uvs + playerOffset / vec2(960, 540)) * 256.0, time * 0.005);
         p.y *= 54.0 / 96.0;
         p = floor(p) / 32.0;
         float n = cnoise(p);
@@ -139,8 +140,8 @@ void main() {
         }
         
 
-        int lavaT = secondary_lava_type(uvs, vec2(0.0, 0.0));
-        int lavaAboveT = secondary_lava_type(uvs, vec2(0, 6));
+        int lavaT = secondary_lava_type((uvs + playerOffset / vec2(960, 540)), vec2(0.0, 0.0));
+        int lavaAboveT = secondary_lava_type((uvs + playerOffset / vec2(960, 540)), vec2(0, 6));
         
         if (lavaAboveT == 1) {
             final_colour = vec3(160, 38, 53) / 255;
