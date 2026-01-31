@@ -366,5 +366,7 @@ class LavaRegion:
         
         if player.fallen:
             player.change_size(player.size * 0.975)
+            if player.size <= 1:
+                player.death()
 
         self.t += self.game.dt * 10

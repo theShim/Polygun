@@ -10,6 +10,7 @@ import json
 import numpy as np
 
 from scripts.particles.sparks import Spark
+from scripts.particles.death import Death_Particle
 from scripts.particles.bullet_casing import Bullet_Casing
 from scripts.projectiles.bullet import Bullet
 
@@ -31,7 +32,7 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         self.screen = self.game.screen
 
-        self.size = size = 16
+        self.size = self.max_size = size = 16
         self.points = np.array([
             [-size/2, -size/2],
             [size/2, -size/2],
@@ -69,6 +70,10 @@ class Player(pygame.sprite.Sprite):
         self.energy_refill_timer = Timer(FPS, 1)
         self.silver = 0 #silver cuz bullet casing looked too similar to gold or yellow coins
         self.pickup_radius = 100 #remains and money
+
+        self.death_timer = Timer(FPS * 2, 1)
+        self.death_timer.t = self.death_timer.end
+        self.death_timer.finished = True
 
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
@@ -227,11 +232,25 @@ class Player(pygame.sprite.Sprite):
                         self.pos.x = tile.hitbox.left - self.size / 2
                         self.vel.x = 0
 
+    def death(self):
+        for i in range(8):
+            a = (i/4) * math.pi
+            Death_Particle(self.game, [self.game.all_sprites, self.game.particles], self.pos, a)
+        self.death_timer.reset()
+        self.fallen = False
+
     def update(self):
         self.move()
 
-        if not self.fallen:
+        if not self.fallen and self.death_timer.finished:
             self.mouse_inputs()
+        
+        if not self.death_timer.finished:
+            self.death_timer.update()
+            if self.death_timer.finished:
+                self.pos = vec(WIDTH/2 - self.max_size/2, HEIGHT/2 - self.max_size/2 + TILE_SIZE * 5)
+                self.change_size(self.max_size)
+                self.health = self.max_health
 
         self.energy_refill_timer.update()
         if self.energy_refill_timer.finished:
