@@ -19,18 +19,28 @@ class ExitPortal(pygame.sprite.Sprite):
 
         self.pos = vec(pos)
         self.radius = 1
-        self.max_radius = 50
+        self.max_radius = 40
         self.pause_timer = Timer(FPS, 1)
+        self.activate_sound = True
         
         self.children = pygame.sprite.Group()
 
     def update(self):
+        if (self.game.player.pos - self.pos).magnitude() < self.radius:
+            self.game.state_loader.current_state.current_level_index += 1
+            self.game.player.pos = vec(WIDTH/2 - self.game.player.size/2, HEIGHT/2 - self.game.player.size/2 + TILE_SIZE * 5)
+            return self.kill()
+        
         self.pause_timer.update()
         if not self.pause_timer.finished: return
         
+        if self.activate_sound:
+            self.game.music_player.play("exit_portal_activate", pool="ambient", loop=False)
+            self.activate_sound = False
+        
         self.radius = self.radius + (self.max_radius - self.radius) * 0.05
         for i in range(3):
-            PortalParticle(self.game, [self.children], self.pos, random.randint(int(20 * (self.radius / self.max_radius)), int(50 * (self.radius / self.max_radius))))
+            PortalParticle(self.game, [self.children], self.pos, random.randint(int(20 * (self.radius / self.max_radius)), int(40 * (self.radius / self.max_radius))))
         self.children.update(None)
         self.render()
 

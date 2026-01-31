@@ -265,6 +265,7 @@ class Player(pygame.sprite.Sprite):
         points = self.points.copy()
         if self.acc.magnitude():
             points[:, 1] *= 0.6
+            # points[:, 0] *= ()
         points = rot_2d(points, self.angle)
         jump_scale = max(0.25, 1 -(self.jump_height / self.max_jump_height))
         

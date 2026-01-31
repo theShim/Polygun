@@ -93,12 +93,12 @@ class DungeonLevel:
         self.start_room = self.rooms[(0, 0)]
 
     def generate_exit_room(self):
-        # leaves = self.get_leaves()
-        # self.exit_room = self.rooms[random.choice(leaves)]
-        # self.exit_room.exit_room = True
+        leaves = self.get_leaves()
+        self.exit_room = self.rooms[random.choice(leaves)]
+        self.exit_room.exit_room = True
         
-        self.rooms[(0, 0)].exit_room = True
-        self.exit_room = self.rooms[(0, 0)]
+        # self.rooms[(0, 0)].exit_room = True
+        # self.exit_room = self.rooms[(0, 0)]
 
     def generate_boss_room(self):
         leaves = self.get_leaves()

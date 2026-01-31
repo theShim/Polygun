@@ -32,8 +32,8 @@ class Tilemap:
         self.load()
 
     def load(self):
-        room = random.choices(ROOMS, [10, 1, 1], k=1)[0]
-        if self.room.start_room: room = ROOMS[0]
+        room = random.choices(ROOMS, [10, 5, 5], k=1)[0]
+        if self.room.start_room: room = ROOMS[-1]
         
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):
@@ -321,7 +321,7 @@ class Lava_Tile(Tile):
         self.hitbox = pygame.Rect(*self.pos, TILE_SIZE, TILE_SIZE)
 
         self.lava = True
-        self.lava_region = None
+        self.lava_region: LavaRegion = None
         self.top_edge = top_edge
         self.bottom_edge = bottom_edge
 
@@ -330,11 +330,17 @@ class Lava_Tile(Tile):
 
     def update(self):
         self.screen.blit(self.surf, self.rect.topleft - self.game.offset)
-        pygame.draw.rect(self.game.emissive_surf, (255, 102, 0), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height])
+        rect = pygame.Rect([*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height])
+        if not self.top_edge:
+            rect.inflate_ip((i := (1 + math.sin(self.lava_region.t * 0.5)) / 2) * 8, i * 1.5)
+        pygame.draw.rect(self.game.emissive_surf, (255, 102, 0), rect)
 
         if self.top_edge:
             pygame.draw.rect(self.screen, (20, 20, 20), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height * 0.75])
-            pygame.draw.rect(self.game.emissive_surf, (20, 20, 20), [*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height * 0.75])
+            rect = pygame.Rect([*(self.rect.topleft - self.game.offset), self.rect.width, self.rect.height * 0.75])
+            if not self.top_edge:
+                rect.inflate_ip(i, i * 1.5)
+            pygame.draw.rect(self.game.emissive_surf, (20, 20, 20), rect)
         
         # pygame.draw.rect(self.screen, (255, 0, 0), [*(self.rect.topleft - self.game.offset), *self.rect.size], 2)
 
@@ -347,6 +353,7 @@ class LavaRegion:
         self.pos = None
         self.bounds: pygame.Rect = None
         self.t_offset = random.random() * 1000
+        self.t = self.t_offset
 
     def player_collide(self):
         player = self.game.player
@@ -359,3 +366,5 @@ class LavaRegion:
         
         if player.fallen:
             player.change_size(player.size * 0.975)
+
+        self.t += self.game.dt * 10
