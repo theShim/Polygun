@@ -13,7 +13,7 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT
     ##############################################################################################
 
 class Minimap(pygame.sprite.Sprite):
-    def __init__(self, game, groups, conns: dict):
+    def __init__(self, game, groups, conns: dict, exit_room=None):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.gui_surf
@@ -132,8 +132,10 @@ class Minimap(pygame.sprite.Sprite):
                         ])
                     
         self.angle = 0
+        self.exit_room = exit_room #room object
 
     def update(self):
+        #player rendering
         self.angle += math.radians(3)
         points = np.array([
             vec(math.cos(self.angle), math.sin(self.angle)),
@@ -149,5 +151,23 @@ class Minimap(pygame.sprite.Sprite):
         pygame.draw.polygon(surf, (0, 255 - 100, 247 - 100), points + vec(1, 2))
         pygame.draw.polygon(surf, (0, 255, 247), points)
         # pygame.draw.rect(surf, (0, 255, 247), [player_pos[0] + self.pxsize * 3, player_pos[1] + self.pxsize * 2, 2 * self.pxsize, 2 * self.pxsize])
+
+        #exit flag
+        exit_room_pos = self.surf_coords[self.exit_room.pos]
+        if player_pos != exit_room_pos:
+            points = np.array([
+                vec(-1.25, -1),
+                vec(1.5, -1),
+                vec(1.5, 1),
+                vec(-1.25, 1)
+            ]) * self.pxsize + exit_room_pos + vec(self.pxsize * 4, self.pxsize * 3)
+            i = False
+            for y in range(int(points[0, 1]), int(points[2, 1]), 2):
+                for x in range(int(points[0, 0]), int(points[1, 0]), 2):
+                    i = not i
+                    pygame.draw.rect(surf, (0, 0, 0), [x, y + 2 + math.sin(3 * self.angle + x / 2) * 0.5 - 1, 2, 2])
+                    pygame.draw.rect(surf, (0, 0, 0) if i else (255, 255, 255), [x, y + math.sin(3 * self.angle + x / 2) * 0.5 - 1, 2, 2])
+                i = not i
+            # pygame.draw.polygon(surf, (255, 0, 0), points)
 
         self.screen.blit(surf, self.rect)

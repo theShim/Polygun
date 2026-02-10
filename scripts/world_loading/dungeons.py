@@ -71,6 +71,8 @@ class DungeonLevel:
         self.exit_room: Room = None
         self.boss_room: Room = None
 
+        self.minimap: Minimap = None
+
         self.generate_dungeon()
 
     def get_leaves(self) -> list[tuple]:
@@ -106,7 +108,7 @@ class DungeonLevel:
         self.boss_room = random.choice(leaves)
 
     def generate_minimap(self):
-        Minimap(self.game, [self.game.gui_elements], self.conns)
+        self.minimap = Minimap(self.game, [self.game.gui_elements], self.conns, exit_room=self.exit_room)
 
 
 class Room:
