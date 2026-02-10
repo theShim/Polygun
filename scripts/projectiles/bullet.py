@@ -98,6 +98,7 @@ class Bullet(pygame.sprite.Sprite):
                 self.game.player.health -= self.damage
                 if self.game.player.health <= 0:
                     self.game.player.death()
+                self.game.screen_shake.start(10, 10)
                 for i in range(random.randint(3, 3)):
                     Spark(
                         self.game, 

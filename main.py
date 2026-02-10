@@ -21,6 +21,7 @@ from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
 from scripts.world_loading.tilemap import Tile
+from scripts.utils.screen_effects import Screen_Shake
 
 from scripts.config.SETTINGS import *
 from scripts.utils.CORE_FUNCS import *
@@ -88,6 +89,7 @@ class Game:
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
+        self.screen_shake = Screen_Shake(self)
         self.debugger = Debugger(self)
 
         self.surf = pygame.Surface((100, 100))
@@ -262,7 +264,7 @@ class Game:
             #     spr.update()
 
             self.state_loader.update()
-
+            self.screen_shake.update()
 
             if DEBUG:
                 debug_info = f"FPS: {int(self.clock.get_fps())}"

@@ -42,9 +42,9 @@ class Minimap(pygame.sprite.Sprite):
             nx = x + abs(min_x)
             ny = y + abs(min_y)
             self.surf_coords[(x, y)] = (nx * ((8 + 6) * pxsize), ny * ((6 + 4) * pxsize))
-            pygame.draw.rect(self.surf, (0, 0, 1), [nx * ((8 + 6) * pxsize) + 3, ny * ((6 + 4) * pxsize) + 3, 8 * pxsize, 6 * pxsize], pxsize)
-            pygame.draw.rect(self.surf, col, [nx * ((8 + 6) * pxsize), ny * ((6 + 4) * pxsize), 8 * pxsize, 6 * pxsize])
-            pygame.draw.rect(self.surf, (74 + 120, 71 + 120, 68 + 120), [nx * ((8 + 6) * pxsize), ny * ((6 + 4) * pxsize), 8 * pxsize, 6 * pxsize], pxsize)
+            pygame.draw.rect(self.surf, (0, 0, 1), [nx * ((8 + 6) * pxsize) + 3, ny * ((6 + 4) * pxsize) + 3, 8 * pxsize, 6 * pxsize], pxsize, border_radius=4)
+            pygame.draw.rect(self.surf, col, [nx * ((8 + 6) * pxsize), ny * ((6 + 4) * pxsize), 8 * pxsize, 6 * pxsize], border_radius=4)
+            pygame.draw.rect(self.surf, (74 + 120, 71 + 120, 68 + 120), [nx * ((8 + 6) * pxsize), ny * ((6 + 4) * pxsize), 8 * pxsize, 6 * pxsize], pxsize, border_radius=4)
         
         used = []
         for room in conns:

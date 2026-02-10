@@ -63,6 +63,7 @@ class Grenade(pygame.sprite.Sprite):
 
         if self.landed:
             Grenade_Explosion(self.game, [self.game.all_sprites, self.game.particles], self.pos)
+            self.game.screen_shake.start(30, 20, 0.95)
             return self.kill()
 
         self.spark.update()
