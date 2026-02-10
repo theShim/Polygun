@@ -61,6 +61,8 @@ class Dungeon(State):
             self.game.music_player.play("xqc_dungeon", pool="music", loop=True)
             self.start = False
 
+            self.levels[self.current_level_index].generate_minimap()
+
         # if pygame.key.get_just_pressed()[pygame.K_SEMICOLON]:
         #     self.current_level_index += 1
             

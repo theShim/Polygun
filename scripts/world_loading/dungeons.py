@@ -7,6 +7,7 @@ import random
 
 from scripts.entities.enemy import Enemy, EnemySpawnData
 from scripts.entities.tesseract import Tesseract
+from scripts.gui.minimap import Minimap
 from scripts.world_loading.exit_portal import ExitPortal
 from scripts.world_loading.tilemap import Tilemap
 
@@ -76,7 +77,7 @@ class DungeonLevel:
         return [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]
 
     def generate_dungeon(self):
-        nodes, conns = generate_path()
+        nodes, conns = generate_path(6, 8)
         self.conns = conns
 
         for node in nodes:
@@ -103,6 +104,9 @@ class DungeonLevel:
     def generate_boss_room(self):
         leaves = self.get_leaves()
         self.boss_room = random.choice(leaves)
+
+    def generate_minimap(self):
+        Minimap(self.game, [self.game.gui_elements], self.conns)
 
 
 class Room:
