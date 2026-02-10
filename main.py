@@ -93,7 +93,7 @@ class Game:
         self.debugger = Debugger(self)
 
         self.surf = pygame.Surface((100, 100))
-        self.k = 0
+        self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
 
     @property
     def mousePos(self) -> vec:
@@ -257,6 +257,9 @@ class Game:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
+
+            self.screen.blit(self.k, (WIDTH/2, HEIGHT/2 + TILE_SIZE * 5) - self.offset)
+            self.emissive_surf.blit(self.k, (WIDTH/2, HEIGHT/2 + TILE_SIZE * 5) - self.offset)
 
             # self.emissive_surf.fill((255, 0, 0), [100, 100, 500, 100])
 

@@ -28,6 +28,8 @@ class Gun(pygame.sprite.Sprite):
 
         self.bullet_spread = math.pi/80 #+- spread angle in radians
         self.shoot_timer = Timer(10, 1)
+        self.shake_duration = 0
+        self.shake_intesity = 0
 
     def play_sound(self):
         self.game.music_player.play("gunshot", pool="sfx", loop=False)
@@ -40,6 +42,8 @@ class Gun(pygame.sprite.Sprite):
 
     def update(self):
         self.play_sound()
+
+        self.game.screen_shake.start(self.shake_duration, self.shake_intesity)
         
         mousePos = self.game.mousePos + vec(0, self.game.player.jump_height)
         mouseAngle = math.atan2(mousePos.y - self.game.player.pos.y + self.game.offset.y, mousePos.x - self.game.player.pos.x + self.game.offset.x)
@@ -69,11 +73,14 @@ class Shotgun(Gun):
         super().__init__(game, groups)
         self.shoot_timer = Timer(FPS * 0.8, 1)
         self.cone = math.pi / 6
+        self.shake_duration = 5
+        self.shake_intesity = 4
         
     def spawn_casing(self, mouseAngle):
         Shotgun_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
 
     def shoot(self, mouseAngle):
+        self.game.player.vel += vec(math.cos(mouseAngle), math.sin(mouseAngle)) * -3
         Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
         Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
         Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=7)

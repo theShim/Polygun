@@ -56,6 +56,7 @@ class Grenade_Explosion(pygame.sprite.Sprite):
             if self.game.player.jump_height < 4 and (self.game.player.pos - self.pos).magnitude() < self.outer.radius * 0.9:
                 self.game.player.health -= 10
                 self.hit = True
+                self.game.screen_shake.start(10, 10)
                 # self.game.player.jump_height += 20
 
     class Circle(pygame.sprite.Sprite):
