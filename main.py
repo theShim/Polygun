@@ -21,6 +21,7 @@ from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
 from scripts.world_loading.tilemap import Tile
+from scripts.world_loading.vending_machine import VendingMachine
 from scripts.utils.screen_effects import Screen_Shake
 
 from scripts.config.SETTINGS import *
@@ -94,6 +95,7 @@ class Game:
 
         self.surf = pygame.Surface((100, 100))
         self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
+        VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))
 
     @property
     def mousePos(self) -> vec:
@@ -258,8 +260,8 @@ class Game:
             if keys[pygame.K_MINUS]: self.zoom /= 1.05
             if keys[pygame.K_EQUALS]: self.zoom *= 1.05
 
-            self.screen.blit(self.k, (WIDTH/2, HEIGHT/2 + TILE_SIZE * 5) - self.offset)
-            self.emissive_surf.blit(self.k, (WIDTH/2, HEIGHT/2 + TILE_SIZE * 5) - self.offset)
+            # self.screen.blit(self.k, (WIDTH/2, HEIGHT/2 + TILE_SIZE * 5) - self.offset)
+            # self.emissive_surf.blit(self.k, (WIDTH/2, HEIGHT/2 + TILE_SIZE * 5) - self.offset)
 
             # self.emissive_surf.fill((255, 0, 0), [100, 100, 500, 100])
 
