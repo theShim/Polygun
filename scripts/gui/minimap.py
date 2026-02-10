@@ -155,6 +155,12 @@ class Minimap(pygame.sprite.Sprite):
         #exit flag
         exit_room_pos = self.surf_coords[self.exit_room.pos]
         if player_pos != exit_room_pos:
+            
+            p1 = vec(-1.25, -1) * self.pxsize + exit_room_pos + vec(self.pxsize * 4 - 2, self.pxsize * 3 - 3)
+            p2 = vec(-1.25, 1.25) * self.pxsize + exit_room_pos + vec(self.pxsize * 4 - 2, self.pxsize * 3 + 1)
+            pygame.draw.line(surf, (0, 0, 0), p1 + vec(1, 1), p2 + vec(1, 1), 2)
+            pygame.draw.line(surf, (110, 45, 2), p1, p2, 2)
+
             points = np.array([
                 vec(-1.25, -1),
                 vec(1.5, -1),
@@ -168,6 +174,5 @@ class Minimap(pygame.sprite.Sprite):
                     pygame.draw.rect(surf, (0, 0, 0), [x, y + 2 + math.sin(3 * self.angle + x / 2) * 0.5 - 1, 2, 2])
                     pygame.draw.rect(surf, (0, 0, 0) if i else (255, 255, 255), [x, y + math.sin(3 * self.angle + x / 2) * 0.5 - 1, 2, 2])
                 i = not i
-            # pygame.draw.polygon(surf, (255, 0, 0), points)
 
         self.screen.blit(surf, self.rect)
