@@ -96,8 +96,6 @@ class Bullet(pygame.sprite.Sprite):
             if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.jump_height) - abs(self.shadow_height.y)) < 4:
                 # self.game.player.knockback(self.vel * self.speed * 40)
                 self.game.player.health -= self.damage
-                if self.game.player.health <= 0:
-                    self.game.player.death()
                 self.game.screen_shake.start(10, 10)
                 for i in range(random.randint(3, 3)):
                     Spark(

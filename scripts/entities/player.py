@@ -74,6 +74,7 @@ class Player(pygame.sprite.Sprite):
         self.death_timer = Timer(FPS * 2, 1)
         self.death_timer.t = self.death_timer.end
         self.death_timer.finished = True
+        self.dead = False
 
         self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
@@ -233,16 +234,25 @@ class Player(pygame.sprite.Sprite):
                         self.vel.x = 0
 
     def death(self):
-        for i in range(8):
-            a = (i/4) * math.pi
-            Death_Particle(self.game, [self.game.all_sprites, self.game.particles], self.pos, a)
+        if self.dead:
+            return
+        
+        self.dead = True
         self.death_timer.reset()
         self.fallen = False
 
+        for i in range(8):
+            a = (i/4) * math.pi
+            Death_Particle(self.game, [self.game.all_sprites, self.game.particles], self.pos, a)
+            
+
     def update(self):
         self.move()
+        
+        if self.health <= 0:
+            self.death()
 
-        if not self.fallen and self.death_timer.finished:
+        if not self.fallen and self.death_timer.finished: #self.fallen represents being in lava
             self.mouse_inputs()
         
         if not self.death_timer.finished:
@@ -251,6 +261,7 @@ class Player(pygame.sprite.Sprite):
                 self.pos = vec(WIDTH/2 - self.max_size/2, HEIGHT/2 - self.max_size/2 + TILE_SIZE * 5)
                 self.change_size(self.max_size)
                 self.health = self.max_health
+                self.dead = False
 
         self.energy_refill_timer.update()
         if self.energy_refill_timer.finished:
