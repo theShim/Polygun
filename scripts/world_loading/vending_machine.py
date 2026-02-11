@@ -40,16 +40,42 @@ class VendingMachine(pygame.sprite.Sprite):
         self.shadow = pygame.mask.from_surface(shadow).to_surface(setcolor=(0, 0, 0, 200), unsetcolor=(0, 0, 0, 0))
 
         self.hitbox = pygame.Rect(self.target_pos.x - self.surf.width/2, self.target_pos.y - self.surf.height / 3, self.surf.width, self.surf.height / 2)
-
         self.just_landed = False
 
+        self.interact_button = pygame.Surface((40, 45), pygame.SRCALPHA)
+        pygame.draw.rect(self.interact_button, (0, 0, 0), [0, 5, 40, 40], border_radius=4)
+        pygame.draw.rect(self.interact_button, (255, 255, 255), [0, 0, 40, 40], border_radius=4)
+        self.render_interact_flag = False
+
     def collisions(self):
+        self.render_interact_flag = False
+
         if self.just_landed:
             player = self.game.player
             hitbox = pygame.Rect(player.pos.x - player.size/2, player.pos.y - player.size/2, player.size, player.size)
             if self.hitbox.colliderect(hitbox):
                 player.health = 0
-        # pygame.draw.rect(self.screen, (255, 0, 0), [*(self.hitbox.topleft - self.game.offset), *self.hitbox.size])
+
+        else:
+            player = self.game.player
+            hitbox = pygame.Rect(player.pos.x - player.size/2, player.pos.y - player.size/2, player.size, player.size)
+            if self.hitbox.colliderect(hitbox):
+                if player.pos.y - player.size / 2 < self.hitbox.bottom and player.vel.y < 0:
+                    player.pos.y = self.hitbox.bottom + player.size / 2
+                    player.vel.y = 0
+                elif player.pos.y + player.size / 2 > self.hitbox.top and player.vel.y > 0:
+                    player.pos.y = self.hitbox.top - player.size / 2
+                    player.vel.y = 0
+
+                elif player.pos.x - player.size / 2 < self.hitbox.right and player.vel.x < 0:
+                    player.pos.x = self.hitbox.right + player.size / 2
+                    player.vel.x = 0
+                elif player.pos.x + player.size / 2 > self.hitbox.left and player.vel.x > 0:
+                    player.pos.x = self.hitbox.left - player.size / 2
+                    player.vel.x = 0
+
+            if vec(self.hitbox.center).distance_to(player.pos) < 100:
+                self.render_interact_flag = True
 
 
     def update(self):
@@ -89,3 +115,6 @@ class VendingMachine(pygame.sprite.Sprite):
 
         if self.lights2on:
             self.game.emissive_surf.blit(self.lights2, self.surf.get_rect(midbottom=self.pos - self.game.offset))
+
+        if self.render_interact_flag:
+            self.screen.blit(self.interact_button, self.surf.get_rect(center=self.pos - self.game.offset))

@@ -146,7 +146,10 @@ class Minimap(pygame.sprite.Sprite):
 
         surf = self.surf.copy()
 
-        player_pos = self.surf_coords[self.game.state_loader.current_state.get_current_room().pos]
+        try: #preventing bug for if the room does not have a valid room for the tilemap
+            player_pos = self.surf_coords[self.game.state_loader.current_state.get_current_room().pos]
+        except:
+            pass
         points += player_pos + vec(self.pxsize * 4, self.pxsize * 3)
         pygame.draw.polygon(surf, (0, 255 - 100, 247 - 100), points + vec(1, 2))
         pygame.draw.polygon(surf, (0, 255, 247), points)

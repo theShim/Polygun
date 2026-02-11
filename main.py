@@ -86,7 +86,7 @@ class Game:
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
-        self.state_loader = State_Loader(self, start="dungeon")
+        self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
