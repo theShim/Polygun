@@ -14,6 +14,7 @@ import numpy as np
 
 from scripts.entities.player import Player
 from scripts.entities.silver import Silver
+from scripts.entities.powerups import PowerUp
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.energy_bar import EnergyBar
 from scripts.gui.cursor import Cursor
@@ -21,6 +22,7 @@ from scripts.shaders.shader import Shader_Handler
 from scripts.states.state_loader import State_Loader
 from scripts.controls.controller_handler import ControlsHandler
 from scripts.world_loading.tilemap import Tile
+from scripts.world_loading.vending_machine import VendingMachine
 from scripts.utils.screen_effects import Screen_Shake
 
 from scripts.config.SETTINGS import *
@@ -95,6 +97,7 @@ class Game:
 
         self.surf = pygame.Surface((100, 100))
         self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
+        VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))
 
     @property
     def mousePos(self) -> vec:
@@ -203,7 +206,7 @@ class Game:
         EnergyBar.cache_sprites()
         Cursor.cache_sprites()
         Silver.cache_sprites()
-        # Player.cache_sprites()
+        PowerUp.cache_sprites()
 
     def calculate_offset(self):
         #have the screen offset kinda lerp to the player location

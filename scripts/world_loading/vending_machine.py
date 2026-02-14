@@ -51,7 +51,7 @@ class VendingMachine(pygame.sprite.Sprite):
         self.font.render(self.interact_button, "E", (49, 56, 123), (self.interact_button.width/2 - self.font.space_width/2, self.interact_button.height/2 - self.font.space_height/2 + 2))
         self.button_siner = 0
 
-        self.game.possible_powerups += [PowerUp(self.game, [], "gui") for i in range(3)]
+        self.game.possible_powerups += [PowerUp(self.game, [], "gui", a_offset=((i/3) * 2*math.pi)) for i in range(3)]
 
     def collisions(self):
         self.render_interact_flag = False
@@ -104,6 +104,8 @@ class VendingMachine(pygame.sprite.Sprite):
             self.lights2on = not self.lights2on
 
         self.collisions()
+        if self.just_landed:
+            self.game.music_player.play("vending_machine_fall", pool="sfx", loop=False)
         self.just_landed = False
 
         if self.render_interact_flag:

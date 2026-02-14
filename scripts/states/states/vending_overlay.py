@@ -10,7 +10,7 @@ from scripts.gui.custom_fonts import Custom_Font
 from scripts.states.state_loader import State
 from scripts.gui.cursor import Cursor
 
-from scripts.config.SETTINGS import WIDTH, HEIGHT
+from scripts.config.SETTINGS import WIDTH, HEIGHT, SIZE
 from scripts.utils.CORE_FUNCS import vec
 
     ##############################################################################################
@@ -27,12 +27,21 @@ class Vending_Overlay(State):
 
         self.radius = (WIDTH/2) * 1.1
         
+        self.shadow = pygame.Surface((WIDTH * 0.50, HEIGHT), pygame.SRCALPHA)
+        for x in range(self.shadow.width):
+            pygame.draw.line(self.shadow, (0, 0, 0, 255 * (1 - (x/self.shadow.width))), (x, 0), (x, self.shadow.height))
+        self.shadow_pos = vec(-WIDTH, 0)
+        
     def update(self):
         self.prev.update()
         
         self.radius *= 0.9 if self.active else (1 / 0.9)
         self.game.gui_surf.fill((44 - 30, 46 - 30, 95 - 30))
         pygame.draw.circle(self.screen, (0, 0, 0, 0), vec(WIDTH, HEIGHT)/2, self.radius)
+        
+        self.shadow_pos = self.shadow_pos.lerp(vec(), 0.1)
+        self.screen.blit(self.shadow, self.shadow_pos)
+        self.screen.blit(self.shadow, self.shadow_pos)
 
         if not self.active:
             if self.radius >= (WIDTH/2) * 1:
@@ -47,7 +56,9 @@ class Vending_Overlay(State):
             self.active = False
             self.radius = 1
 
-        self.cursor.update()
-
         for pow_up in self.game.possible_powerups:
+            if not self.active:
+                pow_up.external_offset += (pow_up.external_offset) / 2
             pow_up.update()
+
+        self.cursor.update()

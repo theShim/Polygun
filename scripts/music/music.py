@@ -16,5 +16,6 @@ SOUNDS = {
     "gunshot" : Sound("audio/gun.mp3"),
     "nujabes" : Sound("audio/test2.mp3"),
     "main_menu" : Sound("audio/main_menu.mp3"),
-    "exit_portal_activate" : Sound("audio/exit_portal_activation.mp3")
+    "exit_portal_activate" : Sound("audio/exit_portal_activation.mp3"),
+    "vending_machine_fall" : Sound("audio/vending_machine_fall.mp3")
 }

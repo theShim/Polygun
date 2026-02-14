@@ -110,7 +110,6 @@ class DungeonLevel:
         for node in self.rooms:
             room = self.rooms[node]
             room.vending_room = random.randint(1, 2) == 1 and not (room.start_room or room.exit_room)
-            if room.vending_room: print(node)
 
     def generate_boss_room(self):
         leaves = self.get_leaves()
