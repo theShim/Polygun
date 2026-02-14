@@ -83,10 +83,11 @@ class Game:
         self.bosses = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
         self.gui_elements = pygame.sprite.Group()
+        self.possible_powerups = []
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
-        self.state_loader = State_Loader(self, start="title_screen")
+        self.state_loader = State_Loader(self, start="dungeon")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
@@ -95,7 +96,7 @@ class Game:
 
         self.surf = pygame.Surface((100, 100))
         self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
-        VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))
+        # VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))/
 
     @property
     def mousePos(self) -> vec:
@@ -147,7 +148,7 @@ class Game:
         # self.original_viewport = [i for i in self.ctx.viewport]
 
         #extra fbo for gui elements since the lighting messes it up
-        self.gui_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
+        self.gui_surf = pygame.Surface(SIZE, pygame.SRCALPHA).convert_alpha()
         self.gui_tex = self.ctx.texture(SIZE, 4)
         self.gui_tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
         self.gui_tex.swizzle = "BGRA"

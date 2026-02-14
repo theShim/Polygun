@@ -6,8 +6,8 @@ with contextlib.redirect_stdout(None):
 import random
 import math
 
-# from scripts.world_loading.tiles import Tile
-# from scripts.world_loading.nature.manager import Nature_Manager
+from scripts.gui.custom_fonts import Custom_Font, Font
+from scripts.entities.powerups import PowerUp
 
 from scripts.utils.CORE_FUNCS import vec, Timer
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
@@ -19,6 +19,7 @@ class VendingMachine(pygame.sprite.Sprite):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
+        self.font = Font("assets/fonts/nea_font.png", scale=1.75)
 
         self.o_pos = vec(pos) + vec(0, -HEIGHT * 2)
         self.target_pos = vec(pos)
@@ -42,10 +43,15 @@ class VendingMachine(pygame.sprite.Sprite):
         self.hitbox = pygame.Rect(self.target_pos.x - self.surf.width/2, self.target_pos.y - self.surf.height / 3, self.surf.width, self.surf.height / 2)
         self.just_landed = False
 
-        self.interact_button = pygame.Surface((40, 45), pygame.SRCALPHA)
-        pygame.draw.rect(self.interact_button, (0, 0, 0), [0, 5, 40, 40], border_radius=4)
-        pygame.draw.rect(self.interact_button, (255, 255, 255), [0, 0, 40, 40], border_radius=4)
+        self.interact_button = pygame.Surface((30, 35), pygame.SRCALPHA)
+        pygame.draw.rect(self.interact_button, (75, 81, 115), [0, 5, 30, 30], border_radius=4)
+        pygame.draw.rect(self.interact_button, (105 - 20, 153 - 20, 251 - 20), [0, 0, 30, 30], border_radius=4)
         self.render_interact_flag = False
+        self.interact_button_size = 0.0
+        self.font.render(self.interact_button, "E", (49, 56, 123), (self.interact_button.width/2 - self.font.space_width/2, self.interact_button.height/2 - self.font.space_height/2 + 2))
+        self.button_siner = 0
+
+        self.game.possible_powerups += [PowerUp(self.game, [], "gui") for i in range(3)]
 
     def collisions(self):
         self.render_interact_flag = False
@@ -57,6 +63,9 @@ class VendingMachine(pygame.sprite.Sprite):
                 player.health = 0
 
         else:
+            if self.t < 1:
+                return
+            
             player = self.game.player
             hitbox = pygame.Rect(player.pos.x - player.size/2, player.pos.y - player.size/2, player.size, player.size)
             if self.hitbox.colliderect(hitbox):
@@ -74,7 +83,7 @@ class VendingMachine(pygame.sprite.Sprite):
                     player.pos.x = self.hitbox.left - player.size / 2
                     player.vel.x = 0
 
-            if vec(self.hitbox.center).distance_to(player.pos) < 100:
+            if vec(self.hitbox.center).distance_to(player.pos) < 80:
                 self.render_interact_flag = True
 
 
@@ -92,10 +101,28 @@ class VendingMachine(pygame.sprite.Sprite):
         if self.flicker_timer.finished:
             self.flicker_timer.change_speed(random.randint(1, 5))
             self.flicker_timer.reset()
-            self.lights2on = not self.lights2on#
+            self.lights2on = not self.lights2on
 
         self.collisions()
         self.just_landed = False
+
+        if self.render_interact_flag:
+            self.interact_button_size += (1 - self.interact_button_size) * 0.25
+            if self.interact_button_size > 0.995:
+                self.interact_button_size = 1
+
+            if pygame.key.get_just_pressed()[pygame.K_e] and self.game.player.active:
+                current_state = self.game.state_loader.current_state
+                self.game.state_loader.add_state(self.game.state_loader.get_state("vending"))
+                self.game.state_loader.current_state.prev = current_state
+                self.game.player.toggle_active()
+            
+        else:
+            self.interact_button_size += (0 - self.interact_button_size) * 0.25
+            if self.interact_button_size < 0.005:
+                self.interact_button_size = 0
+
+        self.button_siner += math.radians(4)
 
         self.draw()
 
@@ -116,5 +143,7 @@ class VendingMachine(pygame.sprite.Sprite):
         if self.lights2on:
             self.game.emissive_surf.blit(self.lights2, self.surf.get_rect(midbottom=self.pos - self.game.offset))
 
-        if self.render_interact_flag:
-            self.screen.blit(self.interact_button, self.surf.get_rect(center=self.pos - self.game.offset))
+        if self.interact_button_size > 0.05:
+            button = pygame.transform.scale_by(self.interact_button, self.interact_button_size) if self.interact_button_size < 1 else self.interact_button
+            self.game.gui_surf.blit(button, button.get_rect(center=self.surf.get_rect(midbottom=self.pos - self.game.offset + vec(0, math.sin(self.button_siner) * 2 + 10)).center))
+            self.game.emissive_surf.blit(button, button.get_rect(center=self.surf.get_rect(midbottom=self.pos - self.game.offset + vec(0, math.sin(self.button_siner) * 2 + 10)).center))

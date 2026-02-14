@@ -131,11 +131,12 @@ class Room:
         self.parent_level = parent_level
         self.tilemap = Tilemap(self.game, self)
 
-        self.wave_stack: list[list[EnemySpawnData]] = [
-            [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 4)],
-            [EnemySpawnData(Enemy.Pentagon, 1), EnemySpawnData(Enemy.Hexagon, 1)],
-            [EnemySpawnData(Enemy, 2)],
-        ]
+        self.wave_stack: list[list[EnemySpawnData]] = self.generate_wave_stack()
+        # [
+        #     [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 4)],
+        #     [EnemySpawnData(Enemy.Pentagon, 1), EnemySpawnData(Enemy.Hexagon, 1)],
+        #     [EnemySpawnData(Enemy, 2)],
+        # ]
         self.max_waves = len(self.wave_stack)
 
         self.enemies_to_kill = pygame.sprite.Group()
@@ -148,6 +149,30 @@ class Room:
         self.exit_portal_spawned = True
         ExitPortal(self.game, [self.game.all_sprites], [self.pos[0] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2, self.pos[1] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2])
 
+
+    def generate_wave_stack(self) -> list[list[EnemySpawnData]]:
+        dungeon_level = self.parent_level.parent_dungeon.current_level_index
+        difficulty = dungeon_level + 1
+
+        wave_stack = []
+        num_waves = 1 + (dungeon_level // 2)
+
+        for i in range(num_waves):
+            budget = int(4 + 2 * (difficulty ** 1.2)) + i * 2
+            
+            remaining = budget
+            to_spawn = {}
+
+            while remaining > 0:
+                enemy_type = random.choices([Enemy, Enemy.Pentagon, Enemy.Hexagon], [10, 2, 1], k=1)[0]
+                cost = EnemySpawnData.COSTS[enemy_type]
+                
+                if cost <= remaining:
+                    to_spawn[enemy_type] = to_spawn.get(enemy_type, 0) + 1
+                    remaining -= cost
+            
+            wave_data = [EnemySpawnData(e_type, count) for e_type, count in to_spawn.items()]
+            wave_stack.append(wave_data)
         
     def spawn_wave(self):
         if not self.wave_stack:

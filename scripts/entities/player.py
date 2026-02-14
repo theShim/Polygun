@@ -70,6 +70,7 @@ class Player(pygame.sprite.Sprite):
         self.energy_refill_timer = Timer(FPS, 1)
         self.silver = 0 #silver cuz bullet casing looked too similar to gold or yellow coins
         self.pickup_radius = 100 #remains and money
+        self.active = True
 
         self.death_timer = Timer(FPS * 2, 1)
         self.death_timer.t = self.death_timer.end
@@ -244,33 +245,36 @@ class Player(pygame.sprite.Sprite):
         for i in range(8):
             a = (i/4) * math.pi
             Death_Particle(self.game, [self.game.all_sprites, self.game.particles], self.pos, a)
+
+    def toggle_active(self):
+        self.active = not self.active
             
-
     def update(self):
-        self.move()
-        
-        if self.health <= 0:
-            self.death()
+        if self.active:
+            self.move()
+            
+            if self.health <= 0:
+                self.death()
 
-        if not self.fallen and self.death_timer.finished: #self.fallen represents being in lava
-            self.mouse_inputs()
-        
-        if not self.death_timer.finished:
-            self.death_timer.update()
-            if self.death_timer.finished:
-                self.pos = vec(WIDTH/2 - self.max_size/2, HEIGHT/2 - self.max_size/2 + TILE_SIZE * 5)
-                self.change_size(self.max_size)
-                self.health = self.max_health
-                self.dead = False
+            if not self.fallen and self.death_timer.finished: #self.fallen represents being in lava
+                self.mouse_inputs()
+            
+            if not self.death_timer.finished:
+                self.death_timer.update()
+                if self.death_timer.finished:
+                    self.pos = vec(WIDTH/2 - self.max_size/2, HEIGHT/2 - self.max_size/2 + TILE_SIZE * 5)
+                    self.change_size(self.max_size)
+                    self.health = self.max_health
+                    self.dead = False
 
-        self.energy_refill_timer.update()
-        if self.energy_refill_timer.finished:
-            self.energy_refill_timer.reset()
-            self.energy += 0.5
-        self.energy = min(self.energy, self.max_energy)
+            self.energy_refill_timer.update()
+            if self.energy_refill_timer.finished:
+                self.energy_refill_timer.reset()
+                self.energy += 0.5
+            self.energy = min(self.energy, self.max_energy)
 
-        # if pygame.key.get_just_pressed()[pygame.K_SPACE]:
-        #     self.energy = 10
+            # if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+            #     self.energy = 10
 
         self.shader_draw()
 

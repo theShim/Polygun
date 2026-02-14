@@ -467,6 +467,12 @@ Enemy.Pentagon = Pentagon
     ##############################################################################################
 
 class EnemySpawnData:
+    COSTS = {
+        Enemy : 1,
+        Enemy.Pentagon : 4,
+        Enemy.Hexagon : 5,
+    }
+
     def __init__(self, enemy_class, count):
         self.enemy_class = enemy_class
         self.count = count

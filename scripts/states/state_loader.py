@@ -35,6 +35,7 @@ class State_Loader:
         from scripts.states.states.controllers import Controllers_GUI
         from scripts.states.states.keyboard import Keyboard_GUI
         from scripts.states.states.transition import TransitionIn
+        from scripts.states.states.vending_overlay import Vending_Overlay
 
         self.states = {
             "transition" : TransitionIn,
@@ -44,6 +45,7 @@ class State_Loader:
             "settings" : Settings(self.game),
             "controllers_gui" : Controllers_GUI(self.game),
             "keyboard_gui" : Keyboard_GUI(self.game),
+            "vending" : Vending_Overlay(self.game),
         }
 
         #adding the first state

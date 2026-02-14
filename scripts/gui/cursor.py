@@ -31,7 +31,7 @@ class Cursor(pygame.sprite.Sprite):
         self.state = "base"
 
     def update(self):
-        if not self.game.state_loader.current_state.name in {"title_screen", "settings", "controllers_gui", "keyboard_gui"}:
+        if not self.game.state_loader.current_state.name in {"title_screen", "settings", "controllers_gui", "keyboard_gui", "vending"}:
             return
         
         if any([hasattr(b, "hovered") and b.hovered for b in self.game.state_loader.current_state.buttons]):
