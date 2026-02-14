@@ -10,9 +10,10 @@ from scripts.entities.tesseract import Tesseract
 from scripts.gui.minimap import Minimap
 from scripts.world_loading.exit_portal import ExitPortal
 from scripts.world_loading.tilemap import Tilemap
+from scripts.world_loading.vending_machine import VendingMachine
 
 from scripts.utils.CORE_FUNCS import vec
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE, SIZE
 
     ##############################################################################################
 
@@ -91,6 +92,7 @@ class DungeonLevel:
 
         self.generate_start_room()
         self.generate_exit_room()
+        self.choose_vending_rooms()
 
     def generate_start_room(self):
         self.rooms[(0, 0)].start_room = True
@@ -103,6 +105,12 @@ class DungeonLevel:
         
         # self.rooms[(0, 0)].exit_room = True
         # self.exit_room = self.rooms[(0, 0)]
+
+    def choose_vending_rooms(self):
+        for node in self.rooms:
+            room = self.rooms[node]
+            room.vending_room = random.randint(1, 2) == 1 and not (room.start_room or room.exit_room)
+            if room.vending_room: print(node)
 
     def generate_boss_room(self):
         leaves = self.get_leaves()
@@ -125,6 +133,8 @@ class Room:
         self.start_room = False
         self.exit_room = False
         self.exit_portal_spawned = False
+        self.vending_room = False
+        self.vending_machine_spawned = False
         self.temp = True
 
         self.pos = pos
@@ -144,6 +154,13 @@ class Room:
 
         self.exit_portal_spawned = True
         ExitPortal(self.game, [self.game.all_sprites], [self.pos[0] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2, self.pos[1] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2])
+
+    def spawn_vending_machine(self):
+        if not self.vending_room: return
+        if self.vending_machine_spawned: return
+
+        self.vending_machine_spawned = True
+        VendingMachine(self.game, [self.game.all_sprites], [self.pos[0] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2, self.pos[1] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2])
 
 
     def generate_wave_stack(self) -> list[list[EnemySpawnData]]:
@@ -262,3 +279,4 @@ class Room:
 
         elif self.state == Room.CLEARED:
             self.spawn_exit_portal()
+            self.spawn_vending_machine()
