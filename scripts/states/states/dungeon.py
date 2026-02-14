@@ -26,8 +26,8 @@ class Dungeon(State):
         super().__init__(game, "dungeon", prev)
         # # self.game.player.rect.center = [100, -50]
 
-        self.levels: list[DungeonLevel] = [DungeonLevel(self.game, self) for _ in range(self.LEVEL_NUM)]
         self.current_level_index = 0
+        self.levels: list[DungeonLevel] = [DungeonLevel(self.game, self, level_no=i) for i in range(self.LEVEL_NUM)]
 
         self.last_available_room = None
 

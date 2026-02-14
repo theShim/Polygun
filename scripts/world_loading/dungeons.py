@@ -59,12 +59,13 @@ def generate_path(min_length=5, max_length=10):
 
 
 class DungeonLevel:
-    def __init__(self, game, parent):
+    def __init__(self, game, parent, level_no=0):
         self.game = game
         self.parent_dungeon = parent
 
         self.rooms: dict[tuple, Room] = {}
         self.conns: dict[tuple, list[tuple]] = {}
+        self.level_no = level_no
 
         self.current_room = None
         self.start_room: Room = None
@@ -83,7 +84,7 @@ class DungeonLevel:
         self.conns = conns
 
         for node in nodes:
-            self.rooms[node] = Room(self.game, node, conns[node], self, node == (0, 0))
+            self.rooms[node] = Room(self.game, node, conns[node], self)
         for node in nodes:
            self.rooms[node].tilemap.auto_tile()
            self.rooms[node].tilemap.lava_region_dfs()
@@ -117,12 +118,12 @@ class Room:
     PLAYER_FIGHTING = 1
     CLEARED = 2
 
-    def __init__(self, game, pos, conns, parent_level, start_room = False, exit_room = False):
+    def __init__(self, game, pos, conns, parent_level):
         self.game = game
 
         self.state = Room.UNENTERED
-        self.start_room = start_room
-        self.exit_room = exit_room
+        self.start_room = False
+        self.exit_room = False
         self.exit_portal_spawned = False
         self.temp = True
 
@@ -132,11 +133,6 @@ class Room:
         self.tilemap = Tilemap(self.game, self)
 
         self.wave_stack: list[list[EnemySpawnData]] = self.generate_wave_stack()
-        # [
-        #     [EnemySpawnData(Enemy, 4), EnemySpawnData(Enemy, 4)],
-        #     [EnemySpawnData(Enemy.Pentagon, 1), EnemySpawnData(Enemy.Hexagon, 1)],
-        #     [EnemySpawnData(Enemy, 2)],
-        # ]
         self.max_waves = len(self.wave_stack)
 
         self.enemies_to_kill = pygame.sprite.Group()
@@ -151,28 +147,48 @@ class Room:
 
 
     def generate_wave_stack(self) -> list[list[EnemySpawnData]]:
-        dungeon_level = self.parent_level.parent_dungeon.current_level_index
+        dungeon_level = self.parent_level.level_no
         difficulty = dungeon_level + 1
 
         wave_stack = []
-        num_waves = 1 + (dungeon_level // 2)
+        num_waves = 1 + (dungeon_level)
 
         for i in range(num_waves):
-            budget = int(4 + 2 * (difficulty ** 1.2)) + i * 2
+            budget = int(4 + 4 * (difficulty ** 1.2)) + i * 2
             
             remaining = budget
             to_spawn = {}
 
             while remaining > 0:
-                enemy_type = random.choices([Enemy, Enemy.Pentagon, Enemy.Hexagon], [10, 2, 1], k=1)[0]
+                enemy_type = random.choices(
+                    [
+                        Enemy, Enemy.Pentagon, Enemy.Hexagon
+                    ], 
+                    [
+                        2 * (difficulty - 1) * EnemySpawnData.COSTS[Enemy] + 10, 
+                        2 * (difficulty - 1) * EnemySpawnData.COSTS[Enemy.Pentagon] + 2, 
+                        2 * (difficulty - 1) * EnemySpawnData.COSTS[Enemy.Hexagon] + 1
+                    ], 
+                    k=1
+                )[0]
                 cost = EnemySpawnData.COSTS[enemy_type]
                 
                 if cost <= remaining:
                     to_spawn[enemy_type] = to_spawn.get(enemy_type, 0) + 1
                     remaining -= cost
+
+            wave_data = []
+            for e_type, count in to_spawn.items():
+                remaining = count
+
+                while remaining > 0:
+                    n = random.randint(3, 4)
+                    group_size = min(n, remaining)
+                    wave_data.append(EnemySpawnData(e_type, group_size))
+                    remaining -= group_size
             
-            wave_data = [EnemySpawnData(e_type, count) for e_type, count in to_spawn.items()]
             wave_stack.append(wave_data)
+        return wave_stack
         
     def spawn_wave(self):
         if not self.wave_stack:
