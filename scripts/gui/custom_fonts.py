@@ -22,7 +22,7 @@ class Font:
     def __init__(self, path, scale=1):
         self.spacing = 1 #distance between characters
         self.spacing *= scale if scale >= 1 else (1/scale)
-        self.character_order = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','.','-',',',':','+','\'','!','?','0','1','2','3','4','5','6','7','8','9','(',')','/','_','=','\\','[',']','*','"','<','>',';']
+        self.character_order = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','.','-',',',':','+','\'','!','?','0','1','2','3','4','5','6','7','8','9','%','●','(',')','/','_','=','\\','[',']','*','"','<','>',';']
 
         #accessing the image containing the font characters
         font_img = pygame.image.load(path).convert_alpha()
