@@ -8,6 +8,7 @@ import math
 
 from scripts.gui.custom_fonts import Custom_Font, Font
 from scripts.entities.powerups import PowerUp
+from scripts.particles.wind import Wind_Particle
 
 from scripts.utils.CORE_FUNCS import vec, Timer
 from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
@@ -51,7 +52,11 @@ class VendingMachine(pygame.sprite.Sprite):
         self.font.render(self.interact_button, "E", (49, 56, 123), (self.interact_button.width/2 - self.font.space_width/2, self.interact_button.height/2 - self.font.space_height/2 + 2))
         self.button_siner = 0
 
-        self.game.possible_powerups += [PowerUp(self.game, [], "gui", a_offset=((i/3) * 2*math.pi)) for i in range(3)]
+        self.used = False
+        self.used_vel = 0
+        self.used_timer = Timer(FPS, 1)
+        self.used_shadow_t = 1
+        self.game.possible_powerups = [PowerUp(self.game, [], "gui", parent=self, a_offset=((i/3) * 2*math.pi)) for i in range(3)]
 
     def collisions(self):
         self.render_interact_flag = False
@@ -61,6 +66,9 @@ class VendingMachine(pygame.sprite.Sprite):
             hitbox = pygame.Rect(player.pos.x - player.size/2, player.pos.y - player.size/2, player.size, player.size)
             if self.hitbox.colliderect(hitbox):
                 player.health = 0
+        
+        elif self.used:
+            pass
 
         else:
             if self.t < 1:
@@ -88,12 +96,20 @@ class VendingMachine(pygame.sprite.Sprite):
 
 
     def update(self):
+        if self.used:
+            a = random.uniform(0, 2*math.pi)
+            Wind_Particle(self.game, [self.game.all_sprites, self.game.particles], self.pos + vec(math.cos(a), math.sin(a)) * 4, vec(random.uniform(-2, 2), random.uniform(1, 5)), (41, 201, 255))
+            self.used_timer.update()
+            if self.used_timer.finished:
+                self.used_vel += 1.5 * self.game.dt
+                self.pos.y -= self.used_vel
+
         if self.t < 1:
             self.t += 0.4 * self.game.dt
             self.t = min(1, self.t)
             self.pos = self.o_pos.lerp(self.target_pos, 2 ** (10 * self.t - 10))
             if self.t == 1:
-                self.pos = self.target_pos
+                self.pos = self.target_pos.copy()
                 self.game.screen_shake.start(30, 15, 0.99)
                 self.just_landed = True
 
@@ -117,6 +133,7 @@ class VendingMachine(pygame.sprite.Sprite):
                 current_state = self.game.state_loader.current_state
                 self.game.state_loader.add_state(self.game.state_loader.get_state("vending"))
                 self.game.state_loader.current_state.prev = current_state
+                self.game.state_loader.current_state.active = True
                 self.game.player.toggle_active()
             
         else:
@@ -135,7 +152,12 @@ class VendingMachine(pygame.sprite.Sprite):
             t = a * t + (1-a)
             shadow = pygame.transform.scale_by(self.shadow, t)
             self.screen.blit(shadow, shadow.get_rect(midbottom=self.target_pos - self.game.offset + vec(-8, -5)))
-
+        elif self.used:
+            self.used_shadow_t *= 0.995
+            if self.used_shadow_t < 0.2: #acts as an exit flag too
+                return self.kill()
+            shadow = pygame.transform.scale_by(self.shadow, self.used_shadow_t)
+            self.screen.blit(shadow, shadow.get_rect(midbottom=self.target_pos - self.game.offset + vec(-2, 8)))
         else:
             self.screen.blit(self.shadow, self.surf.get_rect(midbottom=self.target_pos - self.game.offset + vec(-8, -5)))
 

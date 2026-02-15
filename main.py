@@ -97,7 +97,7 @@ class Game:
 
         self.surf = pygame.Surface((100, 100))
         self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
-        VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))
+        # VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))
 
     @property
     def mousePos(self) -> vec:

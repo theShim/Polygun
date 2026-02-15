@@ -39,7 +39,7 @@ class Vending_Overlay(State):
         self.game.gui_surf.fill((44 - 30, 46 - 30, 95 - 30))
         pygame.draw.circle(self.screen, (0, 0, 0, 0), vec(WIDTH, HEIGHT)/2, self.radius)
         
-        self.shadow_pos = self.shadow_pos.lerp(vec(), 0.1)
+        self.shadow_pos = self.shadow_pos.lerp(vec(0 if self.active else -WIDTH, 0), 0.1 if self.active else 0.02)
         self.screen.blit(self.shadow, self.shadow_pos)
         self.screen.blit(self.shadow, self.shadow_pos)
 
@@ -56,9 +56,14 @@ class Vending_Overlay(State):
             self.active = False
             self.radius = 1
 
-        for pow_up in self.game.possible_powerups:
-            if not self.active:
-                pow_up.external_offset += (pow_up.external_offset) / 2
-            pow_up.update()
+        if self.game.possible_powerups:
+            for pow_up in self.game.possible_powerups:
+                if not self.active:
+                    pow_up.external_offset += (pow_up.external_offset) / 2
+                pow_up.update()
+        else:
+            if self.active:
+                self.active = False
+                self.radius = 1
 
         self.cursor.update()

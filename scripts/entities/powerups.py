@@ -56,11 +56,12 @@ class PowerUp(pygame.sprite.Sprite):
             img = pygame.image.load(path + filename).convert_alpha()
             cls.SPRITES[filename.split(".")[0]] = img
 
-    def __init__(self, game, groups, mode, a_offset=0):
+    def __init__(self, game, groups, mode, parent, a_offset=0):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen if mode != "gui" else self.game.gui_surf
         self.mode = mode
+        self.parent = parent #vending machine object
         self.font1 = Custom_Font.font2_5
         self.font2 = Custom_Font.font1_5
 
@@ -102,6 +103,11 @@ class PowerUp(pygame.sprite.Sprite):
         self.hover = self.game.mousePos.distance_to(self.pos + vec(self.surf.size)/2) < self.radius
 
         if self.hover:
+            if pygame.mouse.get_just_pressed()[0]:
+                self.mode = "powerup"
+                self.game.possible_powerups = []
+                self.parent.used = True
+
             self.hover_offset += (-20 - self.hover_offset) * 0.2
             self.font1.render(self.screen, self.info["name"], (255, 255, 255), (40, 70))
             
