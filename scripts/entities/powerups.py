@@ -18,17 +18,24 @@ POWER_UP_INFO = {
     "double_rounds" : {
         "name" : "Double Rounds",
         "description" : "Because once was so nice, you had to do it twice.",
-        "effects" : ["x2 bullets for 30 seconds"]
+        "effects" : ["x2 bullets for 30 seconds"],
+        "cost" : 16,
+        "type" : "timed",
+        "duration" : FPS * 30,
     },
     "crowbar" : {
         "name" : "Crowbar",
         "description" : "Blunt force trauma is a great way to meet new people.",
-        "effects" : [r"+75% damage to enemies above 90% health"]
+        "effects" : [r"+75% damage to enemies above 90% health"],
+        "cost" : 35,
+        "type" : "permanent",
     },
     "steak" : {
         "name" : "Steak",
         "description" : "Packed with protein. Possibly made of meat.",
-        "effects" : ["+10 Max HP"]
+        "effects" : ["+10 Max HP"],
+        "cost" : 24,
+        "type" : "consumable",
     }
 }
 
@@ -66,7 +73,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.font2 = Custom_Font.font1_5
 
         self.angle = a_offset + math.pi/6
-        self.angle_offset = 8 * math.pi
+        self.angle_offset = 6 * math.pi
 
         self.radius = 72
         self.surf = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA)
@@ -84,11 +91,36 @@ class PowerUp(pygame.sprite.Sprite):
 
         self.name, img = random.choice(list(self.SPRITES.items()))
         self.surf.blit(img, img.get_rect(center=vec(self.surf.size)/2))
-        self.info = POWER_UP_INFO[self.name]
 
-    def update(self):
+        self.power_surf = pygame.transform.scale_by(self.surf, 0.25)
+        self.power_shadow = pygame.mask.from_surface(self.power_surf).to_surface(setcolor=(0, 0, 0), unsetcolor=(0, 0, 0, 0))
+        self.info = POWER_UP_INFO[self.name]
+        self.type_ = self.info["type"]
+        if self.type_ == "timed":
+            self.timer = Timer(self.info["duration"], 1)
+
+    def update(self, index=0):
         if self.mode == "gui":
-             self.gui_update()
+            self.gui_update()
+
+        elif self.mode == "powerup":
+            self.powerup_update(index)
+
+    def powerup_update(self, index):
+        if self.type_ == "timed":
+            self.timer.update()
+            if self.timer.finished:
+                return self.kill()
+            
+        elif self.type_ == "consumable":
+            if self.name == "steak":
+                self.game.player.max_health += 10
+                return self.kill()
+
+        x = index % 8
+        y = index // 8
+        self.screen.blit(self.power_shadow, self.power_surf.get_rect(bottomright=(WIDTH - 16 + 2 - x * self.power_surf.width * 0.8, HEIGHT - 10 + 2 - y * self.power_surf.height)))
+        self.screen.blit(self.power_surf, self.power_surf.get_rect(bottomright=(WIDTH - 16 - x * self.power_surf.width * 0.8, HEIGHT - 10 - y * self.power_surf.height)))
 
     def gui_update(self):
         a = self.angle + self.angle_offset
@@ -106,6 +138,7 @@ class PowerUp(pygame.sprite.Sprite):
             if pygame.mouse.get_just_pressed()[0]:
                 self.mode = "powerup"
                 self.game.possible_powerups = []
+                self.game.player.item_manager.items.add(self)
                 self.parent.used = True
 
             self.hover_offset += (-20 - self.hover_offset) * 0.2

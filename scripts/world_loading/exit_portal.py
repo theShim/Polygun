@@ -37,6 +37,7 @@ class ExitPortal(pygame.sprite.Sprite):
         if not self.pause_timer.finished: return
         
         if self.activate_sound:
+            self.game.screen_shake.start(60, 25, 0.99)
             self.game.music_player.play("exit_portal_activate", pool="ambient", loop=False)
             self.activate_sound = False
         

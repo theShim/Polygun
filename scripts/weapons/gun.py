@@ -38,7 +38,14 @@ class Gun(pygame.sprite.Sprite):
         Bullet_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
 
     def shoot(self, mouseAngle):
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)
+        spread = random.uniform(-self.bullet_spread, self.bullet_spread)
+        if "double_rounds" in self.game.player.item_manager.current_items:
+            n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8
+            n2 = vec(math.sin(mouseAngle), -math.cos(mouseAngle)) * 8
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)
+        else:
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)
 
     def update(self):
         self.play_sound()

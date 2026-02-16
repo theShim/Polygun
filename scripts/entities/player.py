@@ -13,6 +13,7 @@ from scripts.particles.sparks import Spark
 from scripts.particles.death import Death_Particle
 from scripts.particles.bullet_casing import Bullet_Casing
 from scripts.projectiles.bullet import Bullet
+from scripts.utils.items_manager import Item_Manager
 
 from scripts.weapons.gun import Gun
 from scripts.weapons.spikeball import Spikeball
@@ -50,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.primary = Gun.Shotgun(self.game, [])
+        self.primary = Gun.Rifle(self.game, [])
         self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
         # self.primary = Spikeball(self.game, [], self.pos)
         self.secondary = None
@@ -71,6 +72,7 @@ class Player(pygame.sprite.Sprite):
         self.silver = 0 #silver cuz bullet casing looked too similar to gold or yellow coins
         self.pickup_radius = 100 #remains and money
         self.active = True
+        self.item_manager = Item_Manager(self.game)
 
         self.death_timer = Timer(FPS * 2, 1)
         self.death_timer.t = self.death_timer.end
@@ -275,6 +277,7 @@ class Player(pygame.sprite.Sprite):
 
             # if pygame.key.get_just_pressed()[pygame.K_SPACE]:
             #     self.energy = 10
+        self.item_manager.update()
 
         self.shader_draw()
 

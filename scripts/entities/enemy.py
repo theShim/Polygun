@@ -53,6 +53,7 @@ class Enemy(pygame.sprite.Sprite):
 
         #damage indicator stuff
         self.health = 20
+        self.max_health = 20
         self.knockback_vel = vec()
         self.hurt = False
         self.damage_timer = Timer(4, 1)

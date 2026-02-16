@@ -197,7 +197,7 @@ void main() {
         }
     }
 
-    f_colour = vec4(final_colour, 1.0);
+    f_colour = vec4(vignette(uvs, final_colour), 1.0);
 
     vec4 gui_col = texture(guiTex, uvs);
     if (gui_col.a > 0.0) {
