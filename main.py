@@ -59,7 +59,7 @@ class Game:
         #initalising pygame window
         self.windowed_flags = pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE
         self.fullscrn_flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL | pygame.FULLSCREEN
-        self.window = pygame.display.set_mode(SIZE, self.fullscrn_flags, vsync=1)
+        self.window = pygame.display.set_mode(SIZE, self.windowed_flags, vsync=1)
         self.screen = pygame.Surface(SIZE, pygame.SRCALPHA)
         self.clock = pygame.time.Clock()
         self.offset = vec()

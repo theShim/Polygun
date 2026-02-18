@@ -18,7 +18,7 @@ from scripts.utils.items_manager import Item_Manager
 from scripts.weapons.gun import Gun
 from scripts.weapons.spikeball import Spikeball
 
-from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, GRAV, FRIC, TILE_SIZE, LEVEL_SIZE
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 
     ##############################################################################################
@@ -283,7 +283,7 @@ class Player(pygame.sprite.Sprite):
             if not self.death_timer.finished:
                 self.death_timer.update()
                 if self.death_timer.finished:
-                    self.pos = vec(WIDTH/2 - self.max_size/2, HEIGHT/2 - self.max_size/2 + TILE_SIZE * 5)
+                    self.pos = vec(self.game.state_loader.current_state.get_current_room().pos) * LEVEL_SIZE * TILE_SIZE + vec(TILE_SIZE * LEVEL_SIZE//2, TILE_SIZE * LEVEL_SIZE//2)
                     self.change_size(self.max_size)
                     self.health = self.max_health
                     self.dead = False
