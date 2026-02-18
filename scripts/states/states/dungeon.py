@@ -20,7 +20,7 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
     ##############################################################################################
 
 class Dungeon(State):
-    LEVEL_NUM = 2
+    LEVEL_NUM = 5
 
     def __init__(self, game, prev=None):
         super().__init__(game, "dungeon", prev)

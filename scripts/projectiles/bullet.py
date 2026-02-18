@@ -61,12 +61,17 @@ class Bullet(pygame.sprite.Sprite):
                 
         if self.owner == self.game.player:
             for enemy in self.game.enemies:
-                if enemy.pos.distance_to(self.pos) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
+                if (dist := enemy.pos.distance_to(self.pos)) < enemy.size and (abs(enemy.height) - abs(self.shadow_height.y)) < 4:
                     enemy.knockback(self.vel * self.speed * 40)
                     damage = self.damage
-                    if "crowbar" in self.game.player.item_manager.current_items:
+                    if "crowbar" in (item_counts := self.game.player.item_manager.current_items):
                         if enemy.health / enemy.max_health > 0.9:
-                            damage *= 1.75
+                            damage *= (1.75) ** item_counts["crowbar"]
+                    if "bean_juice" in item_counts:
+                        damage *= (1.075 ** item_counts["bean_juice"])
+                    if "focus_crystal" in item_counts:
+                        if dist < 3 * TILE_SIZE:
+                            damage *= (1.2 ** item_counts["focus_crystal"])
                     enemy.take_hit(damage)
 
                     for i in range(random.randint(3, 3)):
@@ -101,6 +106,7 @@ class Bullet(pygame.sprite.Sprite):
             if self.game.player.pos.distance_to(self.pos) < self.game.player.size and (abs(self.game.player.jump_height) - abs(self.shadow_height.y)) < 4:
                 # self.game.player.knockback(self.vel * self.speed * 40)
                 self.game.player.health -= self.damage
+                self.game.player.medkit_trigger() #medkit power up
                 self.game.screen_shake.start(10, 10)
                 for i in range(random.randint(3, 3)):
                     Spark(

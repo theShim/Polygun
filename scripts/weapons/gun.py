@@ -87,12 +87,27 @@ class Shotgun(Gun):
         Shotgun_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
 
     def shoot(self, mouseAngle):
-        self.game.player.vel += vec(math.cos(mouseAngle), math.sin(mouseAngle)) * -3
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=7)
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+        self.game.player.vel += vec(math.cos(mouseAngle), math.sin(mouseAngle)) * -3 #recoil knockback
+
+        if "double_rounds" in self.game.player.item_manager.current_items:
+            n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8
+            n2 = vec(math.sin(mouseAngle), -math.cos(mouseAngle)) * 8
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle - self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle - self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=7)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle + self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle + self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle - self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle - self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=7)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle + self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle + self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+        else:
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle - self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=7)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + self.cone/2, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + self.cone, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=16, lifetime=FPS * 0.2, damage=5)
 
 class Pistol(Gun):
     def __init__(self, game, groups):
@@ -101,7 +116,15 @@ class Pistol(Gun):
         self.bullet_spread = math.pi/160 #+- spread angle in radians
 
     def shoot(self, mouseAngle):
-        Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + random.uniform(-self.bullet_spread, self.bullet_spread), (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=18, lifetime=FPS * 0.6, damage=8)
+        spread = random.uniform(-self.bullet_spread, self.bullet_spread)
+        if "double_rounds" in self.game.player.item_manager.current_items:
+            n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8
+            n2 = vec(math.sin(mouseAngle), -math.cos(mouseAngle)) * 8
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=18, lifetime=FPS * 0.6, damage=8)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=18, lifetime=FPS * 0.6, damage=8)
+        else:
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, speed=18, lifetime=FPS * 0.6, damage=8)
+        
 
 
 Gun.Rifle = Rifle

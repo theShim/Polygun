@@ -88,7 +88,7 @@ class Game:
 
         self.player = Player(self, [self.all_sprites, self.entities])
 
-        self.state_loader = State_Loader(self, start="dungeon")
+        self.state_loader = State_Loader(self, start="title_screen")
         self.state_loader.populate_states()
         pygame.mouse.set_visible(False) 
 
@@ -96,7 +96,7 @@ class Game:
         self.debugger = Debugger(self)
 
         self.surf = pygame.Surface((100, 100))
-        self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
+        # self.k = pygame.transform.scale_by(pygame.image.load("assets/currency/vending_machine.png").convert_alpha(), 3.5)
         # VendingMachine(self, [self.all_sprites], vec(SIZE) / 2 + vec(TILE_SIZE * 3, TILE_SIZE * 5))
 
     @property

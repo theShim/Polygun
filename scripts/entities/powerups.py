@@ -27,7 +27,7 @@ POWER_UP_INFO = {
         "name" : "Crowbar",
         "description" : "Blunt force trauma is a great way to meet new people.",
         "effects" : [r"+75% damage to enemies above 90% health"],
-        "cost" : 35,
+        "cost" : 45,
         "type" : "permanent",
     },
     "steak" : {
@@ -36,7 +36,43 @@ POWER_UP_INFO = {
         "effects" : ["+10 Max HP"],
         "cost" : 24,
         "type" : "consumable",
-    }
+    },
+    "energy_drink" : {
+        "name" : "Energy Drink",
+        "description" : "Filled with electrolytes, lemons, phenylcyclidine, benzodiazepines and dihydrogen monoxide.",
+        "effects" : ["+50% Movement Speed for 60s"],
+        "cost" : 20,
+        "type" : "timed",
+        "duration" : FPS * 60,
+    },
+    "bean_juice" : {
+        "name" : "Bean Juice",
+        "description" : "mmmm bean.",
+        "effects" : ["+7.5% Attack Speed", "+7% Movement Speed"],
+        "cost" : 44,
+        "type" : "permanent"
+    },
+    "medkit" : {
+        "name" : "Medkit",
+        "description" : "W NHS",
+        "effects" : ["2s after getting hurt, heal for 10% max HP"],
+        "cost" : 60,
+        "type" : "permanent"
+    },
+    "focus_crystal" : {
+        "name" : "Focus Crystal",
+        "description" : "Astrology can be fatal.",
+        "effects" : ["+20% Damage to enemies within 3 metres."],
+        "cost" : 32,
+        "type" : "permanent"
+    },
+    "gasoline" : {
+        "name" : "Gasoline",
+        "description" : "Work in Progress",
+        "effects" : [r"On the next bullet, all nearby enemies are dealt 150% base damage."],
+        "cost" : 28,
+        "type" : "consumable"
+    },
 }
 
 def wrap_text(text: str, font: Font, width):
@@ -152,7 +188,7 @@ class PowerUp(pygame.sprite.Sprite):
                 self.font2.render(self.screen, "●", (255, 255, 255), (40, 100 + self.font1.space_height + len(desc_lines) * self.font2.space_height))
                 effect_lines = wrap_text(effect, self.font2, WIDTH * 0.35)
                 for j, line in enumerate(effect_lines):
-                    self.font2.render(self.screen, line, (255, 255, 255), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + j) * self.font2.space_height)))
+                    self.font2.render(self.screen, line, (255, 255, 255), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + j + 1) * self.font2.space_height)))
         else:
             self.hover_offset += (0 - self.hover_offset) * 0.2
 

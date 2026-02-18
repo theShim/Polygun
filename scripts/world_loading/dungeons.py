@@ -4,6 +4,7 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 
 import random
+import math
 
 from scripts.entities.enemy import Enemy, EnemySpawnData
 from scripts.entities.tesseract import Tesseract
@@ -81,7 +82,7 @@ class DungeonLevel:
         return [cell for cell, links in self.conns.items() if len(links) == 1 and cell != (0, 0)]
 
     def generate_dungeon(self):
-        nodes, conns = generate_path(6, 8)
+        nodes, conns = generate_path(7, 9)
         self.conns = conns
 
         for node in nodes:
@@ -109,7 +110,7 @@ class DungeonLevel:
     def choose_vending_rooms(self):
         for node in self.rooms:
             room = self.rooms[node]
-            room.vending_room = random.randint(1, 2) == 1 and not (room.start_room or room.exit_room)
+            room.vending_room = random.randint(1, 100) <= 70 and not (room.start_room or room.exit_room)
 
     def generate_boss_room(self):
         leaves = self.get_leaves()
@@ -167,10 +168,10 @@ class Room:
         difficulty = dungeon_level + 1
 
         wave_stack = []
-        num_waves = 1 + (dungeon_level)
+        num_waves = 1 + int(math.ceil(dungeon_level / 1.5))
 
         for i in range(num_waves):
-            budget = int(4 + 4 * (difficulty ** 1.2)) + i * 2
+            budget = int(4 + 2 * (difficulty ** 1.2)) + i * 2
             
             remaining = budget
             to_spawn = {}

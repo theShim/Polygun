@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.primary = Gun.Rifle(self.game, [])
+        self.primary = Gun.Shotgun(self.game, [])
         self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
         # self.primary = Spikeball(self.game, [], self.pos)
         self.secondary = None
@@ -72,7 +72,10 @@ class Player(pygame.sprite.Sprite):
         self.silver = 0 #silver cuz bullet casing looked too similar to gold or yellow coins
         self.pickup_radius = 100 #remains and money
         self.active = True
+
         self.item_manager = Item_Manager(self.game)
+        self.medkit_timer = Timer(FPS * 2, 1)
+        self.medkit_timer.t = self.medkit_timer.end; self.medkit_timer.finished = True
 
         self.death_timer = Timer(FPS * 2, 1)
         self.death_timer.t = self.death_timer.end
@@ -172,10 +175,16 @@ class Player(pygame.sprite.Sprite):
             self.vel.x = 0
         if -0.25 < self.vel.y < 0.25:
             self.vel.y = 0
+        
+        vel = self.vel.copy()
+        if "energy_drink" in (item_counts := self.game.player.item_manager.current_items):
+            vel *= (1.5 ** item_counts["energy_drink"])
+        if "bean_juice" in item_counts:
+            vel *= (1.07 ** item_counts["bean_juice"])
             
-        self.pos.y += self.vel.y
+        self.pos.y += vel.y
         self.collisions("vertical")
-        self.pos.x += self.vel.x
+        self.pos.x += vel.x
         self.collisions("horizontal")
 
         if self.vel.magnitude() > 10:
@@ -248,12 +257,22 @@ class Player(pygame.sprite.Sprite):
             a = (i/4) * math.pi
             Death_Particle(self.game, [self.game.all_sprites, self.game.particles], self.pos, a)
 
+    def medkit_trigger(self):
+        if "medkit" in (item_counts := self.game.player.item_manager.current_items):
+            if self.medkit_timer.finished:
+                self.medkit_timer.reset()
+
     def toggle_active(self):
         self.active = not self.active
             
     def update(self):
         if self.active:
             self.move()
+
+            if not self.medkit_timer.finished:
+                self.medkit_timer.update()
+                if self.medkit_timer.finished:
+                    self.health = min(self.max_health, self.health + self.max_health * 0.1)
             
             if self.health <= 0:
                 self.death()
