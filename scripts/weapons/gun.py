@@ -75,11 +75,27 @@ class Rifle(Gun):
     def __init__(self, game, groups):
         super().__init__(game, groups)
 
+class SMG(Gun):
+    def __init__(self, game, groups):
+        super().__init__(game, groups)
+        self.shoot_timer = Timer(3, 1)
+        self.bullet_spread = math.pi / 16
+        
+    def shoot(self, mouseAngle):
+        spread = random.uniform(-self.bullet_spread, self.bullet_spread)
+        if "double_rounds" in self.game.player.item_manager.current_items:
+            n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8
+            n2 = vec(math.sin(mouseAngle), -math.cos(mouseAngle)) * 8
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, damage=2, speed=8)
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, damage=2, speed=8)
+        else:
+            Bullet(self.game, [self.game.all_sprites], self.game.player.pos, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player, damage=2, speed=8)
+
 class Shotgun(Gun):
     def __init__(self, game, groups):
         super().__init__(game, groups)
         self.shoot_timer = Timer(FPS * 0.8, 1)
-        self.cone = math.pi / 6
+        self.cone = math.pi / 18
         self.shake_duration = 5
         self.shake_intesity = 4
         
@@ -130,3 +146,4 @@ class Pistol(Gun):
 Gun.Rifle = Rifle
 Gun.Shotgun = Shotgun
 Gun.Pistol = Pistol
+Gun.SMG = SMG

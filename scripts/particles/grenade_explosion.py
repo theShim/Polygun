@@ -55,6 +55,7 @@ class Grenade_Explosion(pygame.sprite.Sprite):
         if not self.hit:
             if self.game.player.jump_height < 4 and (self.game.player.pos - self.pos).magnitude() < self.outer.radius * 0.9:
                 self.game.player.health -= 10
+                self.game.player.medkit_trigger() #medkit power up
                 self.hit = True
                 self.game.screen_shake.start(10, 10)
                 # self.game.player.jump_height += 20

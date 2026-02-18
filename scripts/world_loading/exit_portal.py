@@ -27,6 +27,8 @@ class ExitPortal(pygame.sprite.Sprite):
 
     def update(self):
         if (self.game.player.pos - self.pos).magnitude() < self.radius:
+            for spr in self.game.to_cull_on_level_complete:
+                spr.kill()
             self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].minimap.kill()
             self.game.state_loader.current_state.current_level_index += 1
             self.game.state_loader.current_state.levels[self.game.state_loader.current_state.current_level_index].generate_minimap()

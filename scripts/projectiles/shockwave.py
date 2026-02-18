@@ -136,6 +136,7 @@ class Shockwave(pygame.sprite.Sprite):
         if not self.hit:
             if self.game.player.jump_height < 4 and self.size * 0.9 < (self.game.player.pos - self.pos).magnitude() < self.size:
                 self.game.player.health -= 8
+                self.game.player.medkit_trigger() #medkit power up
                 self.hit = True
                 self.game.screen_shake.start(10, 10)
         

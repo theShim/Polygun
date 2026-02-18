@@ -33,7 +33,7 @@ class Tilemap:
 
     def load(self):
         room = random.choices(ROOMS, [10, 5, 5], k=1)[0]
-        if self.room.start_room: room = ROOMS[-1]
+        if self.room_pos.x == self.room_pos.y == 0: room = ROOMS[0]
         
         for y in range(LEVEL_SIZE):
             for x in range(LEVEL_SIZE):

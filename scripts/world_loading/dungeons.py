@@ -98,10 +98,13 @@ class DungeonLevel:
     def generate_start_room(self):
         self.rooms[(0, 0)].start_room = True
         self.start_room = self.rooms[(0, 0)]
+        self.start_room.tilemap.load()
+        self.start_room.tilemap.auto_tile()
 
     def generate_exit_room(self):
         leaves = self.get_leaves()
-        self.exit_room = self.rooms[random.choice(leaves)]
+        leaves = sorted(leaves, key=lambda c: c[0] ** 2 + c[1] ** 2)
+        self.exit_room = self.rooms[leaves[-1]]
         self.exit_room.exit_room = True
         
         # self.rooms[(0, 0)].exit_room = True

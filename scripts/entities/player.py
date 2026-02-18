@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
             [size/2, size/2],
             [-size/2, size/2]
         ])
-        self.pos = vec(WIDTH/2 - size/2, HEIGHT/2 - size/2 + TILE_SIZE * 5)
+        self.pos = vec(WIDTH/2 - size/2 + TILE_SIZE * 2.5, HEIGHT/2 - size/2 + TILE_SIZE * 6)
 
         #movement
         self.vel = vec()
@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         
         #shooting
-        self.primary = Gun.Shotgun(self.game, [])
+        self.primary = Gun.Rifle(self.game, [])
         self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
         # self.primary = Spikeball(self.game, [], self.pos)
         self.secondary = None

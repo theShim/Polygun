@@ -3,7 +3,7 @@ import pygame
 DEBUG = False
 
 SIZE = WIDTH, HEIGHT = (960, 540) #window size
-WINDOW_TITLE = "WINDOW TITLE"
+WINDOW_TITLE = "PolyGun"
 FPS = 60
 CAMERA_FOLLOW_SPEED = 12
 

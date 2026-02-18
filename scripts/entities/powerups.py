@@ -107,6 +107,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.parent = parent #vending machine object
         self.font1 = Custom_Font.font2_5
         self.font2 = Custom_Font.font1_5
+        self.font3 = Custom_Font.font2
 
         self.angle = a_offset + math.pi/6
         self.angle_offset = 6 * math.pi
@@ -128,7 +129,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.name, img = random.choice(list(self.SPRITES.items()))
         self.surf.blit(img, img.get_rect(center=vec(self.surf.size)/2))
 
-        self.power_surf = pygame.transform.scale_by(self.surf, 0.25)
+        self.power_surf = pygame.transform.scale_by(self.surf, 0.35)
         self.power_shadow = pygame.mask.from_surface(self.power_surf).to_surface(setcolor=(0, 0, 0), unsetcolor=(0, 0, 0, 0))
         self.info = POWER_UP_INFO[self.name]
         self.type_ = self.info["type"]
@@ -155,8 +156,8 @@ class PowerUp(pygame.sprite.Sprite):
 
         x = index % 8
         y = index // 8
-        self.screen.blit(self.power_shadow, self.power_surf.get_rect(bottomright=(WIDTH - 16 + 2 - x * self.power_surf.width * 0.8, HEIGHT - 10 + 2 - y * self.power_surf.height)))
-        self.screen.blit(self.power_surf, self.power_surf.get_rect(bottomright=(WIDTH - 16 - x * self.power_surf.width * 0.8, HEIGHT - 10 - y * self.power_surf.height)))
+        self.screen.blit(self.power_shadow, self.power_surf.get_rect(bottomright=(WIDTH - 16 + 2 - x * self.power_surf.width * 0.6, HEIGHT - 10 + 2 - y * self.power_surf.height)))
+        self.screen.blit(self.power_surf, self.power_surf.get_rect(bottomright=(WIDTH - 16 - x * self.power_surf.width * 0.6, HEIGHT - 10 - y * self.power_surf.height)))
 
     def gui_update(self):
         a = self.angle + self.angle_offset
@@ -171,11 +172,12 @@ class PowerUp(pygame.sprite.Sprite):
         self.hover = self.game.mousePos.distance_to(self.pos + vec(self.surf.size)/2) < self.radius
 
         if self.hover:
-            if pygame.mouse.get_just_pressed()[0]:
+            if pygame.mouse.get_just_pressed()[0] and self.game.player.silver >= self.info['cost']:
                 self.mode = "powerup"
                 self.game.possible_powerups = []
                 self.game.player.item_manager.items.add(self)
                 self.parent.used = True
+                self.game.player.silver -= self.info['cost']
 
             self.hover_offset += (-20 - self.hover_offset) * 0.2
             self.font1.render(self.screen, self.info["name"], (255, 255, 255), (40, 70))
@@ -184,11 +186,15 @@ class PowerUp(pygame.sprite.Sprite):
             for i, line in enumerate(desc_lines):
                 self.font2.render(self.screen, line, (255, 255, 255), (40, 80 + self.font1.space_height + i * self.font2.space_height))
 
+            i = 0
             for effect in self.info["effects"]:
-                self.font2.render(self.screen, "●", (255, 255, 255), (40, 100 + self.font1.space_height + len(desc_lines) * self.font2.space_height))
+                self.font2.render(self.screen, "●", (255, 255, 255), (40, 100 + self.font1.space_height + (len(desc_lines) + i) * self.font2.space_height))
                 effect_lines = wrap_text(effect, self.font2, WIDTH * 0.35)
                 for j, line in enumerate(effect_lines):
-                    self.font2.render(self.screen, line, (255, 255, 255), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + j + 1) * self.font2.space_height)))
+                    self.font2.render(self.screen, line, (255, 255, 255), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + i + j) * self.font2.space_height)))
+                i += 1
+
+            self.font3.render(self.screen, f"Cost: {self.info['cost']}", (255, 255, 255) if self.game.player.silver >= self.info['cost'] else (186, 0, 0), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + i + j + 2) * self.font2.space_height)))
         else:
             self.hover_offset += (0 - self.hover_offset) * 0.2
 

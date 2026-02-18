@@ -57,8 +57,9 @@ class Game:
         self.initialise()
 
         #initalising pygame window
-        flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL | pygame.FULLSCREEN
-        self.window = pygame.display.set_mode(SIZE, flags, vsync=1)
+        self.windowed_flags = pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE
+        self.fullscrn_flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL | pygame.FULLSCREEN
+        self.window = pygame.display.set_mode(SIZE, self.fullscrn_flags, vsync=1)
         self.screen = pygame.Surface(SIZE, pygame.SRCALPHA)
         self.clock = pygame.time.Clock()
         self.offset = vec()
@@ -84,6 +85,7 @@ class Game:
         self.bosses = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
         self.gui_elements = pygame.sprite.Group()
+        self.to_cull_on_level_complete = pygame.sprite.Group()
         self.possible_powerups = []
 
         self.player = Player(self, [self.all_sprites, self.entities])

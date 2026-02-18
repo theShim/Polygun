@@ -22,7 +22,7 @@ class Remains(pygame.sprite.Sprite):
 
 
     def __init__(self, game, groups, pos, colour, initial_height=0):
-        super().__init__(groups)
+        super().__init__(groups + [game.to_cull_on_level_complete])
         self.game = game
         self.screen = self.game.screen
 
