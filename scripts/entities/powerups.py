@@ -135,6 +135,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.type_ = self.info["type"]
         if self.type_ == "timed":
             self.timer = Timer(self.info["duration"], 1)
+        self.cost_mod = random.randint(-10, 10)
 
     def update(self, index=0):
         if self.mode == "gui":
@@ -172,12 +173,12 @@ class PowerUp(pygame.sprite.Sprite):
         self.hover = self.game.mousePos.distance_to(self.pos + vec(self.surf.size)/2) < self.radius
 
         if self.hover:
-            if pygame.mouse.get_just_pressed()[0] and self.game.player.silver >= self.info['cost']:
+            if pygame.mouse.get_just_pressed()[0] and self.game.player.silver >= self.info['cost'] + self.cost_mod:
                 self.mode = "powerup"
                 self.game.possible_powerups = []
                 self.game.player.item_manager.items.add(self)
                 self.parent.used = True
-                self.game.player.silver -= self.info['cost']
+                self.game.player.silver -= self.info['cost'] + self.cost_mod
 
             self.hover_offset += (-20 - self.hover_offset) * 0.2
             self.font1.render(self.screen, self.info["name"], (255, 255, 255), (40, 70))
@@ -194,7 +195,7 @@ class PowerUp(pygame.sprite.Sprite):
                     self.font2.render(self.screen, line, (255, 255, 255), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + i + j) * self.font2.space_height)))
                 i += 1
 
-            self.font3.render(self.screen, f"Cost: {self.info['cost']}", (255, 255, 255) if self.game.player.silver >= self.info['cost'] else (186, 0, 0), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + i + j + 2) * self.font2.space_height)))
+            self.font3.render(self.screen, f"Cost: {self.info['cost'] + self.cost_mod}", (255, 255, 255) if self.game.player.silver >= self.info['cost'] + self.cost_mod else (186, 0, 0), (40 + self.font2.space_width * 2, 100 + self.font1.space_height + ((len(desc_lines) + i + j + 2) * self.font2.space_height)))
         else:
             self.hover_offset += (0 - self.hover_offset) * 0.2
 
