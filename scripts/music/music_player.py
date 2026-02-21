@@ -11,9 +11,11 @@ class Music_Player:
     def __init__(self, game, channel_num = 32):
         self.game = game
         pygame.mixer.set_num_channels(channel_num)
+        pygame.mixer.music.set_volume(1.0)
 
         self.sounds: dict[str, pygame.mixer.Sound] = SOUNDS
         self.pools: dict[str, Sound_Pool] = {}
+        self.master_volume: float = 1.0
 
         self.channel_index = 0
         self.channel_num = channel_num
@@ -44,12 +46,21 @@ class Music_Player:
         self.pools[pool].stop(fadeout_ms)
 
     def set_master_volume(self, vol):
+        self.master_volume = vol
         pygame.mixer.music.set_volume(vol)
         for pool in self.pools.values():
-            pool.set_volume(pool.volume * vol)
+            pool.set_volume(min(pool.volume, vol))
+
+    def get_pool_volume(self, pool):
+        if pool == "all":
+            return self.master_volume
+        return self.pools[pool].volume
 
     def set_pool_volume(self, pool, volume):
-        self.pools[pool].set_volume(volume)  
+        if pool == "all":
+            return self.set_master_volume(volume)
+        
+        self.pools[pool].set_volume(min(volume, self.master_volume))  
 
     def save_json(self):
         pass

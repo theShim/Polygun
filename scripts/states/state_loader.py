@@ -32,6 +32,7 @@ class State_Loader:
         from scripts.states.states.title_screen import Title_Screen
         from scripts.states.states.dungeon import Dungeon
         from scripts.states.states.settings import Settings
+        from scripts.states.states.audio import Audio_GUI
         from scripts.states.states.controllers import Controllers_GUI
         from scripts.states.states.keyboard import Keyboard_GUI
         from scripts.states.states.transition import TransitionIn
@@ -43,6 +44,7 @@ class State_Loader:
             "title_screen" : Title_Screen(self.game),
             "dungeon" : Dungeon(self.game),
             "settings" : Settings(self.game),
+            "audio_gui" : Audio_GUI(self.game),
             "controllers_gui" : Controllers_GUI(self.game),
             "keyboard_gui" : Keyboard_GUI(self.game),
             "vending" : Vending_Overlay(self.game),

@@ -107,7 +107,7 @@ class Bullet(pygame.sprite.Sprite):
                 # self.game.player.knockback(self.vel * self.speed * 40)
                 self.game.player.health -= self.damage
                 self.game.player.medkit_trigger() #medkit power up
-                self.game.screen_shake.start(10, 10)
+                self.game.screen_shake.start(10, 10) #shake for 10 frames by 10 pixels
                 for i in range(random.randint(3, 3)):
                     Spark(
                         self.game, 

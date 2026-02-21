@@ -59,7 +59,7 @@ class Game:
         #initalising pygame window
         self.windowed_flags = pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE
         self.fullscrn_flags = pygame.SCALED | pygame.DOUBLEBUF | pygame.OPENGL | pygame.FULLSCREEN
-        self.window = pygame.display.set_mode(SIZE, self.windowed_flags, vsync=1)
+        self.window = pygame.display.set_mode(SIZE, self.fullscrn_flags, vsync=1)
         self.screen = pygame.Surface(SIZE, pygame.SRCALPHA)
         self.clock = pygame.time.Clock()
         self.offset = vec()
@@ -86,6 +86,7 @@ class Game:
         self.particles = pygame.sprite.Group()
         self.gui_elements = pygame.sprite.Group()
         self.to_cull_on_level_complete = pygame.sprite.Group()
+        self.always_update = pygame.sprite.Group()
         self.possible_powerups = []
 
         self.player = Player(self, [self.all_sprites, self.entities])
@@ -158,17 +159,19 @@ class Game:
         self.gui_fbo  = self.ctx.framebuffer([self.gui_tex])
 
         
-        #bloom lighting stuff
+        ### bloom lighting stuff
+        # emissive surf to render light to and is affected by the bloom
         self.emissive_surf = pygame.Surface(SIZE, pygame.SRCALPHA)
         self.emissive_tex  = self.ctx.texture(self.emissive_surf.get_size(), 4)
         self.emissive_tex.filter = (moderngl.LINEAR, moderngl.LINEAR)
-        # self.emissive_tex.swizzle = "BGRA"
 
+        #the blur shader code that takes in a direction (0, 1) or (1, 0) for blur direction
         with open("scripts/shaders/vertex_shader2.glsl") as file:
             self.vertex_shader2 = "".join(file.readlines())
         with open("scripts/shaders/blur.glsl") as file:
             self.blur_shader = "".join(file.readlines())
         
+        #had to redefine a new buffer
         quad_vertices = np.array([
             -1.0, -1.0,
             1.0, -1.0,
@@ -177,14 +180,16 @@ class Game:
         ], dtype='f4')
         self.vbo = self.ctx.buffer(quad_vertices.tobytes())
 
+        #blur buffer texture that processes and stores the result of the horizontal pass
         self.blur_prog = self.ctx.program(vertex_shader=self.vertex_shader2, fragment_shader=self.blur_shader)
-        self.blur_vao = self.ctx.vertex_array(self.blur_prog, [(self.vbo, "2f", "vert")])   
+        self.blur_vao = self.ctx.vertex_array(self.blur_prog, [(self.vbo, "2f", "vert")]) 
         self.blur_tex  = self.ctx.texture(SIZE, 4, dtype="f2")
         self.blur_tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
         self.blur_tex.swizzle = "BGRA"
         self.blur_tex.repeat_x = self.blur_tex.repeat_y = not False
-        self.blur_fbo  = self.ctx.framebuffer([self.blur_tex])
+        self.blur_fbo  = self.ctx.framebuffer([self.blur_tex]) #the actual buffer
 
+        #second blur buffer texture that processes and stores the final bloomed result after the vertical pass
         self.bloom_tex = self.ctx.texture(SIZE, 4, dtype="f2")
         self.bloom_fbo  = self.ctx.framebuffer([self.bloom_tex])
 
@@ -287,37 +292,37 @@ class Game:
             self.emissive_tex.write(self.emissive_surf.get_view("1"))
             self.gui_tex.write(self.gui_surf.get_view("1"))
 
+            #use the initial horizontal buffer object
             self.blur_fbo.use()
-            self.ctx.clear(0, 0, 0, 0)
-            self.emissive_tex.use(0)
-            self.blur_prog["image"].value = 0
-            self.blur_prog["axis"].value = (1.0, 0.0)
+            self.ctx.clear(0, 0, 0, 0) #clear the texture to prevent repeating bug
+            self.emissive_tex.use(0) #assign the emissive texture to the buffer
+            self.blur_prog["image"].value = 0 
+            self.blur_prog["axis"].value = (1.0, 0.0) #horizontal axis
             self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
             self.blur_prog["radius"].value = 12
             self.blur_prog["sigma"].value = 5
-            self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
+            self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP) #perform the render calculation
 
-            # data = self.blur_fbo.read(components=4, alignment=1)
-            # pygame.image.save(pygame.image.frombytes(data, SIZE, "RGBA", True), "rast.png")
-
+            #use the vertical buffer
             self.bloom_fbo.use()
-            self.ctx.clear(0, 0, 0, 0)
-            self.blur_tex.use(0)
+            self.ctx.clear(0, 0, 0, 0) #again clear the texture
+            self.blur_tex.use(0) #assign the result of the horizontal pass this time
             self.blur_prog["image"].value = 0
-            self.blur_prog["axis"].value = (0.0, 1.0)
+            self.blur_prog["axis"].value = (0.0, 1.0) #vertical axis
             self.blur_prog["texelSize"] = (1.0 / WIDTH, 1.0 / HEIGHT)
             self.blur_prog["radius"].value = 12
             self.blur_prog["sigma"].value = 5
-            self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP)
-            # self.blur_tex.release()
+            self.blur_vao.render(mode=moderngl.TRIANGLE_STRIP) #perform 2nd render
 
+            #this time use the main buffer
             self.ctx.screen.use()
+            #had a bug that causes the screen to be tiny, so just resetting the window size
             self.ctx.viewport = (0, 0, *pygame.display.get_window_size())
             self.ctx.clear(0, 0, 0, 0)
-            frame_tex.use(0)
-            self.bloom_tex.use(1)
-            self.noise_tex.use(2)
-            self.gui_tex.use(3)
+            frame_tex.use(0) #assign the main screen
+            self.bloom_tex.use(1) #assign the lighting bloom shader
+            self.noise_tex.use(2) #assign the noise texture for the pencil style shader
+            self.gui_tex.use(3) #assign the gui texture
             self.program["tex"].value = 0
             self.program["noiseTex"].value = 2
             self.program["bloomTex"].value = 1
@@ -327,21 +332,6 @@ class Game:
             self.program["playerOffset"].value = self.offset
             self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
             frame_tex.release()
-
-            # frame_tex.use(0)
-            # emissive_tex = self.surf_to_text(self.emissive_surf)
-            # emissive_tex.use(2)
-
-            # self.program["tex"] = 0 #dict assignment usually means uniform
-            # self.program["time"] = self.t
-            # self.program["zoom"] = self.zoom
-            
-            # self.noise_tex.use(1)  # bind to texture unit 1
-            # self.program['noiseTex'].value = 1
-            # self.program['bloomTex'].value = 2
-
-            # self.opengl_renderer.render(mode=moderngl.TRIANGLE_STRIP)
-            # frame_tex.release()
 
             pygame.display.flip()
             self.clock.tick(60)

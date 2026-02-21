@@ -152,10 +152,10 @@ class Room:
 
 
     def spawn_exit_portal(self):
-        if not self.exit_room: return
-        if self.exit_portal_spawned: return
+        if not self.exit_room: return #if it is not the exit room, don't spawn
+        if self.exit_portal_spawned: return #if it's already been spawned once, don't spawn again
 
-        self.exit_portal_spawned = True
+        self.exit_portal_spawned = True #flag variable
         ExitPortal(self.game, [self.game.all_sprites], [self.pos[0] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2, self.pos[1] * LEVEL_SIZE * TILE_SIZE + TILE_SIZE * LEVEL_SIZE / 2])
 
     def spawn_vending_machine(self):

@@ -53,8 +53,7 @@ class Player(pygame.sprite.Sprite):
         #shooting
         self.primary = Gun.Rifle(self.game, [])
         self.primary.shoot_timer.t = self.primary.shoot_timer.end #remove the cooldon for the first attack
-        # self.primary = Spikeball(self.game, [], self.pos)
-        self.secondary = None
+        self.secondary = None #possible secondary weapon to collect
         
         #jumping
         self.jump_vel = 50 #the velocity applied upwards
@@ -131,11 +130,12 @@ class Player(pygame.sprite.Sprite):
             if mouse[0] and (pygame.key.get_pressed()[pygame.K_LSHIFT] or self.primary.shoot_timer.finished):
                 self.primary.shoot_timer.reset()
                 self.primary.update()
+
         elif self.primary.TYPE == "melee":
             self.primary.update()
 
         else:
-            raise BaseException("vveapon error")
+            raise BaseException("weapon error")
 
 
     def jump(self, keys):

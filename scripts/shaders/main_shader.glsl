@@ -24,6 +24,25 @@ vec3 vignette(vec2 uv, vec3 col) {
     return col * mix(0.4, 1.1, vig); // inner = darker edge
 }
 
+vec3 pencilEffect(vec2 uv, vec3 baseCol) {
+
+    vec2 pencilUV = uv;
+
+    float pencilOffset = floor(time * 0.004) * 0.2;
+    vec2 noiseSample = texture(noiseTex, pencilUV / 6.0 + pencilOffset).rg - 0.5;
+
+    pencilUV += noiseSample * 0.004;
+
+    vec3 col = texture(tex, pencilUV).rgb;
+
+    vec3 pencil = mix(baseCol, col, 0.9);
+    pencil = clamp(pencil, 0.0, 1.0);
+
+    pencil *= vec3(1.05, 1.02, 0.97);
+
+    return pencil;
+}
+
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
 vec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
@@ -135,7 +154,7 @@ void main() {
     guiTex;
 
 
-    vec3 final_colour = texture(tex, uvs).rgb * 0.45 + texture(bloomTex, uvs).rgb;
+    vec3 final_colour = pencilEffect(uvs, texture(tex, uvs).rgb) * 0.45 + texture(bloomTex, uvs).rgb;
 
     bool flag = is_lava(uvs);
     if (flag == true) {

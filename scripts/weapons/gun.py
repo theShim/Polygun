@@ -18,8 +18,9 @@ from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 
     ##############################################################################################
 
+#parent gun class
 class Gun(pygame.sprite.Sprite):
-    TYPE = "ranged"
+    TYPE = "ranged" #in case i add melee weapons
     
     def __init__(self, game, groups):
         super().__init__(groups)
@@ -27,18 +28,21 @@ class Gun(pygame.sprite.Sprite):
         self.screen = self.game.screen
 
         self.bullet_spread = math.pi/80 #+- spread angle in radians
-        self.shoot_timer = Timer(10, 1)
+        self.shoot_timer = Timer(10, 1) #number of frames between each shot
         self.shake_duration = 0
         self.shake_intesity = 0
 
+    #play bullet sfx on bullet spawn
     def play_sound(self):
         self.game.music_player.play("gunshot", pool="sfx", loop=False)
 
+    #spawn a bullet casing particle vfx away from the shot direction
     def spawn_casing(self, mouseAngle):
         Bullet_Casing(self.game, [self.game.all_sprites, self.game.particles], self.game.player.pos, mouseAngle + math.pi + random.uniform(-self.bullet_spread, self.bullet_spread) * 20, -vec(0, self.game.player.jump_height))
 
+    #actual spawn the bullet
     def shoot(self, mouseAngle):
-        spread = random.uniform(-self.bullet_spread, self.bullet_spread)
+        spread = random.uniform(-self.bullet_spread, self.bullet_spread) #random angle offset
         if "double_rounds" in self.game.player.item_manager.current_items:
             n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8
             n2 = vec(math.sin(mouseAngle), -math.cos(mouseAngle)) * 8
@@ -49,15 +53,15 @@ class Gun(pygame.sprite.Sprite):
 
     def update(self):
         self.play_sound()
-
-        self.game.screen_shake.start(self.shake_duration, self.shake_intesity)
         
+        #calculating the angle direction of where the player's mouse is
         mousePos = self.game.mousePos + vec(0, self.game.player.jump_height)
         mouseAngle = math.atan2(mousePos.y - self.game.player.pos.y + self.game.offset.y, mousePos.x - self.game.player.pos.x + self.game.offset.x)
 
         self.shoot(mouseAngle)
         self.spawn_casing(mouseAngle)
         
+        #randomised spark vfx particles
         for i in range(random.randint(3, 3)):
             Spark(
                 self.game, 
@@ -94,8 +98,8 @@ class SMG(Gun):
 class Shotgun(Gun):
     def __init__(self, game, groups):
         super().__init__(game, groups)
-        self.shoot_timer = Timer(FPS * 0.8, 1)
-        self.cone = math.pi / 18
+        self.shoot_timer = Timer(FPS * 0.8, 1) #longer interval (0.8s) between shots
+        self.cone = math.pi / 18 #available spread for bullets
         self.shake_duration = 5
         self.shake_intesity = 4
         

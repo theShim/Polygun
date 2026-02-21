@@ -17,7 +17,7 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS, TILE_SIZE, LEVEL_SIZE
     
 class VendingMachine(pygame.sprite.Sprite):
     def __init__(self, game, groups, pos):
-        super().__init__(groups + [game.to_cull_on_level_complete])
+        super().__init__(groups + [game.to_cull_on_level_complete, game.always_update])
         self.game = game
         self.screen = self.game.screen
         self.font = Font("assets/fonts/nea_font.png", scale=1.75)

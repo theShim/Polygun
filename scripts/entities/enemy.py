@@ -32,7 +32,7 @@ class Enemy(pygame.sprite.Sprite):
         self.screen = self.game.screen
 
         self.size = 12
-        angles = np.linspace(0, 2 * math.pi, 4)
+        angles = np.linspace(0, 2 * math.pi, 4) #triangle
         self.points = np.column_stack((np.cos(angles), np.sin(angles))) * self.size
         self.pos = vec(pos)
 
@@ -41,7 +41,6 @@ class Enemy(pygame.sprite.Sprite):
         self.old_vel = vec()
         self.acc = vec()
         self.run_speed = 100
-        self.dash_speed = 30
         self.angle = 0
         self.height = 0
 
@@ -60,8 +59,6 @@ class Enemy(pygame.sprite.Sprite):
 
         #death
         self.dying = False
-
-        self.shader = self.game.shader_handler.SHADERS["grayscale"]
 
 
         #############################################################################
@@ -139,11 +136,13 @@ class Enemy(pygame.sprite.Sprite):
     def move(self):
         self.acc = vec()
 
+        #calculate the velocity towards the player assuming it's not dead
         if not self.dying:
             self.vel = (self.game.player.pos - self.pos).normalize() * self.run_speed
         else:
             self.vel = vec()
 
+        #euler integrate as before, this time with secondary knockback velocity too
         self.pos.x += self.vel.x * self.game.dt
         self.pos.x += self.knockback_vel.x * self.game.dt
         self.collisions("horizontal")
@@ -152,11 +151,11 @@ class Enemy(pygame.sprite.Sprite):
         self.pos.y += self.knockback_vel.y * self.game.dt
         self.collisions("vertical")
 
+        #reduce the kb back to 0
         self.knockback_vel = self.knockback_vel.lerp(vec(), 0.3)
 
         if not self.dying:
             self.change_direction()
-        # self.apply_forces()
 
     def change_direction(self):
         targetPos = self.pos + self.vel
@@ -169,22 +168,28 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.move()
 
+        #if the enemy is not hurt or is in the process of dying
         if not (self.hurt or self.dying):
+            #allow them a shoot cycle
             self.shoot_timer.update()
             if self.shoot_timer.finished:
                 Bullet(self.game, [self.game.all_sprites], self.pos, self.angle + random.uniform(-self.bullet_spread, self.bullet_spread), (255 - 55, 0, 55 - 55), speed=10, shadow_height=-vec(0, 0), scale_mod=0.75, owner=self)
                 self.shoot_timer.reset()
                 self.game.music_player.play("gunshot", pool="sfx", loop=False)
 
+        #if they are hurt, process the damage timer
+        #the damage timer acts as a cooldown for them to shoot
         if self.hurt:
             self.damage_timer.update()
             if self.damage_timer.finished:
                 self.hurt = False
 
+        #if their health has gone below 0 and thus is dying
         if self.dying:
-            self.points *= 0.9
-            self.angle += math.radians(20)
+            self.points *= 0.9 #cause them to shrink in size
+            self.angle += math.radians(20) #cause them to spin
             
+            #once it reaches a critically small size, kill off the sprite
             if self.points[0, 0] < 0.25:
                 self.death()
                 return
@@ -207,10 +212,6 @@ class Enemy(pygame.sprite.Sprite):
 
         pygame.draw.polygon(self.game.emissive_surf, saturate_colour((255, 0, 55), 1.7) if not self.hurt else (255, 255, 255), points * 1.3 + self.pos - self.game.offset, 0)
 
-        # Apply shader only to that region
-        # temp_surf = self.game.shader_handler.SHADERS["invert"].apply(temp_surf)
-
-        # Blit result to the main screen
         rect = temp_surf.get_rect(center=self.pos - self.game.offset)
         self.screen.blit(temp_surf, rect)
 
