@@ -265,18 +265,29 @@ class Hexagon(Enemy):                               #plants bombs on the floor
         #############################################################################
 
     def update(self):
+        #allow for cycles of attacks to happen
+        #one cycle is the chase to player -> falling edge of the slam -> 
+        #shockwave -> rising edge -> delay
         self.attack_cycle_timer.update()
         if self.attack_cycle_timer.finished:
-            self.chase_timer.update()
+            self.chase_timer.update() #allow the hexagon to chase the player
             if self.chase_timer.finished:
-                self.angle += math.radians(5)
+                self.angle += math.radians(5) #let the hexagon spin while it's charging up
                 self.attack_delay.update()
+                #processing the current delay before the next attack
                 if self.attack_delay.finished:
                     self.attack_t += self.game.dt * 5
+                    #mathematical equation depicting the slam attack of the hexagon as a parabola
+                    #when it slams into the floor, it has covered t/2 of total t time.
                     self.height = (50 / ((self.attack_duration / 2) ** 4)) * ((self.attack_t - (self.attack_duration / 2)) ** 4)
+                    
+                    #try spawn a shockwave when the hexagon is on the floor and it hasn't spawned
+                    #a shockwave yet as of this moment
                     if self.attack_t >= self.attack_duration / 2 and not self.spawned_shockwave:
                         Shockwave(self.game, [self.game.all_sprites], self.pos)
                         self.spawned_shockwave = True
+
+                    #delay for the next attack cycle to start while the hexagon rises back up
                     if self.attack_t >= self.attack_duration:
                         self.attack_t = 0
                         self.chase_timer.reset()

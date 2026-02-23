@@ -167,58 +167,77 @@ class Room:
 
 
     def generate_wave_stack(self) -> list[list[EnemySpawnData]]:
-        dungeon_level = self.parent_level.level_no
-        difficulty = dungeon_level + 1
+        dungeon_level = self.parent_level.level_no #current dungeon level
+        difficulty = dungeon_level + 1 #this scales directly with the level, with +1 to avoid 0
 
         wave_stack = []
+        #the number of waves should ideally increase gradually every 1.5 levels
         num_waves = 1 + int(math.ceil(dungeon_level / 1.5))
 
         for i in range(num_waves):
+            #later waves get a higher budget, hence the i * 2
+            #the difficulty should cause a non-linear increase too, from the ** 1.2
             budget = int(4 + 2 * (difficulty ** 1.2)) + i * 2
-            
-            remaining = budget
-            to_spawn = {}
+          
+            remaining = budget #remaining budget for this wave  
+            to_spawn = {} #dictionary of {"enemy_type" : cost (int)}
 
+            #keep adding enemies till the budget is completely exhausted
+            #(which is why triangle had to be 1)
             while remaining > 0:
+                #randomly choose an enemy based on weighted probabilites from their costs
                 enemy_type = random.choices(
                     [
                         Enemy, Enemy.Pentagon, Enemy.Hexagon
                     ], 
                     [
+                        #simple triangles become more common as difficulty rises to prevent
+                        #a hexagon or pentagon massacre
                         2 * (difficulty - 1) * EnemySpawnData.COSTS[Enemy] + 10, 
+                        #stronger enemies also increase in likelihood at a slower rate
                         2 * (difficulty - 1) * EnemySpawnData.COSTS[Enemy.Pentagon] + 2, 
                         2 * (difficulty - 1) * EnemySpawnData.COSTS[Enemy.Hexagon] + 1
                     ], 
                     k=1
                 )[0]
-                cost = EnemySpawnData.COSTS[enemy_type]
+                cost = EnemySpawnData.COSTS[enemy_type] #look up selected enemy cost
                 
+                #only add the enemy if there is enough budget remaining
                 if cost <= remaining:
+                    #then increment their count and decrement the remaining budget
                     to_spawn[enemy_type] = to_spawn.get(enemy_type, 0) + 1
                     remaining -= cost
 
+            #construct the final wave stack
             wave_data = []
             for e_type, count in to_spawn.items():
                 remaining = count
 
+                #break apart groups of 3-4 enemies to prevent massive clumps in one spot
                 while remaining > 0:
                     n = random.randint(3, 4)
                     group_size = min(n, remaining)
                     wave_data.append(EnemySpawnData(e_type, group_size))
                     remaining -= group_size
             
-            wave_stack.append(wave_data)
-        return wave_stack
+            wave_stack.append(wave_data) #add the wave to the stack
+        return wave_stack #return the full wave stack
         
+    #spawn the next wave for the current room
     def spawn_wave(self):
-        if not self.wave_stack:
+        if not self.wave_stack: #if there are any remaining waves to clear...
             return
         
+        #get the last wave from the top of the stack
         wave = self.wave_stack.pop(0)
 
+        #for each enemyspawndata in the wave
         for data in wave:
+            #calculate a random position in the room
             pos = [self.pos[0] * TILE_SIZE * LEVEL_SIZE + random.uniform(TILE_SIZE * 2, LEVEL_SIZE * TILE_SIZE - TILE_SIZE * 2),
                     self.pos[1] * TILE_SIZE * LEVEL_SIZE + random.uniform(TILE_SIZE * 2, LEVEL_SIZE * TILE_SIZE - TILE_SIZE * 2)]
+            #spawn in the required amount of enemies with a slight offset so they don't
+            #spawn on top of each other
             for _ in range(data.count):
                 offset = vec(random.uniform(-TILE_SIZE, TILE_SIZE), random.uniform(-TILE_SIZE, TILE_SIZE))
                 enemy = data.enemy_class(
@@ -231,13 +250,6 @@ class Room:
         if self.start_room:
             self.state = Room.CLEARED
             self.wave_stack = []
-
-        if self.exit_room:
-            if self.temp:
-                # pos = [self.pos[0] * TILE_SIZE * LEVEL_SIZE,
-                #         self.pos[1] * TILE_SIZE * LEVEL_SIZE]
-                # Tesseract(self.game, [self.game.all_sprites, self.game.entities, self.game.bosses], pos)
-                self.temp = False
             
         #only time the update method (and therefore the first condition) is triggered is if the player is in the room, 
         #i.e. it's been entered by the player
@@ -249,13 +261,17 @@ class Room:
             delta_y = room_y - (LEVEL_SIZE // 2)
             mag = delta_x * delta_x + delta_y * delta_y
             
+            #just so the wave doesn't start instantly outside the corridor, add some
+            #leeway at a radius away from the center of the room
             if mag < (LEVEL_SIZE * 0.5 * 0.75) ** 2:
-                self.state = Room.PLAYER_FIGHTING
+                self.state = Room.PLAYER_FIGHTING #set the room state to fighting
 
+                #fill the corridoors in with tiles
                 self.tilemap.fill_corridoors()
                 for conn in self.conns:
                     self.parent_level.rooms[conn].tilemap.fill_corridoors()
 
+                #reautotile to fix visual bugs
                 self.tilemap.auto_tile()
                 for conn in self.conns:
                     self.parent_level.rooms[conn].tilemap.auto_tile()
@@ -263,23 +279,29 @@ class Room:
                 self.spawn_wave()
 
         elif self.state == Room.PLAYER_FIGHTING:
+            #if there are enemies in the current room, return back
             if len(self.enemies_to_kill):
                 return
             
+            #otherwise spawn the next wave
             self.spawn_wave()
+            #if there are enemies - i.e. there is still a wave to complete - return
             if len(self.enemies_to_kill):
                 return
             
+            #otherwise there are no more rooms and therefore it has been cleared
             self.state = Room.CLEARED
 
+            #remove the corridoors
             self.tilemap.remove_corridoors()
             for conn in self.conns:
                 self.parent_level.rooms[conn].tilemap.remove_corridoors()
 
+            #retile again
             self.tilemap.auto_tile()
             for conn in self.conns:
                 self.parent_level.rooms[conn].tilemap.auto_tile()
 
         elif self.state == Room.CLEARED:
-            self.spawn_exit_portal()
-            self.spawn_vending_machine()
+            self.spawn_exit_portal() #try spawning exit portal if its an end room
+            self.spawn_vending_machine() #try spawning a vending machine if its a room for that

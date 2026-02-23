@@ -37,7 +37,7 @@ if DEBUG:
     import cProfile
     import io
 
-# print(countLinesIn(os.path.dirname(os.path.abspath(__file__))))
+print(countLinesIn(os.path.dirname(os.path.abspath(__file__))))
 
     ##############################################################################################
 

@@ -20,7 +20,7 @@ class HealthBar(pygame.sprite.Sprite):
         self.player = self.game.player
         
         self.surf = pygame.image.load("assets/gui/health_bar.png").convert_alpha()
-        self.surf.set_colorkey((0, 0, 0))
+        self.surf.set_colorkey((0, 0, 0)) #make the background transparent
         self.t = 0
 
 
@@ -28,7 +28,8 @@ class HealthBar(pygame.sprite.Sprite):
         self.draw()
 
     def draw(self):
+        #find the true interpolation factor for the health
         t = min(1, 1 - (self.player.health / self.player.max_health))
-        self.t = self.t + (t - self.t) * 0.5
+        self.t = self.t + (t - self.t) * 0.5 #further lerp to so the health doesn't change immediately
         pygame.draw.polygon(self.screen, (237, 28, 36), [(37, 16), (37, 45), (213 - 180 * (self.t), 45), (233 - 180 * (self.t), 16)])
         self.screen.blit(self.surf, (15, 10))

@@ -37,6 +37,13 @@ POWER_UP_INFO = {
         "cost" : 24,
         "type" : "consumable",
     },
+    "bean_juice" : {
+        "name" : "Bean Juice",
+        "description" : "beans.",
+        "effects" : ["+7.5% Attack Speed", "+7% Movement Speed"],
+        "cost" : 44,
+        "type" : "permanent"
+    },
     "energy_drink" : {
         "name" : "Energy Drink",
         "description" : "Filled with electrolytes, lemons, phenylcyclidine, benzodiazepines and dihydrogen monoxide.",
@@ -44,13 +51,6 @@ POWER_UP_INFO = {
         "cost" : 20,
         "type" : "timed",
         "duration" : FPS * 60,
-    },
-    "bean_juice" : {
-        "name" : "Bean Juice",
-        "description" : "mmmm bean.",
-        "effects" : ["+7.5% Attack Speed", "+7% Movement Speed"],
-        "cost" : 44,
-        "type" : "permanent"
     },
     "medkit" : {
         "name" : "Medkit",
@@ -76,17 +76,18 @@ POWER_UP_INFO = {
 }
 
 def wrap_text(text: str, font: Font, width):
-    sections = []
+    sections = [] #final return
 
-    stack = ""
-    for word in text.split(" "):
-        curr_width = font.calc_surf_width(stack)
+    stack = "" #current segment
+    for word in text.split(" "): #split the string into a list of words
+        curr_width = font.calc_surf_width(stack) #calculate the segment width
+        #if the segment width so far is greater than the max. w
         if curr_width > width:
             sections.append(stack.strip(" "))
-            stack = ""
+            stack = "" #reset the segment
 
-        stack += word + " "
-    sections.append(stack.strip(" "))
+        stack += word + " " #otherwise add the word to the segment
+    sections.append(stack.strip(" ")) #add the remaining segment to the stack
     return sections
 
     
@@ -112,12 +113,14 @@ class PowerUp(pygame.sprite.Sprite):
         self.angle = a_offset + math.pi/6
         self.angle_offset = 6 * math.pi
 
+        #circle background
         self.radius = 72
         self.surf = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA)
-        pygame.draw.circle(self.surf, (0, 0, 0), (self.radius, self.radius), self.radius)
-        pygame.draw.circle(self.surf, (255, 255, 255), (self.radius, self.radius), self.radius, 8)
-        self.surf = pygame.transform.pixelate(self.surf, 2)
+        pygame.draw.circle(self.surf, (0, 0, 0), (self.radius, self.radius), self.radius) #black circle
+        pygame.draw.circle(self.surf, (255, 255, 255), (self.radius, self.radius), self.radius, 8) #white border
+        self.surf = pygame.transform.pixelate(self.surf, 2) #slightly pixelate the background
         self.shadow = pygame.mask.from_surface(self.surf).to_surface(setcolor=(0, 0, 0), unsetcolor=(0, 0, 0, 0))
+        
         self.ring_radius = 0
         self.anchor = vec(WIDTH/2, HEIGHT/2)
         self.pos = self.anchor.copy()

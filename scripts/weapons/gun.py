@@ -43,8 +43,8 @@ class Gun(pygame.sprite.Sprite):
     #actual spawn the bullet
     def shoot(self, mouseAngle):
         spread = random.uniform(-self.bullet_spread, self.bullet_spread) #random angle offset
-        if "double_rounds" in self.game.player.item_manager.current_items:
-            n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8
+        if "double_rounds" in self.game.player.item_manager.current_items: #double rounds
+            n1 = vec(-math.sin(mouseAngle), math.cos(mouseAngle)) * 8 #find the normal vector and offset them
             n2 = vec(math.sin(mouseAngle), -math.cos(mouseAngle)) * 8
             Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n1, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)
             Bullet(self.game, [self.game.all_sprites], self.game.player.pos + n2, mouseAngle + spread, (0, 255 - 90, 247 - 90), shadow_height=-vec(0, self.game.player.jump_height), owner=self.game.player)

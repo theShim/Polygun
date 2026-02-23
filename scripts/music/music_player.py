@@ -57,9 +57,11 @@ class Music_Player:
         return self.pools[pool].volume
 
     def set_pool_volume(self, pool, volume):
+        #if all, change the master volume and of all channels individually
         if pool == "all":
             return self.set_master_volume(volume)
-        
+        #otherwise change that pool's volume as normal
+        #cap the volume to set to the master volume's maximum
         self.pools[pool].set_volume(min(volume, self.master_volume))  
 
     def save_json(self):
